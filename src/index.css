@@ -1,0 +1,197 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   TOKENS
+   One theme: warm off-white canvas, pure white for elevated
+   sheets, near-black type.
+
+   Saturated colour is deliberately absent here. It lives only in
+   the highlighter chips (src/lib/palette.js), which sit on top of
+   these neutrals as small marker swipes — plus one blue, reserved
+   for the Figma-style selection state and the scroll ruler.
+   ============================================================ */
+@layer base {
+  :root {
+    --c-canvas: 245 242 236; /* #F5F2EC */
+    --c-panel: 255 255 255; /* #FFFFFF */
+    --c-surface: 242 239 232; /* #F2EFE8 */
+    --c-surface2: 232 228 219; /* #E8E4DB */
+    --c-ink: 17 17 17; /* #111111 */
+    --c-ink2: 97 94 88;
+    --c-ink3: 150 146 139;
+    --c-shadow: 40 36 28;
+    --c-dot: 214 209 198; /* placeholder dot texture */
+
+    /* chrome heights. --nav-h is measured at runtime by TopNav; this
+       is the pre-paint fallback. The Home shell subtracts both to
+       size itself to exactly one viewport. */
+    --ruler-h: 26px;
+    --nav-h: 88px;
+
+    color-scheme: light;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: rgb(var(--c-canvas));
+  }
+
+  body {
+    @apply bg-canvas font-body text-ink antialiased;
+    margin: 0;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  /* Numerals: clean sans, tight, tabular so they never re-flow. */
+  .num,
+  [data-num] {
+    @apply tabular-nums;
+    font-feature-settings: 'tnum' 1, 'zero' 1;
+    letter-spacing: -0.03em;
+  }
+
+  ::selection {
+    background: #d7f24b;
+    color: #141410;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--c-surface2));
+    border-radius: 999px;
+    border: 3px solid rgb(var(--c-canvas));
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--c-ink));
+    outline-offset: 3px;
+    border-radius: 10px;
+  }
+}
+
+/* ============================================================
+   PRIMITIVES
+   Surfaces are defined by fill tone alone — no strokes, no
+   dividers anywhere in the project. Separation is whitespace
+   and one step on the neutral ramp.
+   ============================================================ */
+@layer components {
+  /* Full-bleed: the container reaches both viewport edges and only
+     holds the page off them by a comfortable gutter. Nothing is
+     centred in a fixed measure — where a single element would stretch
+     unreadably wide, that element caps its own width. */
+  .wrap {
+    @apply w-full px-md md:px-lg lg:px-xl;
+  }
+
+  /* a readable measure for prose inside a full-bleed page */
+  .measure {
+    @apply max-w-[68ch];
+  }
+
+  .surface {
+    @apply rounded-card bg-surface sq;
+  }
+
+  .well {
+    @apply rounded-sm bg-surface2/60 sq;
+  }
+
+  .sec-label {
+    @apply font-body text-[10px] font-semibold uppercase leading-none tracking-micro text-ink3;
+  }
+
+  .readout-label {
+    @apply font-body text-[10px] font-medium uppercase tracking-label text-ink3;
+  }
+
+  .quiet {
+    @apply text-[12px] leading-relaxed text-ink3;
+  }
+
+  /* thin bar with fully rounded caps */
+  .bar-track {
+    @apply relative block h-[7px] overflow-hidden rounded-pill bg-surface2;
+  }
+  .bar-fill {
+    @apply absolute inset-y-0 left-0 block rounded-pill;
+    transition: width 520ms cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+}
+
+/* ============================================================
+   SHAPE — superellipse
+
+   `border-radius` alone gives a circular corner with a visible
+   curvature break where it meets the edge. Where the browser ships
+   `corner-shape`, the same radius is redrawn as a superellipse so
+   the corner flows continuously into the side.
+
+   Exponent 3 sits between an ellipse (2) and the `squircle` keyword
+   (4). It is deliberately *below* the keyword: a higher exponent
+   hugs the box and visually shrinks the corner, and these radii are
+   large because the corner is meant to read large. Everything
+   degrades to a big smooth radius elsewhere.
+   ============================================================ */
+@layer utilities {
+  @supports (corner-shape: squircle) {
+    .sq {
+      corner-shape: squircle;
+    }
+  }
+  @supports (corner-shape: superellipse(3)) {
+    .sq {
+      corner-shape: superellipse(3);
+    }
+  }
+
+  /* unfinished wireframe block */
+  .ph {
+    background-image: radial-gradient(rgb(var(--c-dot)) 1px, transparent 1px);
+    background-size: 7px 7px;
+    background-color: rgb(var(--c-surface2) / 0.4);
+  }
+
+  /* the scroll region in the Home shell — its own scrollbar, quiet */
+  .scroll-col {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--c-surface2)) transparent;
+  }
+}
+
+/* ============================================================
+   MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
