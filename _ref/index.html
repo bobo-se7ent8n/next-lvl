@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>aera — wireframe prototype</title>
+<style>
+  :root{
+    --accent:#2F6BFF;
+    --ink:#222;
+    --ink2:#555;
+    --ink3:#888;
+    --line:#bbb;
+    --line2:#ddd;
+    --fill:#eee;
+    --fill2:#f6f6f6;
+    --wrap:1180px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    color:var(--ink);
+  }
+  .wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px;}
+
+  /* ---------- TOP NAV ---------- */
+  #nav{
+    border-bottom:1px solid var(--line);
+    background:var(--fill2);
+    position:sticky;top:0;z-index:20;
+  }
+  #nav .wrap{display:flex;align-items:stretch;flex-wrap:wrap;padding-left:0;padding-right:0;}
+  #brand{
+    padding:12px 18px;display:flex;flex-direction:column;justify-content:center;
+    border-right:1px solid var(--line);min-width:130px;
+  }
+  #brand b{font-size:17px;letter-spacing:.14em;font-weight:600;}
+  #brand span{font-size:9px;color:var(--ink3);letter-spacing:.06em;}
+  .tab{
+    padding:12px 20px;background:none;border:0;border-right:1px solid var(--line2);
+    font-family:inherit;text-align:left;cursor:pointer;color:var(--ink2);
+    display:flex;flex-direction:column;gap:3px;min-width:140px;
+  }
+  .tab .t{font-size:14px;}
+  .tab .p{font-size:9px;color:var(--ink3);letter-spacing:.04em;}
+  .tab:hover{background:#efefef;}
+  .tab.active{color:var(--accent);box-shadow:inset 0 -3px 0 var(--accent);background:#fff;}
+  .tab.active .p{color:var(--accent);}
+  #nav .navspace{flex:1;border-right:1px solid var(--line2);}
+  .tab.shareable-tab{border-left:3px double var(--line);background:#ececec;}
+  .tab.shareable-tab.active{background:#fff;}
+
+  /* ---------- SCREENS ---------- */
+  .screen{display:none;padding:18px 0 60px;}
+  .screen.active{display:block;}
+  .hdr{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;border-bottom:1px dashed var(--line);padding-bottom:10px;margin-bottom:16px;}
+  .hdr h1{font-size:18px;margin:0;font-weight:600;}
+  .hdr h1 span{color:var(--ink3);font-weight:400;}
+  .hdr .spacer{flex:1;}
+  .privacy{
+    font-size:10px;border:1px solid var(--line);border-radius:10px;padding:3px 9px;
+    color:var(--ink2);background:var(--fill2);white-space:nowrap;
+  }
+  .privacy.shared-on{border-color:var(--accent);color:var(--accent);background:#fff;}
+  .sec-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin:0 0 8px;}
+
+  .box{border:1px solid var(--line);background:#fff;}
+  .ph{background:repeating-linear-gradient(45deg,#f0f0f0,#f0f0f0 6px,#e6e6e6 6px,#e6e6e6 12px);}
+  .quiet{font-size:11px;color:var(--ink3);}
+  a.lnk{color:var(--ink2);font-size:12px;text-decoration:underline;cursor:pointer;}
+  a.lnk:hover{color:var(--accent);}
+  button{font-family:inherit;cursor:pointer;}
+  .btn{border:1px solid var(--line);background:#fff;padding:6px 12px;font-size:12px;color:var(--ink);}
+  .btn:hover{background:var(--fill);}
+  .btn.blue{border-color:var(--accent);color:#fff;background:var(--accent);}
+  .btn.sm{padding:3px 8px;font-size:11px;}
+
+  /* ---------- HOME ---------- */
+  .focus-card{width:100%;max-width:840px;}
+  .farow{display:flex;gap:18px;border:1px solid var(--line);padding:12px 14px;margin-bottom:8px;flex-wrap:wrap;}
+  .farow .fad{width:150px;font-size:11px;color:var(--ink3);flex:0 0 150px;}
+  .farow .fab{flex:1;min-width:280px;}
+  .farow .fai{font-size:14px;margin:0 0 8px;}
+  .farow .faa{font-size:12px;color:var(--ink2);border:1px solid var(--line2);background:var(--fill2);padding:8px 10px;}
+  .farow .faa em{font-style:normal;color:var(--ink3);font-size:10px;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:3px;}
+  .feed-card{flex:0 0 min(780px,88%);scroll-snap-align:start;border:1px solid var(--line);padding:16px 18px;transition:opacity .35s;}
+  .feed-card .l1{font-size:21px;line-height:1.35;margin:0 0 12px;}
+  .feed-card .l2{font-size:13px;color:var(--ink2);line-height:1.5;margin:0 0 14px;}
+  .feed-card .l2 em, .feed-card .l3 em{font-style:normal;color:var(--ink3);font-size:10px;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;}
+  .feed-card .l3{border:1px solid var(--line2);background:var(--fill2);padding:10px 12px;margin:0 0 14px;font-size:13px;}
+  .meta-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px dashed var(--line2);padding-top:10px;}
+  .meta-row .src{font-size:11px;color:var(--ink3);flex:1;}
+  #read-dismissed{display:none;border:1px dashed var(--line);padding:18px;text-align:center;color:var(--ink3);font-size:12px;margin-bottom:12px;}
+  #read-dismissed button{margin-left:10px;}
+
+  .pattern{border:1px solid var(--line);padding:12px 14px;margin-bottom:10px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;transition:opacity .3s;}
+  .pattern.muted{opacity:.35;}
+  .pattern.muted .pbody > *:not(.pname), .pattern.muted .ptrend, .pattern.muted .pacts{display:none;}
+  .pbody{flex:1;min-width:230px;}
+  .pname{font-size:15px;margin:0 0 5px;}
+  .pev{font-size:11px;color:var(--ink2);border:1px solid var(--line2);background:var(--fill2);display:inline-block;padding:2px 7px;margin-bottom:6px;}
+  .tag{font-size:10px;border:1px solid var(--line);padding:2px 7px;color:var(--ink2);display:inline-block;}
+  .tag.blue{border-color:var(--accent);color:var(--accent);}
+  .pstat{font-size:12px;color:var(--ink2);margin-top:8px;}
+  .pstat b{font-weight:600;}
+  .pstat.up b{color:var(--accent);}
+  .pstat .cap{font-size:10px;color:var(--ink3);}
+  .pacts{display:flex;flex-direction:column;gap:6px;width:120px;}
+
+  #vitals-head{display:flex;align-items:center;gap:10px;border-top:1px dashed var(--line);margin-top:22px;padding-top:12px;}
+  #vitals-body{display:none;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .vtile{border:1px solid var(--line2);background:var(--fill2);padding:8px 10px;width:170px;}
+  .vtile .vn{font-size:18px;color:var(--ink2);}
+  .vtile .vl{font-size:10px;color:var(--ink3);letter-spacing:.04em;}
+  .vtile{position:relative;}
+  .vtile .info{position:absolute;top:6px;right:6px;}
+  .vtile .vh{display:none;font-size:10px;color:var(--ink3);line-height:1.35;margin-top:6px;border-top:1px dashed var(--line2);padding-top:5px;}
+  .vtile.showinfo .vh{display:block;}
+  .vtile.showinfo{border-color:var(--accent);}
+
+  /* ---------- SESSIONS ---------- */
+  #session-search{width:100%;max-width:520px;border:1px solid var(--line);padding:9px 11px;font-family:inherit;font-size:13px;margin-bottom:12px;}
+  .srow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border:1px solid var(--line);padding:12px 14px;background:#fff;cursor:pointer;text-align:left;width:100%;}
+  .srow:hover{border-color:var(--accent);}
+  .srow .sd{width:230px;font-size:14px;}
+  .srow .st{font-size:11px;color:var(--ink2);width:74px;}
+  .srow .go{margin-left:auto;color:var(--ink3);font-size:12px;}
+  .srow-wrap{margin-bottom:8px;}
+  .inline-pattern{display:none;border:1px solid var(--accent);border-top:0;padding:12px 14px;background:#fafbff;}
+
+  #viewport{height:260px;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:13px;border:1px solid var(--line);position:relative;overflow:hidden;}
+  .pin{position:absolute;transform:translate(-50%,-100%);border:1px solid var(--line);background:#fff;font-size:10px;padding:3px 7px;color:var(--ink2);white-space:nowrap;opacity:.55;}
+  .pin::after{content:"";position:absolute;left:50%;bottom:-7px;width:1px;height:7px;background:var(--line);}
+  .pin.on{border-color:var(--accent);color:var(--accent);opacity:1;box-shadow:inset 0 0 0 1px var(--accent);}
+  .track{display:flex;align-items:center;border:1px solid var(--line2);margin-bottom:6px;flex-wrap:wrap;}
+  .track .tl{width:150px;font-size:11px;color:var(--ink2);padding:8px 10px;border-right:1px solid var(--line2);background:var(--fill2);}
+  .track .tc{flex:1;padding:6px 10px;display:flex;gap:6px;align-items:center;min-height:38px;flex-wrap:wrap;}
+  .tick{height:14px;width:3px;background:var(--line);}
+  .tblk{height:16px;background:var(--fill);border:1px solid var(--line2);}
+  .chip{border:1px solid var(--line);background:#fff;font-size:11px;padding:4px 9px;color:var(--ink2);}
+  .chip.on{border-color:var(--accent);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);}
+  #scrub{position:relative;height:34px;border:1px solid var(--line);background:var(--fill2);cursor:pointer;user-select:none;}
+  #playhead{position:absolute;top:-4px;bottom:-4px;width:3px;background:var(--accent);left:20%;}
+  #playhead::after{content:"";position:absolute;top:-5px;left:-5px;width:13px;height:13px;background:var(--accent);border-radius:2px;}
+  .marker{position:absolute;top:0;bottom:0;width:1px;background:var(--line);}
+  .marker i{position:absolute;top:2px;left:-5px;width:11px;height:11px;border:1px solid var(--ink3);background:#fff;display:block;}
+  .marker.on i{border-color:var(--accent);background:var(--accent);}
+  .marker b{position:absolute;bottom:1px;left:-8px;font-size:9px;color:var(--ink3);font-weight:400;}
+  #continue-wrap{display:none;align-items:center;gap:10px;border:1px solid var(--accent);padding:8px 12px;margin-top:10px;background:#fafbff;}
+  #candidate{display:none;border:1px solid var(--accent);padding:12px 14px;margin-top:12px;}
+  .statrow{display:flex;justify-content:space-between;font-size:12px;border-bottom:1px dashed var(--line2);padding:6px 0;}
+  .statrow b{font-weight:600;}
+  .mrow{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;padding:8px 10px;font-size:11px;margin-bottom:6px;}
+
+  /* ---------- SCOREBOARD ---------- */
+  .seg{display:inline-flex;border:1px solid var(--line);margin-bottom:14px;}
+  .seg button{border:0;background:#fff;padding:7px 18px;font-size:12px;color:var(--ink2);border-right:1px solid var(--line);}
+  .seg button:last-child{border-right:0;}
+  .seg button.on{background:var(--accent);color:#fff;}
+  .sb-grid{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;}
+  .sechead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+  .sechead .sec-label{margin:0;}
+  .shstate{display:none;font-size:10px;border:1px solid var(--accent);padding:2px 7px;color:var(--accent);}
+  .shstate.on{display:inline-block;}
+  #share-picker{display:none;border:1px solid var(--accent);padding:12px 14px;margin-bottom:14px;background:#fafbff;max-width:560px;}
+  .pick{display:block;font-size:13px;padding:4px 0;cursor:pointer;}
+  .zone{position:absolute;border:1px solid var(--line);font-size:10px;text-align:center;padding:4px 2px;color:var(--ink2);}
+  .skill{border:1px solid var(--line2);margin-bottom:6px;}
+  .skill .sh{display:flex;align-items:center;gap:12px;padding:8px 10px;cursor:pointer;background:#fff;}
+  .skill.open .sh{color:var(--accent);}
+  .skill .sn{width:150px;font-size:12px;}
+  .skill .bar{flex:1;min-width:80px;height:10px;border:1px solid var(--line);background:var(--fill2);position:relative;}
+  .skill .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--line);display:block;}
+  .skill.open .bar i{background:var(--accent);}
+  .skill .num{width:34px;text-align:right;font-size:12px;}
+  .info{border:1px solid var(--line);background:#fff;width:20px;height:20px;font-size:11px;color:var(--ink2);line-height:1;padding:0;}
+  .info.on{border-color:var(--accent);color:var(--accent);}
+  .composition{display:none;border-top:1px dashed var(--line2);padding:8px 10px;font-size:11px;color:var(--ink2);background:#fcfcfc;}
+  .skill.showinfo .composition{display:block;}
+  .skill .exp{display:none;border-top:1px dashed var(--line2);padding:10px;background:var(--fill2);}
+  .skill.open .exp{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+
+  .finput{border:1px solid var(--line);background:#fff;padding:6px 8px;font-family:inherit;font-size:12px;width:100%;}
+  .goal{border:1px solid var(--line);padding:10px 12px;margin-bottom:8px;}
+  .goal .gt{display:flex;align-items:baseline;gap:8px;font-size:13px;margin-bottom:6px;}
+  .goal .gt .gv{margin-left:auto;font-size:12px;color:var(--ink2);}
+  .goal .gbar{height:10px;border:1px solid var(--line);background:var(--fill2);position:relative;margin-bottom:6px;}
+  .goal .gbar i{position:absolute;left:0;top:0;bottom:0;background:var(--line);display:block;}
+  .goal .gbar u{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink3);}
+  .goal .gpred{font-size:10px;color:var(--ink3);margin-top:4px;}
+  .goal .grow{display:flex;align-items:center;gap:8px;}
+
+  .friend{display:flex;align-items:center;gap:14px;border:1px solid var(--line);padding:10px 12px;margin-bottom:8px;}
+  .avatar{width:34px;height:34px;border:1px solid var(--line);}
+  .pending{border-style:dashed;color:var(--ink3);}
+
+  /* ---------- INSIGHTS ---------- */
+  .qcard{border:1px solid var(--line);padding:12px;width:250px;min-height:150px;display:flex;flex-direction:column;}
+  .qcard .qt{font-size:14px;margin-bottom:8px;flex:1;}
+  .refchip{font-size:10px;border:1px solid var(--accent);color:var(--accent);padding:2px 7px;display:inline-block;margin-bottom:8px;}
+  .fchip{border:1px solid var(--line);background:#fff;font-size:11px;padding:4px 10px;color:var(--ink2);margin-right:6px;}
+  .fchip.on{border-color:var(--accent);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);}
+  /* slide-in chat sidebar */
+  #chat-panel{
+    position:fixed;top:0;right:0;bottom:0;width:380px;max-width:92vw;z-index:40;
+    background:#fff;border-left:1px solid var(--line);
+    display:flex;flex-direction:column;
+    transform:translateX(100%);transition:transform .22s ease;
+  }
+  #chat-panel.open{transform:translateX(0);}
+  #chat-scrim{position:fixed;inset:0;background:rgba(0,0,0,.18);z-index:35;display:none;}
+  #chat-scrim.open{display:block;}
+  #chat-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--fill2);}
+  #results{flex:1;overflow-y:auto;padding:12px;}
+  #results .qcard{width:100%;min-height:0;}
+  #chatbar{display:flex;gap:8px;border-top:1px solid var(--line);padding:10px;background:var(--fill2);flex-wrap:wrap;}
+  #chatinput{flex:1;min-width:140px;border:1px solid var(--line2);padding:8px 10px;font-family:inherit;font-size:13px;}
+
+  @media (max-width:860px){
+    .tab{min-width:120px;padding:10px 12px;}
+    .ptrend{width:100%;text-align:left;}
+    .pacts{flex-direction:row;width:100%;}
+    .srow .sd{width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= TOP NAV ================= -->
+<div id="nav">
+  <div class="wrap">
+    <div id="brand"><b>aera</b><span>self-knowledge instrument</span></div>
+    <button class="tab active" data-go="home"><span class="t">Home</span><span class="p">only you</span></button>
+    <button class="tab" data-go="sessions"><span class="t">Sessions</span><span class="p">only you</span></button>
+    <button class="tab" data-go="insights"><span class="t">Insights</span><span class="p">only you · on-device</span></button>
+    <div class="navspace"></div>
+    <button class="tab shareable-tab" data-go="scoreboard"><span class="t">Scoreboard</span><span class="p">shareable</span></button>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- ================= SCREEN 1 — HOME ================= -->
+  <section class="screen active" id="s-home">
+    <!-- MAIN -->
+    <div id="home-main">
+      <div class="hdr">
+        <h1>Home <span>/ what your sessions are showing you</span></h1>
+        <div class="spacer"></div>
+        <div class="privacy">only you</div>
+      </div>
+
+      <!-- SECTION A — focus -->
+      <div class="sechead">
+        <p class="sec-label">Focus</p>
+        <button class="btn sm" id="see-all-focuses" title="all past focuses">→</button>
+      </div>
+      <div id="read-dismissed">read dismissed <button class="btn" id="undo-read">undo</button></div>
+      <div id="read-card" class="feed-card focus-card">
+        <p class="l1">In your last scrimmage, your release sped up the 3 times you missed under a closeout.</p>
+        <p class="l2"><em>where it shows up · hypothesis</em>This is the same rushing that tends to appear when you're put on the spot — an unexpected question, a deadline that moves up.</p>
+        <div class="l3"><em>one experiment</em>Next session: one breath before the gather. That's it.</div>
+        <div class="meta-row">
+          <span class="src">from Session 14 · 3 days ago</span>
+          <a class="lnk" id="see-in-game">See it in the game →</a>
+          <a class="lnk" id="dismiss-read">not quite right</a>
+        </div>
+      </div>
+
+      <!-- SECTION B — vitals -->
+      <div id="vitals-head">
+        <p class="sec-label" style="margin:0">Vitals</p>
+        <button class="btn sm" id="vitals-toggle">hide vitals ▾</button>
+        <span class="quiet">background signals · not a pattern yet · tap ⓘ on a tile for how it's scored</span>
+      </div>
+      <div id="vitals-body"></div>
+
+      <!-- SECTION C — patterns -->
+      <p class="sec-label" style="margin-top:26px">Your patterns · confirmed across sessions</p>
+      <div id="patterns"></div>
+      <p class="quiet" style="margin-top:6px">patterns confirm automatically after they repeat across sessions.</p>
+    </div>
+
+    <!-- FOCUS ARCHIVE (own view) -->
+    <div id="focus-archive" style="display:none">
+      <a class="lnk" id="back-home">← Back to Home</a>
+      <div class="hdr" style="margin-top:10px">
+        <h1>Focus archive <span>/ every read you've been given</span></h1>
+        <div class="spacer"></div>
+        <div class="privacy">only you</div>
+      </div>
+      <div id="focus-archive-rows"></div>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 2 — SESSIONS ================= -->
+  <section class="screen" id="s-sessions">
+    <!-- LIST -->
+    <div id="session-list">
+      <div class="hdr">
+        <h1>Sessions <span>/ your recorded games</span></h1>
+        <div class="spacer"></div>
+        <div class="privacy">only you</div>
+      </div>
+      <input id="session-search" placeholder="Find a session… e.g. 'games where I had 3+ turnovers'">
+      <div id="session-rows"></div>
+      <p class="quiet" style="margin-top:10px" id="session-count">6 of 6 recorded sessions · stored on device</p>
+    </div>
+
+    <!-- DETAIL -->
+    <div id="session-detail" style="display:none">
+      <a class="lnk" id="back-sessions">← All sessions</a>
+      <div class="hdr" style="margin-top:10px">
+        <h1>Game review <span id="detail-title">/ Apr 12 · Tuesday scrimmage</span></h1>
+        <div class="spacer"></div>
+        <div class="privacy">only you</div>
+      </div>
+
+      <div class="sb-grid">
+        <div style="flex:1;min-width:420px">
+          <div id="viewport" class="ph"><span>3D replay — drag to orbit</span></div>
+
+          <div style="display:flex;gap:10px;align-items:center;margin:12px 0 6px;flex-wrap:wrap">
+            <button class="btn" id="playbtn" style="width:80px">▶ Play</button>
+            <div id="scrub" style="flex:1;min-width:220px"><div id="playhead"></div></div>
+            <span id="timecode" style="font-size:12px;width:80px;text-align:right">00:00 / 30:00</span>
+          </div>
+          <p class="quiet" id="moment-readout">full session timeline · markers = moments · playback pauses at each one</p>
+
+          <div id="continue-wrap">
+            <span style="flex:1;font-size:12px">Paused at <b id="cont-label">moment</b></span>
+            <button class="btn blue" id="continue-btn">Continue →</button>
+          </div>
+
+          <p class="sec-label" style="margin-top:14px">Tracks</p>
+          <div class="track"><div class="tl">Motion · pose</div><div class="tc" id="tr-motion"></div></div>
+          <div class="track"><div class="tl">Opponents · lidar</div><div class="tc" id="tr-lidar"></div></div>
+          <div class="track"><div class="tl">Physiology</div><div class="tc" id="tr-phys"></div></div>
+          <div class="track"><div class="tl">Insights</div><div class="tc" id="tr-insights"></div></div>
+
+          <div id="candidate">
+            <p class="sec-label" style="color:var(--accent)">Pattern candidate</p>
+            <p style="margin:0 0 6px;font-size:15px" id="cand-name">release change</p>
+            <p class="quiet" style="margin:0 0 8px" id="cand-desc">seen 2 times so far · needs to repeat across sessions before it becomes a pattern</p>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <div class="box ph" style="width:160px;height:34px"></div>
+              <span class="quiet">candidate → confirmed pattern (Home)</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="width:250px;flex:0 0 250px">
+          <p class="sec-label">Session stats</p>
+          <div class="box" style="padding:10px 12px" id="detail-stats"></div>
+          <p class="sec-label" style="margin-top:14px">Moments</p>
+          <div id="moment-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 3 — INSIGHTS ================= -->
+  <section class="screen" id="s-insights">
+    <!-- MAIN -->
+    <div id="insights-main">
+      <div class="hdr">
+        <h1>Insights <span>/ built from your sessions</span></h1>
+        <div class="spacer"></div>
+        <button class="btn sm" id="chat-toggle">› Ask something</button>
+        <div class="privacy">only you · on-device</div>
+      </div>
+
+      <p class="sec-label">Quick start · seeded from your patterns</p>
+      <div style="margin-bottom:10px" id="ins-filters">
+        <button class="fchip on" data-f="all">All</button>
+        <button class="fchip" data-f="on">On court</button>
+        <button class="fchip" data-f="off">Off court</button>
+      </div>
+      <div id="quickstart" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px"></div>
+
+    </div>
+
+    <!-- ARTICLE (draft page per pattern) -->
+    <div id="article" style="display:none">
+      <a class="lnk" id="back-insights">← Back to Insights</a>
+      <div class="hdr" style="margin-top:10px">
+        <h1 id="article-title">Working on it</h1>
+        <div class="spacer"></div>
+        <span class="tag" id="article-kind">DRAFT ARTICLE</span>
+        <div class="privacy">only you · on-device</div>
+      </div>
+      <div class="focus-card" style="border:1px solid var(--line);padding:16px 18px">
+        <p class="quiet" id="article-src" style="margin:0 0 10px">from your pattern · —</p>
+        <p class="l2" id="article-body" style="max-width:640px"></p>
+        <div class="box ph" style="height:70px;margin:12px 0"></div>
+        <p class="l2" style="max-width:640px" id="article-body2"></p>
+        <div class="meta-row"><span class="src">draft · placeholder content</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- chat sidebar (slides in over Insights) -->
+  <div id="chat-scrim"></div>
+  <aside id="chat-panel">
+    <div id="chat-head">
+      <b style="font-size:13px">Ask aera</b>
+      <span class="quiet" style="flex:1">on-device</span>
+      <button class="btn sm" id="chat-close">✕</button>
+    </div>
+    <div id="results"><p class="quiet" style="margin:0">Ask for something to work on. Answers come back as cards, pulled from the whole library.</p></div>
+    <div id="chatbar">
+      <input id="chatinput" placeholder="Tell me what you want to work on…">
+      <button class="btn blue" id="sendbtn">Send</button>
+    </div>
+  </aside>
+
+  <!-- ================= SCREEN 4 — SCOREBOARD ================= -->
+  <section class="screen" id="s-scoreboard">
+    <div class="hdr">
+      <h1>Scoreboard <span>/ Session 14 · made for sharing</span></h1>
+      <div class="spacer"></div>
+      <div class="privacy" id="sb-privacy">shareable</div>
+      <button class="btn blue" id="share-stats">Share stats</button>
+    </div>
+
+    <!-- share picker -->
+    <div id="share-picker">
+      <p class="sec-label" style="margin-bottom:8px">Choose what to share</p>
+      <label class="pick"><input type="checkbox" data-pick="zones"> Shot zones</label>
+      <label class="pick"><input type="checkbox" data-pick="skills"> Skills · shooting + handling</label>
+      <label class="pick"><input type="checkbox" data-pick="summary"> Session summary</label>
+      <label class="pick"><input type="checkbox" data-pick="goals"> Goals</label>
+      <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+        <button class="btn blue" id="share-confirm">Confirm</button>
+        <button class="btn" id="share-cancel">Cancel</button>
+        <span class="quiet">unchecked sections stay private · nothing leaves the device until you confirm</span>
+      </div>
+    </div>
+
+    <div class="seg" id="sb-seg">
+      <button class="on" data-sb="mine">My scoreboard</button>
+      <button data-sb="shared">Shared view</button>
+    </div>
+
+    <!-- 3A -->
+    <div id="sb-mine">
+      <div class="sb-grid">
+        <div style="width:360px;flex:0 0 360px">
+          <div class="sechead">
+            <p class="sec-label">Shot zones</p>
+            <span class="shstate" id="state-zones">shared</span>
+          </div>
+          <div class="box" style="height:250px;position:relative;background:var(--fill2)" id="court"></div>
+          <p class="quiet" style="margin-top:4px">tile shade = FG% · darker blue is hotter</p>
+        </div>
+
+        <div style="flex:1;min-width:340px">
+          <div class="sechead">
+            <p class="sec-label">Skills · shooting + handling</p>
+            <span class="shstate" id="state-skills">shared</span>
+          </div>
+          <p class="sec-label">Shooting</p>
+          <div id="skills-shooting"></div>
+          <p class="sec-label" style="margin-top:14px">Handling &amp; movement</p>
+          <div id="skills-handling"></div>
+          <p class="quiet" style="margin-top:6px">tap a row for extra stats · tap ⓘ for what makes up the score</p>
+        </div>
+
+        <div style="width:220px;flex:0 0 220px">
+          <p class="sec-label">Shot mechanics</p>
+          <div class="box" style="padding:12px">
+            <div style="margin-bottom:12px"><div class="quiet">arc angle</div><div style="font-size:22px">46°</div></div>
+            <div style="margin-bottom:12px"><div class="quiet">release time</div><div style="font-size:22px">0.58s</div></div>
+            <div><div class="quiet">motion consistency</div><div style="font-size:22px">81 / 100</div></div>
+            <div class="box ph" style="height:44px;margin-top:12px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sechead" style="margin-top:20px">
+        <p class="sec-label">Session summary</p>
+        <span class="shstate" id="state-summary">shared</span>
+      </div>
+      <div class="box" style="padding:12px;text-align:center;max-width:360px">
+        <div style="font-size:44px;line-height:1">94 / 271</div>
+        <div class="quiet">total makes / attempts</div>
+      </div>
+
+      <div class="sechead" style="margin-top:20px">
+        <p class="sec-label">Goals</p>
+        <span class="shstate" id="state-goals">shared</span>
+      </div>
+      <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
+        <div id="goal-list" style="flex:1;min-width:320px"></div>
+        <div class="box" id="goal-form" style="padding:10px 12px;width:300px">
+          <p class="sec-label" style="margin-bottom:6px">Add a goal</p>
+          <select id="goal-stat" class="finput"></select>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <input id="goal-target" class="finput" style="width:80px" type="number" placeholder="target">
+            <select id="goal-when" class="finput" style="flex:1">
+              <option value="end of week">end of week</option>
+              <option value="end of month">end of month</option>
+              <option value="custom">custom date…</option>
+            </select>
+          </div>
+          <input id="goal-date" class="finput" type="date" style="margin-top:6px;display:none">
+          <button class="btn blue" id="goal-add" style="margin-top:8px;width:100%">Add goal</button>
+          <p class="quiet" id="goal-limit" style="margin:6px 0 0;display:none">3 goal max — remove one to add another</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3B -->
+    <div id="sb-shared" style="display:none">
+      <p class="sec-label">What friends can see</p>
+      <div class="box" style="padding:12px;margin-bottom:16px" id="shared-sections"></div>
+
+      <p class="sec-label">Friends</p>
+      <div id="friend-list"></div>
+      <div class="friend" style="border-style:dashed">
+        <div style="flex:1;font-size:13px">Invite a friend</div>
+        <button class="btn" id="invite-btn">Invite a friend</button>
+      </div>
+      <div id="pending-list"></div>
+      <p class="quiet" style="margin-top:16px;border-top:1px dashed var(--line);padding-top:10px">
+        Shared view · read-only · only the sections you switched on appear here. No head-to-head, no leaderboard, no ranking.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+var $ = function(s,r){return (r||document).querySelector(s);};
+var $$ = function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+
+/* ---------------- navigation ---------------- */
+function go(name){
+  $$('.screen').forEach(function(s){s.classList.toggle('active', s.id==='s-'+name);});
+  $$('.tab').forEach(function(t){t.classList.toggle('active', t.dataset.go===name);});
+  window.scrollTo(0,0);
+}
+$$('.tab').forEach(function(t){ t.onclick=function(){go(t.dataset.go);}; });
+
+/* ---------------- sparkline ---------------- */
+/* plotted with a real y-axis: 3 gridlines with value labels, min/max at the ends */
+function spark(points, blueEnd, unit){
+  unit = unit || '';
+  var w=250,h=76, gut=34, pad=8;
+  var raw = {max:Math.max.apply(null,points), min:Math.min.apply(null,points)};
+  var span = (raw.max-raw.min)||1;
+  var lo = raw.min - span*0.15, hi = raw.max + span*0.15;
+  function fmtv(v){ return (Math.abs(hi)<3 ? v.toFixed(2) : Math.round(v)) + unit; }
+  function y(v){ return pad + (1-(v-lo)/(hi-lo))*(h-pad*2); }
+  var lines = [raw.min, (raw.min+raw.max)/2, raw.max];   // y-axis reads true min / mid / max
+  var grid = lines.map(function(v){
+    return '<line x1="'+gut+'" x2="'+w+'" y1="'+y(v).toFixed(1)+'" y2="'+y(v).toFixed(1)+'" stroke="#ddd" stroke-width="1" stroke-dasharray="2,3"/>'+
+           '<text x="'+(gut-4)+'" y="'+(y(v)+3).toFixed(1)+'" text-anchor="end" font-size="8" fill="#888" font-family="-apple-system,sans-serif">'+fmtv(v)+'</text>';
+  }).join('');
+  var pts = points.map(function(v,i){
+    return [gut + i*((w-gut-4)/(points.length-1)), y(v)];
+  });
+  var d = pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');
+  var last = pts[pts.length-1], first = pts[0];
+  return '<svg width="'+w+'" height="'+h+'" style="border:1px solid #ddd;background:#fafafa;max-width:100%">'+
+    grid +
+    '<line x1="'+gut+'" x2="'+gut+'" y1="0" y2="'+h+'" stroke="#ccc" stroke-width="1"/>'+
+    '<polyline points="'+d+'" fill="none" stroke="#999" stroke-width="2"/>'+
+    '<circle cx="'+first[0].toFixed(1)+'" cy="'+first[1].toFixed(1)+'" r="2.5" fill="#666"/>'+
+    '<circle cx="'+last[0].toFixed(1)+'" cy="'+last[1].toFixed(1)+'" r="3.5" fill="'+(blueEnd?'#2F6BFF':'#666')+'"/>'+
+    '<text x="'+(last[0]-2)+'" y="'+(last[1]-6).toFixed(1)+'" text-anchor="end" font-size="8" fill="'+(blueEnd?'#2F6BFF':'#666')+'" font-family="-apple-system,sans-serif">now '+fmtv(points[points.length-1])+'</text>'+
+    '</svg>';
+}
+
+/* ---------------- HOME: patterns ---------------- */
+var PATTERNS = [
+  {name:'Rushing under pressure', ev:'Seen in 4 of your last 6 sessions',
+   cap:'release time under pressure · last 6 sessions', pts:[0.61,0.58,0.57,0.51,0.46,0.42], unit:'s', blue:true,
+   metric:'release time: 0.61s → 0.42s', delta:'−31% since Session 9', up:true,
+   tag:'Improving since the breath cue', tagBlue:true,
+   article:{title:'Slowing the release without losing the shot',
+     body:'Placeholder body copy. Your release speeds up when a closeout arrives — the gather gets shorter, not the shot itself. The work here is separating urgency from speed: the closeout is real, the rush is optional.',
+     body2:'Placeholder continuation. Next block covers the breath cue you already ran in Session 12, plus two closeout drills and what to look for on film.'}},
+  {name:'Handle tightens late in sessions', ev:'Seen in 4 of your last 6 sessions',
+   cap:'dribble variance, final 10 min · last 6 sessions', pts:[14,15,14.5,15,14,13], unit:'%', blue:false,
+   metric:'dribble variance: 14% → 13%', delta:'flat across 6 sessions', up:false,
+   tag:'Steady', tagBlue:false,
+   article:{title:'What your handle does in the last ten minutes',
+     body:'Placeholder body copy. In the closing stretch of a session your dribble variance narrows — fewer changes of pace, more predictable rhythm. It reads as fatigue, but it shows up before your heart rate does.',
+     body2:'Placeholder continuation. Next block covers fatigue-state ballhandling, when to push through it, and when it is telling you the session is over.'}},
+  {name:'Recovers fast after a make', ev:'Seen in 5 of your last 6 sessions',
+   cap:'next-possession FG% · last 6 sessions', pts:[33,36,35,40,38,41], unit:'%', blue:false,
+   metric:'next-possession FG: 33% → 41%', delta:'+8 pts since Session 9', up:false,
+   tag:'New', tagBlue:false,
+   article:{title:'Recovery after a make is a skill you already have',
+     body:'Placeholder body copy. Your next possession after a made shot is measurably better than your baseline. This is a strength worth naming, because strengths are easier to extend than weaknesses are to erase.',
+     body2:'Placeholder continuation. Next block covers how to reach the same state after a miss, and what your tempo looks like in both cases.'}}
+];
+$('#patterns').innerHTML = PATTERNS.map(function(p,i){
+  return '<div class="pattern" id="pat'+i+'">'+
+    '<div class="pbody">'+
+      '<p class="pname">'+p.name+'</p>'+
+      '<div class="pev">'+p.ev+'</div><br>'+
+      '<span class="tag'+(p.tagBlue?' blue':'')+'">'+p.tag+'</span>'+
+      '<div class="pstat'+(p.up?' up':'')+'"><b>'+p.metric+'</b> · '+p.delta+
+        '<br><span class="cap">'+p.cap+'</span></div>'+
+    '</div>'+
+    '<div class="pacts">'+
+      '<button class="btn" data-work="'+i+'">Work on this →</button>'+
+      '<button class="btn" data-mute="'+i+'">Mute</button>'+
+    '</div>'+
+  '</div>';
+}).join('');
+/* each pattern routes to its own draft article, not the generic Insights feed */
+function openArticle(i){
+  var p = PATTERNS[i];
+  $('#insights-main').style.display='none';
+  $('#article').style.display='block';
+  $('#article-title').textContent = p.article.title;
+  $('#article-src').textContent = 'from your pattern · '+p.name.toLowerCase();
+  $('#article-body').textContent = p.article.body;
+  $('#article-body2').textContent = p.article.body2;
+  go('insights');
+}
+$$('[data-work]').forEach(function(b){ b.onclick=function(){ openArticle(+b.dataset.work); }; });
+$('#back-insights').onclick=function(){
+  $('#article').style.display='none';
+  $('#insights-main').style.display='block';
+};
+$$('[data-mute]').forEach(function(b){
+  b.onclick=function(){
+    var card = $('#pat'+b.dataset.mute);
+    card.classList.toggle('muted');
+    b.textContent = card.classList.contains('muted') ? 'Unmute' : 'Mute';
+  };
+});
+
+/* HOME: today's read */
+$('#dismiss-read').onclick=function(){
+  var c=$('#read-card'); c.style.opacity=0;
+  setTimeout(function(){c.style.display='none';$('#read-dismissed').style.display='block';},350);
+};
+$('#undo-read').onclick=function(){
+  $('#read-dismissed').style.display='none';
+  var c=$('#read-card'); c.style.display='block';
+  setTimeout(function(){c.style.opacity=1;},20);
+};
+$('#see-in-game').onclick=function(){ go('sessions'); openSession(0); };
+
+/* focus archive */
+var FOCUSES = [
+  ['Apr 12 · Session 14','Your release sped up the 3 times you missed under a closeout.',
+   'Next session: one breath before the gather. That\'s it.'],
+  ['Apr 09 · Session 13','Free-throw routine held its timing even after a long run of makes.',
+   'Keep the routine identical on the 10th rep as on the 1st. Count it out loud once.'],
+  ['Apr 06 · Session 12','First breath cue session — release held on 4 of 6 contested looks.',
+   'Run the same cue two more sessions before judging it.'],
+  ['Apr 03 · Session 11','Handle got quiet in the final ten minutes, before your heart rate moved.',
+   'Add one change-of-pace dribble per possession in the last ten minutes.'],
+  ['Mar 30 · Session 10','You shot better on the possession after a make than after a miss.',
+   'After a miss, take the same three seconds you take after a make.'],
+  ['Mar 27 · Session 9','Baseline read: release time under pressure averaged 0.61s.',
+   'Nothing to change yet — this session is the baseline everything else is measured against.']
+];
+$('#focus-archive-rows').innerHTML = FOCUSES.map(function(f){
+  return '<div class="farow">'+
+    '<span class="fad">'+f[0]+'</span>'+
+    '<div class="fab">'+
+      '<p class="fai">'+f[1]+'</p>'+
+      '<div class="faa"><em>the experiment you were given</em>'+f[2]+'</div>'+
+    '</div>'+
+  '</div>';
+}).join('');
+function showArchive(on){
+  $('#home-main').style.display = on ? 'none' : 'block';
+  $('#focus-archive').style.display = on ? 'block' : 'none';
+  window.scrollTo(0,0);
+}
+$('#see-all-focuses').onclick=function(){ showArchive(true); };
+$('#back-home').onclick=function(){ showArchive(false); };
+
+/* HOME: vitals */
+var VITALS=[
+  ['Stress','32 / 100','real-time nervous-system arousal during pressure moments'],
+  ['HRV','74 ms','beat-to-beat variation, rolling 7-day median'],
+  ['Resting HR','54 bpm','lowest sustained 10-min heart rate while still'],
+  ['Cardio capacity','48 VO₂','estimated from pace + heart rate during live play'],
+  ['Resilience score','71 / 100','how fast HR/HRV return to baseline after a stress spike'],
+  ['Activity load','84 / 100','session volume + intensity vs. your 4-week average']
+];
+$('#vitals-body').innerHTML = VITALS.map(function(v,i){
+  return '<div class="vtile" id="vt'+i+'">'+
+         '<button class="info" data-vinfo="'+i+'" title="how this is scored">ⓘ</button>'+
+         '<div class="vn">'+v[1]+'</div><div class="vl">'+v[0]+'</div>'+
+         '<div class="vh">'+v[2]+' <span style="opacity:.7">(placeholder)</span></div></div>';
+}).join('');
+$$('[data-vinfo]').forEach(function(b){
+  b.onclick=function(){
+    var t=$('#vt'+b.dataset.vinfo);
+    b.classList.toggle('on', t.classList.toggle('showinfo'));
+  };
+});
+function showVitals(on){
+  $('#vitals-body').style.display = on ? 'flex' : 'none';
+  $('#vitals-toggle').textContent = on ? 'hide vitals ▾' : 'show vitals ▸';
+}
+$('#vitals-toggle').onclick=function(){ showVitals($('#vitals-body').style.display!=='flex'); };
+showVitals(true);   // vitals are open by default; chevron still collapses them
+
+/* ---------------- SESSIONS ---------------- */
+var SESSIONS = [
+  {d:'Apr 12 · Tuesday scrimmage', shots:41, pts:18, reb:6, ast:4, to:3, stl:2, dur:'62 min', tag:'1 new pattern', cand:'Release change under closeout', cdesc:'Your release time dropped 0.09s on contested catch-and-shoot. Seen twice — one more session and it confirms.'},
+  {d:'Apr 09 · Solo shooting',      shots:120, pts:0, reb:0, ast:0, to:0, stl:0, dur:'45 min', tag:''},
+  {d:'Apr 06 · Pickup run',         shots:33, pts:14, reb:5, ast:6, to:4, stl:1, dur:'70 min', tag:'1 new pattern', cand:'Hesitation on catch, left wing', cdesc:'A 0.3s pause before the gather on left-wing catches. Seen 3 times this session.'},
+  {d:'Apr 03 · Skills session',     shots:58, pts:0, reb:0, ast:0, to:1, stl:0, dur:'50 min', tag:''},
+  {d:'Mar 30 · Sunday scrimmage',   shots:44, pts:21, reb:8, ast:3, to:5, stl:3, dur:'65 min', tag:''},
+  {d:'Mar 27 · Solo shooting',      shots:140, pts:0, reb:0, ast:0, to:0, stl:0, dur:'40 min', tag:''}
+];
+/* wireframe-level "search": numeric stat thresholds ("3+ turnovers"), else keyword match */
+var STATWORDS = {turnover:'to',turnovers:'to',to:'to',point:'pts',points:'pts',pts:'pts',
+  rebound:'reb',rebounds:'reb',reb:'reb',assist:'ast',assists:'ast',ast:'ast',
+  steal:'stl',steals:'stl',stl:'stl',shot:'shots',shots:'shots'};
+function matches(s,q){
+  if(!q) return true;
+  var re=/(\d+)\s*\+?\s*([a-z]+)/g, m, thresholds=[];
+  while((m=re.exec(q))){ if(STATWORDS[m[2]]) thresholds.push([STATWORDS[m[2]], +m[1]]); }
+  if(thresholds.length) return thresholds.every(function(t){ return s[t[0]] >= t[1]; });
+  var hay = [s.d, s.tag, s.cand||'', s.dur].join(' ').toLowerCase();
+  return q.split(/\s+/).filter(function(t){return t.length>2;})
+          .some(function(t){return hay.indexOf(t)>-1;});
+}
+function renderSessions(q){
+  q = (q||'').trim().toLowerCase();
+  var shown = 0;
+  $('#session-rows').innerHTML = SESSIONS.map(function(s,i){
+    if(!matches(s,q)) return '';
+    shown++;
+    return '<div class="srow-wrap">'+
+      '<div class="srow" data-sess="'+i+'">'+
+        '<span class="sd">'+s.d+'</span>'+
+        '<span class="st">'+s.shots+' shots</span>'+
+        '<span class="st">'+(s.pts||'—')+' pts</span>'+
+        '<span class="st">'+(s.reb||'—')+' reb</span>'+
+        '<span class="st">'+(s.ast||'—')+' ast</span>'+
+        '<span class="st">'+(s.to||'—')+' TO</span>'+
+        '<span class="st">'+s.dur+'</span>'+
+        (s.tag?'<button class="tag blue" data-tag="'+i+'">'+s.tag+' ▾</button>':'')+
+        '<span class="go">open review →</span>'+
+      '</div>'+
+      (s.tag?'<div class="inline-pattern" id="ip'+i+'">'+
+        '<p class="sec-label" style="color:var(--accent)">Pattern candidate</p>'+
+        '<div style="font-size:14px;margin-bottom:4px">'+s.cand+'</div>'+
+        '<div class="quiet">'+s.cdesc+'</div></div>':'')+
+    '</div>';
+  }).join('');
+  $('#session-count').textContent = shown+' of '+SESSIONS.length+' recorded sessions · stored on device';
+  bindSessionRows();
+}
+function bindSessionRows(){
+  $$('[data-sess]').forEach(function(b){ b.onclick=function(){openSession(+b.dataset.sess);}; });
+  $$('[data-tag]').forEach(function(b){
+    b.onclick=function(e){
+      e.stopPropagation();
+      var p=$('#ip'+b.dataset.tag), open=p.style.display==='block';
+      p.style.display = open ? 'none' : 'block';
+      b.textContent = b.textContent.replace(open?'▴':'▾', open?'▾':'▴');
+    };
+  });
+}
+renderSessions('');
+$('#session-search').addEventListener('input',function(){ renderSessions(this.value); });
+
+function openSession(i){
+  var s = SESSIONS[i];
+  $('#session-list').style.display='none';
+  $('#session-detail').style.display='block';
+  $('#detail-title').textContent = '/ '+s.d;
+  $('#detail-stats').innerHTML =
+    [['Points',s.pts],['Rebounds',s.reb],['Assists',s.ast],['Turnovers',s.to],
+     ['Steals',s.stl],['Shots',s.shots],['Duration',s.dur]].map(function(r){
+      return '<div class="statrow"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>';
+    }).join('');
+  resetTimeline();
+  window.scrollTo(0,0);
+}
+$('#back-sessions').onclick=function(){
+  $('#session-detail').style.display='none';
+  $('#session-list').style.display='block';
+};
+
+/* tracks: placeholder ticks / blocks */
+(function(){
+  var m='',l='',p='';
+  for(var i=0;i<40;i++) m+='<div class="tick" style="height:'+(6+((i*7)%16))+'px"></div>';
+  for(var j=0;j<8;j++)  l+='<div class="tblk" style="width:'+(30+((j*23)%70))+'px"></div>';
+  for(var k=0;k<26;k++) p+='<div class="tick" style="height:'+(4+((k*5)%18))+'px;background:#ccc"></div>';
+  $('#tr-motion').innerHTML=m; $('#tr-lidar').innerHTML=l; $('#tr-phys').innerHTML=p;
+})();
+
+/* ---------------- hybrid timeline ---------------- */
+var TOTAL = 1800; // 30:00
+var MOMENTS = [
+  {t:131,  label:'Contested pull-up, right wing', insight:'hesitation on catch',
+   desc:'0.3s pause before the gather · seen 2 times so far', pin:[64,32]},
+  {t:464,  label:'Drive to the rim, left baseline', insight:null},
+  {t:723,  label:'Catch-and-shoot, top of key', insight:'release change',
+   desc:'release 0.09s faster than your baseline · seen 2 times so far', pin:[48,26]},
+  {t:1166, label:'Closeout jumper, right corner', insight:null},
+  {t:1498, label:'Step-back, left wing', insight:'late gather',
+   desc:'gather starts after the plant · seen 1 time so far', pin:[28,44]}
+];
+var t=0, playing=false, timer=null, active=-1, consumed=[];
+
+function fmt(sec){ sec=Math.max(0,Math.round(sec));
+  return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0'); }
+
+/* build static bits */
+$('#scrub').innerHTML = MOMENTS.map(function(m,i){
+  return '<div class="marker" id="mk'+i+'" style="left:'+((m.t/TOTAL)*100)+'%"><i></i><b>'+(i+1)+'</b></div>';
+}).join('') + '<div id="playhead"></div>';
+
+$('#viewport').innerHTML = '<span style="position:relative;z-index:0">3D replay — drag to orbit</span>' +
+  MOMENTS.map(function(m,i){
+    if(!m.insight) return '';
+    return '<button class="pin" id="pin'+i+'" data-pin="'+i+'" style="left:'+m.pin[0]+'%;top:'+m.pin[1]+'%">◉ '+m.insight+'</button>';
+  }).join('');
+
+$('#tr-insights').innerHTML = MOMENTS.map(function(m,i){
+  if(!m.insight) return '';
+  return '<button class="chip" data-cand="'+i+'">'+m.insight+'</button>';
+}).join('') + '<span class="quiet">· tap a chip, a pin, or a marker</span>';
+
+$('#moment-list').innerHTML = MOMENTS.map(function(m,i){
+  return '<button class="mrow" data-mom="'+i+'">'+(i+1)+' · '+m.label+' <span class="quiet">'+fmt(m.t)+'</span></button>';
+}).join('');
+
+function nearest(){ // moment the playhead is sitting on (within 12s)
+  for(var i=0;i<MOMENTS.length;i++) if(Math.abs(MOMENTS[i].t - t) < 12) return i;
+  return -1;
+}
+function render(){
+  $('#playhead').style.left = ((t/TOTAL)*100)+'%';
+  $('#timecode').textContent = fmt(t)+' / '+fmt(TOTAL);
+  MOMENTS.forEach(function(m,i){
+    $('#mk'+i).classList.toggle('on', i===active);
+    var pin=$('#pin'+i); if(pin) pin.classList.toggle('on', i===active);
+    var chip=$('.chip[data-cand="'+i+'"]'); if(chip) chip.classList.toggle('on', i===active);
+    var row=$('.mrow[data-mom="'+i+'"]');
+    row.style.borderColor = i===active ? '#2F6BFF' : '#bbb';
+    row.style.color = i===active ? '#2F6BFF' : '#222';
+  });
+  if(active>-1){
+    var m=MOMENTS[active];
+    $('#moment-readout').textContent = 'moment '+(active+1)+' of '+MOMENTS.length+' · '+m.label+' · '+fmt(m.t);
+    if(m.insight){
+      $('#cand-name').textContent = m.insight;
+      $('#cand-desc').textContent = m.desc + ' · needs to repeat across sessions before it becomes a pattern';
+      $('#candidate').style.display='block';
+    } else { $('#candidate').style.display='none'; }
+  } else {
+    $('#moment-readout').textContent = 'full session timeline · markers = moments · playback pauses at each one';
+    $('#candidate').style.display='none';
+  }
+}
+function pause(){ playing=false; clearInterval(timer); $('#playbtn').textContent='▶ Play'; }
+function play(){
+  if(playing) return;
+  playing=true; $('#playbtn').textContent='❚❚ Pause';
+  timer=setInterval(step,80);
+}
+function step(){
+  var nt = t + 4;
+  for(var i=0;i<MOMENTS.length;i++){
+    var m=MOMENTS[i];
+    if(!consumed[i] && m.t > t && m.t <= nt){
+      t=m.t; active=i; consumed[i]=true;
+      pause();
+      $('#cont-label').textContent = 'moment '+(i+1)+' · '+m.label;
+      $('#continue-wrap').style.display='flex';
+      render(); return;
+    }
+  }
+  t = nt >= TOTAL ? 0 : nt;
+  if(nt>=TOTAL){ consumed=[]; active=-1; pause(); }
+  else { active = nearest(); }
+  render();
+}
+$('#playbtn').onclick=function(){ if(playing) pause(); else { $('#continue-wrap').style.display='none'; play(); } };
+$('#continue-btn').onclick=function(){ $('#continue-wrap').style.display='none'; t+=6; active=-1; render(); play(); };
+
+function seek(sec){
+  pause(); $('#continue-wrap').style.display='none';
+  t = Math.max(0,Math.min(TOTAL,sec));
+  consumed = MOMENTS.map(function(m){ return m.t <= t; });
+  active = nearest();
+  render();
+}
+var dragging=false;
+function fromEvent(e){
+  var r=$('#scrub').getBoundingClientRect();
+  var cx = e.touches ? e.touches[0].clientX : e.clientX;
+  seek(((cx-r.left)/r.width)*TOTAL);
+}
+$('#scrub').addEventListener('mousedown',function(e){dragging=true;fromEvent(e);});
+window.addEventListener('mousemove',function(e){if(dragging)fromEvent(e);});
+window.addEventListener('mouseup',function(){dragging=false;});
+$('#scrub').addEventListener('touchstart',function(e){dragging=true;fromEvent(e);e.preventDefault();},{passive:false});
+window.addEventListener('touchmove',function(e){if(dragging){fromEvent(e);e.preventDefault();}},{passive:false});
+window.addEventListener('touchend',function(){dragging=false;});
+
+function goMoment(i){ seek(MOMENTS[i].t); active=i; consumed[i]=true; render(); }
+$$('[data-mom]').forEach(function(b){ b.onclick=function(){ goMoment(+b.dataset.mom); }; });
+$$('[data-cand]').forEach(function(b){ b.onclick=function(){ goMoment(+b.dataset.cand); }; });
+$$('[data-pin]').forEach(function(b){ b.onclick=function(){ goMoment(+b.dataset.pin); }; });
+
+function resetTimeline(){ pause(); t=0; active=-1; consumed=[]; $('#continue-wrap').style.display='none'; render(); }
+resetTimeline();
+
+/* ---------------- SCOREBOARD ---------------- */
+var ZONES = [
+  {l:'left corner 3',   x:8,  y:8,   w:84, h:52, m:6,  a:19},
+  {l:'left wing 3',     x:8,  y:70,  w:84, h:52, m:11, a:34},
+  {l:'top of key 3',    x:134,y:8,   w:92, h:52, m:14, a:47},
+  {l:'right corner 3',  x:262,y:8,   w:84, h:52, m:8,  a:22},
+  {l:'right wing 3',    x:262,y:70,  w:84, h:52, m:9,  a:31},
+  {l:'mid-range left',  x:62, y:135, w:92, h:48, m:12, a:30},
+  {l:'mid-range right', x:196,y:135, w:92, h:48, m:15, a:38},
+  {l:'paint',           x:126,y:194, w:104,h:46, m:19, a:50}
+];
+$('#court').innerHTML = ZONES.map(function(z){
+  var pct = z.m/z.a;                     // ~.28 – .40
+  var k = Math.max(0,Math.min(1,(pct-0.26)/0.18));   // heat 0..1
+  var bg = k < 0.35 ? 'rgba(0,0,0,'+(0.03+k*0.06).toFixed(3)+')'
+                    : 'rgba(47,107,255,'+(0.08+k*0.32).toFixed(3)+')';
+  return '<div class="zone" style="left:'+z.x+'px;top:'+z.y+'px;width:'+z.w+'px;height:'+z.h+'px;background:'+bg+'">'+
+    z.l+'<br><b style="font-size:13px">'+z.m+' / '+z.a+'</b><br><span style="font-size:9px">'+Math.round(pct*100)+'%</span></div>';
+}).join('') + '<div class="quiet" style="position:absolute;bottom:4px;right:8px">court · placeholder zones</div>';
+
+var SKILLS = {
+  shooting:[
+    ['Catch &amp; shoot',78,'catch-to-release time + FG% on passes received'],
+    ['Off the dribble',64,'FG% and balance score on pull-ups off live dribble'],
+    ['Free throw',85,'FT% weighted by routine consistency'],
+    ['Contested 3',52,'FG% with a defender inside 4 ft at release'],
+    ['Corner 3',71,'corner FG% + footwork setup time']
+  ],
+  handling:[
+    ['Ball security',69,'turnovers per possession + loose-ball events'],
+    ['Change of pace',58,'deceleration events detected per drive'],
+    ['First step',74,'burst acceleration over the first 1.5 m'],
+    ['Finishing at rim',66,'contested-finish % inside 5 ft']
+  ]
+};
+function skillHTML(list,key){
+  return list.map(function(s,i){
+    return '<div class="skill" id="sk-'+key+i+'">'+
+      '<div class="sh" data-skill="'+key+i+'">'+
+        '<span class="sn">'+s[0]+'</span>'+
+        '<span class="bar"><i style="width:'+s[1]+'%"></i></span>'+
+        '<span class="num">'+s[1]+'</span>'+
+        '<button class="info" data-info="'+key+i+'" title="what makes up this score">ⓘ</button>'+
+      '</div>'+
+      '<div class="composition"><b>what makes this score:</b> '+s[2]+' <span class="quiet">(placeholder)</span></div>'+
+      '<div class="exp">'+
+        spark([4,5,4.5,6,5.5,7],true)+
+        '<div><div class="quiet">session-over-session</div><div style="font-size:16px;color:#2F6BFF">+4 vs Session 13</div>'+
+        '<div class="quiet" style="margin-top:6px">extra stats · placeholder</div></div>'+
+        '<div class="box ph" style="width:110px;height:44px"></div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+$('#skills-shooting').innerHTML = skillHTML(SKILLS.shooting,'s');
+$('#skills-handling').innerHTML = skillHTML(SKILLS.handling,'h');
+$$('[data-skill]').forEach(function(b){
+  b.onclick=function(){
+    var el=$('#sk-'+b.dataset.skill), was=el.classList.contains('open');
+    $$('.skill').forEach(function(s){s.classList.remove('open');});
+    if(!was) el.classList.add('open');
+  };
+});
+$$('[data-info]').forEach(function(b){
+  b.onclick=function(e){
+    e.stopPropagation();
+    var el=$('#sk-'+b.dataset.info);
+    el.classList.toggle('showinfo');
+    b.classList.toggle('on', el.classList.contains('showinfo'));
+  };
+});
+
+/* ---------------- goals ---------------- */
+/* stat pool = the skills + a few shot zones, with a placeholder per-month drift */
+var GOAL_STATS = SKILLS.shooting.map(function(s){ return {n:s[0].replace('&amp;','&'), v:s[1], u:''}; })
+  .concat(SKILLS.handling.map(function(s){ return {n:s[0], v:s[1], u:''}; }))
+  .concat(ZONES.map(function(z){ return {n:z.l+' FG%', v:Math.round(z.m/z.a*100), u:'%'}; }));
+function drift(stat){ return ((stat.n.length + stat.v) % 7) - 2; }   // placeholder: −2..+4 per month
+var GOALS = [{stat:GOAL_STATS[2], target:90, when:'end of month'}];  // one seeded goal
+
+$('#goal-stat').innerHTML = GOAL_STATS.map(function(s,i){
+  return '<option value="'+i+'">'+s.n+' · now '+s.v+s.u+'</option>';
+}).join('');
+
+function renderGoals(){
+  $('#goal-list').innerHTML = GOALS.map(function(g,i){
+    var s=g.stat, d=drift(s), gap=g.target-s.v;
+    var status = gap<=0 ? 'on pace' : (d>0 ? 'trending toward target' : 'trending away from target');
+    var pace = Math.max(0, s.v + d*2);
+    var pct = Math.max(4, Math.min(100, (s.v/g.target)*100));
+    return '<div class="goal">'+
+      '<div class="gt"><span>'+s.n+'</span><span class="gv">'+s.v+s.u+' → '+g.target+s.u+'</span></div>'+
+      '<div class="gbar"><i style="width:'+pct.toFixed(0)+'%"></i><u style="left:100%"></u></div>'+
+      '<div class="grow">'+
+        '<span class="tag'+(status==='trending toward target'?' blue':'')+'">'+status+'</span>'+
+        '<span class="quiet">by '+g.when+'</span>'+
+        '<button class="btn sm" data-goal-rm="'+i+'" style="margin-left:auto">remove</button>'+
+      '</div>'+
+      '<div class="gpred">at current pace: ~'+pace+s.u+' by '+g.when+'</div>'+
+    '</div>';
+  }).join('');
+  var full = GOALS.length>=3;
+  $('#goal-add').disabled = full;
+  $('#goal-add').style.opacity = full ? .4 : 1;
+  $('#goal-add').style.cursor = full ? 'not-allowed' : 'pointer';
+  $('#goal-limit').style.display = full ? 'block' : 'none';
+  $$('[data-goal-rm]').forEach(function(b){
+    b.onclick=function(){ GOALS.splice(+b.dataset.goalRm,1); renderGoals(); };
+  });
+}
+$('#goal-when').onchange=function(){
+  $('#goal-date').style.display = this.value==='custom' ? 'block' : 'none';
+};
+$('#goal-add').onclick=function(){
+  if(GOALS.length>=3) return;
+  var s = GOAL_STATS[+$('#goal-stat').value];
+  var target = parseInt($('#goal-target').value,10);
+  if(!target) target = Math.min(100, s.v + 8);           // placeholder default
+  var when = $('#goal-when').value;
+  if(when==='custom') when = $('#goal-date').value || 'custom date';
+  GOALS.push({stat:s, target:target, when:when});
+  $('#goal-target').value='';
+  renderGoals();
+};
+renderGoals();
+
+/* per-section sharing */
+var SHARE = {zones:false, skills:false, summary:false, goals:false};
+var SHARE_LABEL = {zones:'Shot zones', skills:'Skills · shooting + handling', summary:'Session summary', goals:'Goals'};
+function renderShare(){
+  Object.keys(SHARE).forEach(function(k){
+    $('#state-'+k).classList.toggle('on', SHARE[k]);      // only shared sections carry a tag
+  });
+  var total = Object.keys(SHARE).length;
+  var n = Object.keys(SHARE).filter(function(k){return SHARE[k];}).length;
+  var p = $('#sb-privacy');
+  p.textContent = n ? 'shared · '+n+' of '+total+' sections' : 'shareable';
+  p.classList.toggle('shared-on', n>0);
+  $('#share-stats').textContent = n ? 'Edit what you share' : 'Share stats';
+  $('#shared-sections').innerHTML = n
+    ? Object.keys(SHARE).filter(function(k){return SHARE[k];}).map(function(k){
+        return '<div class="statrow"><span>'+SHARE_LABEL[k]+'</span><b style="color:#2F6BFF">visible</b></div>';
+      }).join('') + '<p class="quiet" style="margin:8px 0 0">showing only what you chose to share · everything else stays private.</p>'
+    : '<p class="quiet" style="margin:0">nothing shared yet — use <b>Share stats</b> to pick what appears here.</p>';
+}
+/* single share picker: check sections, confirm */
+function openPicker(on){
+  if(on) $$('#share-picker [data-pick]').forEach(function(c){ c.checked = SHARE[c.dataset.pick]; });
+  $('#share-picker').style.display = on ? 'block' : 'none';
+}
+$('#share-stats').onclick=function(){ openPicker($('#share-picker').style.display!=='block'); };
+$('#share-cancel').onclick=function(){ openPicker(false); };
+$('#share-confirm').onclick=function(){
+  $$('#share-picker [data-pick]').forEach(function(c){ SHARE[c.dataset.pick] = c.checked; });
+  openPicker(false); renderShare();
+};
+renderShare();
+
+$$('#sb-seg button').forEach(function(b){
+  b.onclick=function(){
+    $$('#sb-seg button').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    $('#sb-mine').style.display   = b.dataset.sb==='mine'   ? 'block':'none';
+    $('#sb-shared').style.display = b.dataset.sb==='shared' ? 'block':'none';
+  };
+});
+
+var FRIENDS=[['A. Reyes','shooting 74 · handling 61'],['J. Okafor','shooting 68 · handling 77'],['M. Lindqvist','shooting 81 · handling 59']];
+$('#friend-list').innerHTML = FRIENDS.map(function(f){
+  return '<div class="friend"><div class="avatar ph"></div>'+
+    '<div style="flex:1"><div style="font-size:13px">'+f[0]+'</div><div class="quiet">'+f[1]+'</div></div>'+
+    '<span class="tag">read-only</span></div>';
+}).join('') + '<div class="friend" style="background:#fafafa"><div class="avatar ph"></div>'+
+  '<div style="flex:1"><div style="font-size:13px">You · Session 14</div><div class="quiet">only your shared sections</div></div>'+
+  '<span class="tag blue">your snapshot</span></div>';
+
+var invites=0;
+$('#invite-btn').onclick=function(){
+  invites++;
+  var d=document.createElement('div');
+  d.className='friend pending';
+  d.innerHTML='<div class="avatar ph"></div><div style="flex:1;font-size:13px">invite '+invites+' · waiting</div><span class="tag">invite sent · waiting</span>';
+  $('#pending-list').appendChild(d);
+};
+
+/* ---------------- INSIGHTS ---------------- */
+/* full content library — pattern-linked items are ranked higher, never the only results */
+var CARDS=[
+  {t:'One breath before the gather', k:'DRILL', d:'8 min', side:'on', pat:'rushing under pressure', topics:'breath rush release pressure closeout tempo'},
+  {t:'Closeout reps · slow the release', k:'DRILL', d:'12 min', side:'on', pat:'rushing under pressure', topics:'closeout release shooting pressure defense'},
+  {t:'What rushing feels like', k:'LESSON', d:'6 min', side:'off', pat:'rushing under pressure', topics:'rush pressure nerves awareness'},
+  {t:'Film: pressure possessions', k:'VIDEO', d:'9 min', side:'on', topics:'film pressure possessions review shooting'},
+  {t:'Pre-game reset routine', k:'LESSON', d:'5 min', side:'off', topics:'routine reset calm warmup nerves'},
+  {t:'Sleep &amp; decision speed', k:'VIDEO', d:'11 min', side:'off', topics:'sleep recovery decision tired fatigue'},
+  {t:'Handle under fatigue', k:'DRILL', d:'10 min', side:'on', pat:'handle tightens late in sessions', topics:'handle dribble tired fatigue late conditioning'},
+  {t:'Naming the pressure moment', k:'LESSON', d:'7 min', side:'off', topics:'pressure naming mindset awareness'},
+  {t:'Two-ball dribble ladder', k:'DRILL', d:'9 min', side:'on', topics:'handle dribble ball control hands'},
+  {t:'Footwork: first step angles', k:'DRILL', d:'14 min', side:'on', topics:'footwork first step burst speed drive'},
+  {t:'Reading a hedge', k:'VIDEO', d:'8 min', side:'on', topics:'pick roll hedge reads passing decision'},
+  {t:'Strength: single-leg base', k:'DRILL', d:'16 min', side:'off', topics:'strength legs balance base conditioning tired'},
+  {t:'Free throw routine, rebuilt', k:'LESSON', d:'6 min', side:'on', topics:'free throw routine shooting repeatable'},
+  {t:'Nutrition on back-to-backs', k:'LESSON', d:'7 min', side:'off', topics:'nutrition recovery fatigue tired energy'},
+  {t:'Finishing through contact', k:'DRILL', d:'11 min', side:'on', topics:'finishing rim contact layup strength'},
+  {t:'Off-day mobility flow', k:'VIDEO', d:'12 min', side:'off', topics:'mobility recovery stretch off day'}
+];
+var MY_PATTERNS = ['rushing under pressure','handle tightens late in sessions','recovers fast after a make'];
+function cardHTML(c){
+  return '<div class="qcard">'+
+    (c.pat?'<span class="refchip">from your pattern · '+c.pat+'</span>':'')+
+    '<div class="qt">'+c.t+'</div>'+
+    '<div class="box ph" style="height:40px;margin-bottom:8px"></div>'+
+    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+      '<span class="tag">'+c.k+'</span>'+
+      '<span class="tag">'+(c.side==='on'?'on court':'off court')+'</span>'+
+      '<span class="quiet">'+c.d+'</span>'+
+    '</div>'+
+  '</div>';
+}
+function renderCards(f){
+  var list = CARDS.filter(function(c){ return f==='all' || c.side===f; });
+  $('#quickstart').innerHTML = list.slice(0,6).map(cardHTML).join('');
+}
+renderCards('all');
+$$('#ins-filters .fchip').forEach(function(b){
+  b.onclick=function(){
+    $$('#ins-filters .fchip').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on'); renderCards(b.dataset.f);
+  };
+});
+
+/* query → whole library, ranked: topic match first, pattern-linked items get a boost */
+function rank(q){
+  var terms = q.toLowerCase().split(/\s+/).filter(function(t){return t.length>2;});
+  return CARDS.map(function(c,i){
+    var hay = (c.t+' '+c.topics+' '+(c.pat||'')).toLowerCase();
+    var score = terms.reduce(function(a,t){ return a + (hay.indexOf(t)>-1 ? 2 : 0); },0);
+    if(c.pat && MY_PATTERNS.indexOf(c.pat)>-1) score += 1;   // rank boost, not a filter
+    return {c:c, score:score, i:i};
+  }).sort(function(a,b){ return b.score-a.score || a.i-b.i; }).slice(0,3);
+}
+function send(){
+  var v=$('#chatinput').value.trim(); if(!v) return;
+  $('#chatinput').value='';
+  var picks = rank(v);
+  var anyPattern = picks.some(function(p){return p.c.pat;});
+  $('#results').innerHTML =
+    '<p class="sec-label">Built for "'+v.replace(/</g,'&lt;')+'"</p>'+
+    '<p class="quiet" style="margin:-4px 0 8px">pulled from the full library'+
+      (anyPattern?' · your patterns move relevant ones up':'')+'</p>'+
+    '<div style="display:flex;flex-direction:column;gap:10px">'+
+      picks.map(function(p){return cardHTML(p.c);}).join('')+'</div>';
+}
+$('#sendbtn').onclick=send;
+$('#chatinput').addEventListener('keydown',function(e){ if(e.key==='Enter') send(); });
+
+/* chat lives in a slide-in sidebar; the card feed behind it is untouched */
+function openChat(on){
+  $('#chat-panel').classList.toggle('open', on);
+  $('#chat-scrim').classList.toggle('open', on);
+  $('#chat-toggle').classList.toggle('blue', on);
+  if(on) $('#chatinput').focus();
+}
+$('#chat-toggle').onclick=function(){ openChat(!$('#chat-panel').classList.contains('open')); };
+$('#chat-close').onclick=function(){ openChat(false); };
+$('#chat-scrim').onclick=function(){ openChat(false); };
+window.addEventListener('keydown',function(e){ if(e.key==='Escape') openChat(false); });
+</script>
+</body>
+</html>
