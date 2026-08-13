@@ -15,12 +15,12 @@
    muted mint / yellow / orange / lilac / blue palette
    ============================================================ */
 :root{
-  --cream:#F5F2EC; --panel:#FFFFFF; --surface:#F2EFE8; --surface2:#E8E4DB; --well:#F1EEE7;
+  --cream:#FFFFFC; --panel:#FFFFFF; --surface:#F3F2EE; --surface2:#E9E7E1; --well:#F5F4F0;
   --ink:#111111; --ink2:#615E58; --ink3:#96928B;
   --select:#0D99FF; --magenta:#FF2E9A;
   --hl-mint:#93EAC3; --hl-yellow:#FFE159; --hl-coral:#FF9B68; --hl-lavender:#C4B5FF;
   --hl-sky:#A6DBFF; --hl-lime:#D7F24B; --hl-tan:#E7D2AC; --hl-pink:#FF9BD2;
-  --ruler-h:30px; --band-h:120px;
+  --ruler-h:46px; --band-h:0px;
   --f-display:'Oswald',Impact,sans-serif;
   --f-body:'Inter',system-ui,-apple-system,sans-serif;
   --f-mono:'IBM Plex Mono',ui-monospace,monospace;
@@ -54,20 +54,8 @@ input{font-family:inherit;color:inherit;}
 .chip.neutral{background:var(--surface2);color:var(--ink2);}
 
 /* ---------- background ---------- */
+/* the paper stays flat #FFFFFC — texture only, never a colour wash */
 #bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:var(--cream);isolation:isolate;}
-#bg-mesh{position:absolute;inset:-14%;
-  background:
-    radial-gradient(34% 42% at 22% 28%, rgba(147,234,195,.95), transparent 64%),
-    radial-gradient(30% 38% at 74% 20%, rgba(255,225,89,.85), transparent 64%),
-    radial-gradient(36% 44% at 68% 78%, rgba(196,181,255,.9), transparent 64%),
-    radial-gradient(30% 36% at 24% 76%, rgba(166,219,255,.88), transparent 64%),
-    radial-gradient(26% 32% at 50% 52%, rgba(255,155,104,.7), transparent 64%);
-  filter:blur(48px) saturate(1.45) brightness(1.1);
-  mix-blend-mode:multiply;opacity:.6;animation:drift 22s ease-in-out infinite alternate;}
-@keyframes drift{0%{transform:scale(1.02) translate3d(-1.4%,-1%,0);}
-  50%{transform:scale(1.10) translate3d(1.6%,1.2%,0);}
-  100%{transform:scale(1.04) translate3d(-1%,1.8%,0);}}
-#bg-veil{position:absolute;inset:0;background:rgba(245,242,236,.56);}
 /* three independent decorative layers — each one is switched, opacity-ed
    and sized from the sticky settings panel. All strictly pointer-events:none. */
 #bg-grain{position:absolute;inset:0;opacity:.26;mix-blend-mode:multiply;background-size:220px 220px;}
@@ -75,81 +63,75 @@ input{font-family:inherit;color:inherit;}
 #bg-ascii{position:absolute;inset:0;width:100%;height:100%;}
 #bg-grain.off,#bg-lines.off,#bg-ascii.off{display:none;}
 
-/* ---------- top band ---------- */
-#band{position:fixed;inset:0 0 auto 0;z-index:60;
-  backdrop-filter:blur(16px) saturate(1.1);-webkit-backdrop-filter:blur(16px) saturate(1.1);
-  background:linear-gradient(to bottom, rgba(245,242,236,.9) 0%, rgba(245,242,236,.72) 100%);}
-#band-fade{position:fixed;left:0;right:0;z-index:59;height:46px;pointer-events:none;top:var(--band-h);
-  backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
-  background:linear-gradient(to bottom, rgba(245,242,236,.55), rgba(245,242,236,0));
-  -webkit-mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.55) 45%,transparent 100%);
-  mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.55) 45%,transparent 100%);}
+/* ---------- floating bottom nav ----------
+   one capsule track in muted grey; the active item is a white pill
+   riding inside it. Nothing else in the chrome is white. */
+#bnav{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:950;}
+#bnav .track{display:flex;align-items:center;gap:4px;background:var(--surface2);
+  border-radius:999px;padding:6px 16px;
+  box-shadow:0 18px 44px -22px rgba(40,36,28,.55), 0 2px 6px -3px rgba(40,36,28,.18);}
+#bnav button{position:relative;border-radius:999px;padding:10px 20px;font-size:13px;font-weight:500;
+  color:var(--ink2);white-space:nowrap;
+  transition:color .18s var(--ease-out),background .18s var(--ease-out),box-shadow .18s var(--ease-out);}
+#bnav button:hover{color:var(--ink);}
+#bnav button.on{background:var(--panel);color:var(--ink);font-weight:600;
+  box-shadow:0 6px 16px -6px rgba(40,36,28,.34), 0 1px 2px rgba(40,36,28,.08);}
+@media (max-width:560px){#bnav .track{padding:5px 8px;}#bnav button{padding:9px 12px;font-size:12px;}}
+/* on a phone the nav owns the bottom edge — the other floating chrome moves up top */
+@media (max-width:760px){
+  #bnav{bottom:14px;}
+  #panel{bottom:auto;top:14px;right:14px;flex-direction:column-reverse;align-items:flex-end;}
+  #panel-body{transform-origin:100% 0;}
+}
 
-#ruler{position:relative;height:var(--ruler-h);cursor:grab;user-select:none;-webkit-user-select:none;touch-action:pan-y;}
+/* ---------- measure ruler (sits under the pattern fan) ----------
+   a tape of ticks that slides right → left in step with the cards,
+   read against one fixed caret at the centre. */
+#ruler{position:relative;height:var(--ruler-h);margin:26px auto 0;width:min(760px,92vw);
+  cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;overflow:hidden;}
 #ruler.grabbing{cursor:grabbing;}
 body.scrubbing{user-select:none;-webkit-user-select:none;}
-#ruler-track{position:absolute;inset:0 170px 0 0;}
-#ruler .tk{position:absolute;top:0;width:1px;background:var(--ink);}
-#ruler .tl{position:absolute;top:11px;transform:translateX(-50%);font-size:8px;font-weight:600;
+#ruler-track{position:absolute;top:0;left:0;height:100%;will-change:transform;}
+#ruler .tk{position:absolute;top:4px;width:1px;background:var(--ink);}
+#ruler .tl{position:absolute;top:17px;transform:translateX(-50%);font-size:8px;font-weight:600;
   line-height:1;color:var(--ink3);font-variant-numeric:tabular-nums;}
-#ruler-pill{position:absolute;top:5px;transform:translateX(-50%);background:var(--select);color:#fff;
-  border-radius:999px;font-size:9px;font-weight:600;line-height:1;padding:3px 7px;
-  font-variant-numeric:tabular-nums;letter-spacing:-.02em;transition:left .12s var(--ease-out);pointer-events:none;}
-#ruler.grabbing #ruler-pill{transition:none;}
-#ruler-live{position:absolute;right:20px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:5px;pointer-events:none;}
-#ruler-live i{display:block;width:6px;height:6px;border-radius:999px;background:var(--select);}
-#ruler-live span{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);}
-
-/* navbar sits on the horizontal centre of its container */
-#nav{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;padding:14px 20px 16px;}
-#brand{display:flex;align-items:center;gap:7px;margin-right:4px;}
-#brand b{font-family:var(--f-display);font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;line-height:1;}
-#brand i{display:block;width:7px;height:7px;border-radius:999px;background:var(--hl-lime);}
-/* white sits ONLY on the tabs pill */
-#tabs{display:flex;align-items:center;gap:4px;background:var(--panel);border-radius:999px;padding:5px;
-  box-shadow:0 10px 26px -18px rgba(40,36,28,.5);}
-#tabs button{position:relative;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:500;
-  color:var(--ink2);transition:color .18s var(--ease-out),background .18s var(--ease-out);}
-#tabs button:hover{color:var(--ink);}
-#tabs button.on{background:var(--ink);color:var(--panel);}
+#ruler-caret{position:absolute;left:50%;top:0;width:2px;height:13px;background:var(--ink);
+  transform:translateX(-50%);border-radius:2px;}
+#ruler-pill{position:absolute;left:50%;top:30px;transform:translateX(-50%);
+  font-family:var(--f-mono);font-size:9px;font-weight:600;line-height:1;color:var(--ink2);
+  background:var(--cream);padding:0 7px;font-variant-numeric:tabular-nums;letter-spacing:.06em;}
 
 /* ---------- layout ---------- */
 #main{position:relative;z-index:10;padding-top:var(--band-h);}
 .wrap{width:100%;max-width:none;margin:0;padding:0 20px;}
-.screen{display:none;padding:26px 0 220px;}
+.screen{display:none;padding:46px 0 150px;}
 .screen.on{display:block;animation:rise .34s var(--ease-out) both;}
 @keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 .sub-view{display:none;}
 .sub-view.on{display:block;animation:rise .34s var(--ease-out) both;}
 
-.screen-head{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin:0 0 34px;}
-.screen-head h1{font-size:clamp(34px,4vw,58px);}
-.screen-head .sub{font-size:12.5px;color:var(--ink3);}
-.sec-head{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin:0 0 18px;}
+/* ---------- one section header for every screen ----------
+   centred headline, centred description under it, content below. */
+.screen-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;margin:0 auto 38px;}
+.screen-head h1{font-size:clamp(38px,5vw,74px);}
+.screen-head .sub{font-size:13px;line-height:1.55;color:var(--ink3);max-width:52ch;}
+.sec-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;margin:0 auto 22px;}
 .sec-head h2{font-size:clamp(22px,2.3vw,30px);}
+.sec-head .sub{font-size:12.5px;color:var(--ink3);max-width:50ch;}
 .sec-block{margin-bottom:58px;}
 
-/* quiet-mode switch, lives in the Home heading */
-.switch{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:8px 16px 8px 12px;
-  background:var(--panel);font-size:12.5px;font-weight:500;color:var(--ink2);
-  box-shadow:0 10px 26px -18px rgba(40,36,28,.5);transition:background .18s var(--ease-out),color .18s var(--ease-out);}
-.switch:hover{color:var(--ink);}
-.switch .sw{position:relative;width:32px;height:18px;border-radius:999px;background:var(--surface2);
-  transition:background .2s var(--ease-out);flex:0 0 auto;}
-.switch .sw::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:999px;
-  background:var(--panel);transition:transform .2s var(--ease-out);}
-.switch.on{background:var(--ink);color:var(--panel);}
-.switch.on .sw{background:rgba(255,255,255,.34);}
-.switch.on .sw::after{transform:translateX(14px);}
+/* ---------- object shell ----------
+   NOT a universal card. This shell belongs to exactly three places —
+   home vitals, the focus card and the insights library — plus the
+   settings panel and the modal. Sessions, the scoreboard and the
+   pattern fan each have their own card language further down and must
+   never be pulled back onto this one.
 
-/* ---------- object shell ---------- */
-/* UNIVERSAL CARD SPEC.
-   The reference card is 453px wide: outer radius 78, 12 from the card edge
-   to the frame squircle, frame radius 66, 18 inside the frame, 48 on any
-   bar or visual element. None of those are absolute — JS measures each
-   card and writes --k (width / 453) plus the five scaled values onto the
-   shell, so a 300px card lands on ~66% of the reference and a 600px card
-   on ~132%. CSS below only ever consumes the vars. */
+   Inside the shell the reference card is 453px wide: outer radius 78,
+   12 from the card edge to the frame squircle, frame radius 66, 18
+   inside the frame, 48 on any bar. JS measures each card and writes
+   --k (width / 453) plus the five scaled values, so the ratios hold at
+   any size. CSS below only ever consumes the vars. */
 .obj,.scaled{--dx:0px;--dy:0px;--ty:0px;--s:1;
   --k:1;--r-out:78px;--r-frame:66px;--cpad:12px;--fpad:18px;--vfr:48px;}
 .obj{position:relative;width:100%;
@@ -200,7 +182,6 @@ body.scrubbing{user-select:none;-webkit-user-select:none;}
   color:var(--ink);margin:0;-webkit-text-stroke:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
 .card-head .chip{flex:0 0 auto;}
-.hasdots .card-head{padding:0 clamp(18px,calc(34px * var(--k)),38px);}
 .bignum{display:flex;align-items:baseline;justify-content:center;gap:7px;margin:14px 0 10px;}
 .bignum .n{font-family:var(--f-display);font-weight:700;line-height:.82;
   font-size:clamp(26px,calc(58px * var(--k)),62px);
@@ -240,6 +221,8 @@ body.scrubbing{user-select:none;-webkit-user-select:none;}
   display:inline-flex;align-items:center;justify-content:center;color:var(--ink3);
   transition:background .18s var(--ease-out),color .18s var(--ease-out);z-index:6;}
 .more:hover{background:var(--surface);color:var(--ink);}
+#pat-open .more{top:16px;right:54px;color:inherit;opacity:.6;}
+#pat-open .more:hover{opacity:1;background:rgba(255,255,255,.35);}
 .more svg{width:16px;height:16px;}
 
 /* ---------- masonry ---------- */
@@ -250,60 +233,184 @@ body.scrubbing{user-select:none;-webkit-user-select:none;}
 .masonry > .obj{display:block;width:100%;margin:0 0 18px;
   break-inside:avoid;-webkit-column-break-inside:avoid;page-break-inside:avoid;}
 
-/* ---------- home ---------- */
-.home-head{display:flex;flex-direction:column;align-items:center;gap:12px;margin:0 0 30px;text-align:center;}
-.home-head h1{font-size:clamp(38px,5vw,74px);}
-.home-head .sub{font-size:13px;color:var(--ink3);max-width:46ch;}
-#s-home .sec-head{align-items:center;text-align:center;}
-#s-home .sec-block{margin-bottom:64px;}
+/* ============================================================
+   HOME — two stages. Stage one is patterns and nothing else and
+   owns the whole first viewport; stage two is focus + vitals.
+   ============================================================ */
+#s-home{padding:0;}
+.stage{position:relative;}
+/* the ends of the hand sit outside the viewport by design — clip the
+   stage so they never turn into a horizontal scrollbar */
+#stage1{min-height:100svh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:64px 0 96px;overflow:clip;}
+@supports not (overflow:clip){#stage1{overflow:hidden;}}
+#stage2{min-height:100svh;display:flex;flex-direction:column;justify-content:center;
+  padding:76px 0 150px;}
+#s-home.list #stage1,#s-home.list #stage2{display:none;}
+#home-list{display:none;padding:44px 0 150px;}
+#s-home.list #home-list{display:block;}
 
-/* ---------- home · focus ---------- */
-.focus-steps{position:relative;margin:26px 0 0;display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:26px;}
-.focus-glow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:0;}
-.focus-step{position:relative;z-index:1;}
-.focus-step .fs-body{margin:11px 0 0;font-size:13px;line-height:1.55;color:var(--ink2);}
+/* the format switch — persists in both formats so the way back is visible */
+#home-mode{position:fixed;bottom:22px;left:22px;z-index:940;display:none;
+  gap:4px;background:var(--surface2);border-radius:999px;padding:5px;
+  box-shadow:0 14px 32px -20px rgba(40,36,28,.5);}
+body.home #home-mode{display:inline-flex;}
+#home-mode button{border-radius:999px;padding:8px 15px;font-size:12px;font-weight:500;color:var(--ink2);
+  transition:background .18s var(--ease-out),color .18s var(--ease-out);}
+#home-mode button.on{background:var(--panel);color:var(--ink);font-weight:600;
+  box-shadow:0 5px 14px -6px rgba(40,36,28,.34);}
+@media (max-width:760px){#home-mode{bottom:auto;top:14px;left:14px;}}
 
-/* ---------- home · vitals ---------- */
-#vitals-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;}
-@media (max-width:1080px){#vitals-row{grid-template-columns:repeat(2,minmax(0,1fr));}}
-@media (max-width:680px){#vitals-row{grid-template-columns:minmax(0,1fr);}}
+/* ---------- stage 1 · the fanned hand of pattern cards ----------
+   Cards overlap horizontally on an arc: the centre of the fan sits
+   higher and larger, the ends drop away and turn out. Scroll drives
+   the whole hand right → left through the set. */
+#fan-wrap{position:relative;width:100%;height:clamp(360px,50vh,470px);margin-top:26px;
+  touch-action:none;}
+#fan{position:absolute;inset:0;}
+.fnslot{position:absolute;left:50%;top:50%;width:var(--fw);height:var(--fh);
+  margin-left:calc(var(--fw) / -2);margin-top:calc(var(--fh) / -2);
+  transform:translate3d(var(--x,0px),var(--y,0px),0) rotate(var(--rot,0deg)) scale(var(--sc,1));
+  will-change:transform;}
+#fan{--fw:clamp(150px,15vw,224px);--fh:clamp(210px,21vw,312px);}
+.fnslot.hov{z-index:700!important;}
+.fncard{position:absolute;inset:0;border-radius:22px;overflow:visible;
+  background:var(--fill);color:var(--fink);cursor:grab;
+  transform:translate3d(var(--dx,0px),var(--dy,0px),0) rotate(var(--drot,0deg)) scale(var(--dsc,1));
+  transition:transform .26s var(--ease-out),box-shadow .26s var(--ease-out),opacity .26s var(--ease-out);
+  box-shadow:0 16px 34px -22px rgba(40,36,28,.5);}
+.fnslot.hov .fncard{--drot:-3.4deg;--dsc:1.075;
+  box-shadow:0 30px 60px -26px rgba(40,36,28,.55);
+  outline:1.5px solid var(--select);outline-offset:3px;}
+.fncard.dragging{transition:box-shadow .2s var(--ease-out);cursor:grabbing;
+  box-shadow:0 44px 80px -30px rgba(40,36,28,.6);}
+.fncard.springing{transition:transform 640ms cubic-bezier(.34,1.44,.46,1),box-shadow .3s var(--ease-out);}
+.fn-face{position:absolute;inset:0;border-radius:22px;overflow:hidden;}
+.fn-cat{position:absolute;top:14px;left:15px;right:15px;font-family:var(--f-mono);font-size:8px;
+  font-weight:500;text-transform:uppercase;letter-spacing:.15em;opacity:.6;line-height:1;}
+.fn-art{position:absolute;left:15px;right:15px;top:40px;height:44%;}
+.fn-art svg{display:block;width:100%;height:100%;overflow:visible;}
+.fn-name{position:absolute;left:15px;right:15px;bottom:14px;margin:0;
+  font-family:var(--f-display);font-weight:700;text-transform:uppercase;
+  font-size:clamp(13px,1.35vw,19px);line-height:.98;letter-spacing:.008em;-webkit-text-stroke:0;}
+/* figma-style name tag, pinned to the corner of the selection outline */
+.fn-tag{position:absolute;left:-1px;bottom:-25px;background:var(--select);color:#fff;
+  border-radius:5px;font-family:var(--f-mono);font-size:9px;font-weight:500;letter-spacing:.02em;
+  line-height:1;padding:4px 7px;white-space:nowrap;max-width:150%;overflow:hidden;
+  text-overflow:ellipsis;opacity:0;pointer-events:none;transition:opacity .14s var(--ease-out);}
+.fnslot.hov .fn-tag{opacity:1;}
+/* everything recedes while one card is open */
+#fan.dimmed .fncard{opacity:.16;--dsc:.94;pointer-events:none;box-shadow:none;}
+#fan.dimmed .fn-tag{opacity:0;}
+.fn-hint{margin:14px 0 0;text-align:center;}
+
+/* ---------- stage 1 · the opened pattern ---------- */
+#pat-open{position:fixed;z-index:930;border-radius:30px;overflow:hidden;background:var(--fill);
+  color:var(--fink);box-shadow:0 50px 96px -34px rgba(40,36,28,.55);
+  transition:left .44s cubic-bezier(.2,.9,.25,1),top .44s cubic-bezier(.2,.9,.25,1),
+             width .44s cubic-bezier(.2,.9,.25,1),height .44s cubic-bezier(.2,.9,.25,1),
+             border-radius .44s var(--ease-out);}
+#pat-open.hidden{display:none;}
+.po-in{position:absolute;inset:0;overflow:auto;padding:26px 28px 28px;
+  opacity:0;transition:opacity .2s var(--ease-out) .1s;}
+#pat-open.open .po-in{opacity:1;}
+.po-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;color:inherit;opacity:.6;z-index:4;}
+.po-close:hover{opacity:1;background:rgba(255,255,255,.35);}
+.po-close svg{width:16px;height:16px;}
+.po-cat{font-family:var(--f-mono);font-size:8.5px;font-weight:500;text-transform:uppercase;
+  letter-spacing:.16em;opacity:.62;}
+.po-name{margin:10px 0 0;font-family:var(--f-display);font-weight:700;text-transform:uppercase;
+  font-size:clamp(26px,3.4vw,44px);line-height:.96;-webkit-text-stroke:0;}
+.po-ctx{margin:8px 0 0;font-size:12px;line-height:1.5;opacity:.62;}
+.po-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:30px;
+  align-items:start;margin-top:20px;}
+@media (max-width:720px){.po-grid{grid-template-columns:1fr;gap:18px;}}
+.po-num{display:flex;align-items:baseline;gap:8px;}
+.po-num .n{font-family:var(--f-display);font-weight:700;font-size:clamp(48px,7vw,86px);line-height:.8;
+  letter-spacing:-.03em;font-variant-numeric:tabular-nums;-webkit-text-stroke:0;}
+.po-num .u{font-size:15px;font-weight:500;opacity:.6;}
+.po-lab{margin:10px 0 0;font-family:var(--f-mono);font-size:8.5px;font-weight:500;
+  text-transform:uppercase;letter-spacing:.15em;opacity:.6;}
+.po-chart{height:120px;}
+.po-chart svg{display:block;width:100%;height:100%;overflow:visible;}
+.po-bars{display:flex;align-items:flex-end;gap:10px;height:132px;}
+.po-bars .b{flex:1 1 0;display:flex;flex-direction:column;justify-content:flex-end;height:100%;min-width:0;}
+.po-bars .bv{font-family:var(--f-display);font-weight:700;font-size:15px;line-height:1;text-align:center;
+  margin-bottom:6px;font-variant-numeric:tabular-nums;}
+.po-bars .bf{display:block;width:100%;border-radius:12px;height:0;
+  transition:height .5s cubic-bezier(.2,.85,.3,1);}
+.po-bars .bl{margin-top:7px;font-family:var(--f-mono);font-size:7.5px;text-transform:uppercase;
+  letter-spacing:.1em;text-align:center;opacity:.6;line-height:1.3;}
+.po-hist{margin-top:18px;}
+.po-hist .hr{display:flex;align-items:center;gap:12px;padding:5px 0;font-size:12px;}
+.po-hist .hn{width:88px;flex:0 0 auto;opacity:.7;}
+.po-hist .hb{flex:1 1 auto;min-width:40px;height:7px;border-radius:999px;
+  background:rgba(0,0,0,.09);overflow:hidden;}
+.po-hist .hb i{display:block;height:100%;width:0;border-radius:999px;
+  transition:width .5s cubic-bezier(.2,.85,.3,1);}
+.po-hist .hv{width:52px;text-align:right;font-family:var(--f-display);font-weight:700;font-size:16px;
+  font-variant-numeric:tabular-nums;-webkit-text-stroke:0;}
+.po-sess{margin-top:22px;padding:14px 18px;border-radius:20px;background:rgba(255,255,255,.42);}
+.po-sess .ps-t{font-size:13px;font-weight:600;margin:8px 0 0;}
+.po-sess .ps-d{margin:6px 0 0;font-size:12px;line-height:1.5;opacity:.68;}
+.po-sess .ps-stats{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px;}
+.po-sess .ps-stats b{display:block;font-family:var(--f-display);font-weight:700;font-size:20px;
+  line-height:1;font-variant-numeric:tabular-nums;-webkit-text-stroke:0;}
+.po-sess .ps-stats span{display:block;margin-top:5px;font-family:var(--f-mono);font-size:7.5px;
+  text-transform:uppercase;letter-spacing:.13em;opacity:.6;}
+.po-go{margin-top:14px;display:inline-flex;align-items:center;gap:8px;border-radius:999px;
+  background:#141310;color:#fff;padding:11px 18px;font-size:12px;font-weight:600;}
+.po-go svg{width:14px;height:14px;}
+.po-note{margin:11px 0 0;font-size:11px;line-height:1.5;opacity:.55;}
+
+/* ---------- stage 2 · focus + vitals ---------- */
+#fv-grid{display:grid;grid-template-columns:minmax(250px,1fr) minmax(0,2.05fr);gap:36px;align-items:stretch;}
+@media (max-width:1080px){#fv-grid{grid-template-columns:1fr;gap:26px;}}
+#focus-slot{display:flex;}
+#focus-slot > .obj{width:100%;}
+#vitals-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(2,minmax(0,1fr));gap:18px;}
+@media (max-width:1080px){#vitals-row{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto;}}
+@media (max-width:680px){#vitals-row{grid-template-columns:repeat(2,minmax(0,1fr));}}
+#vitals-row > .obj{height:100%;}
 .vcard .bignum{margin:12px 0 8px;}
 .vdesc{margin:10px 0 0;font-size:10.5px;line-height:1.45;color:var(--ink3);}
 
-/* ---------- pattern card ---------- */
-.pcard .pat-cap{margin:10px 0 14px;}
+/* the focus card is tall now, so it reads top to bottom and the number
+   carries all of the weight. No rail, no nodes, no glow. */
+.foc .card{text-align:left;}
+.foc-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.foc-top .fl{font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:15px;
+  letter-spacing:.06em;color:var(--ink3);-webkit-text-stroke:0;}
+.foc-num{display:flex;align-items:baseline;gap:9px;margin:24px 0 0;}
+.foc-num .n{font-family:var(--f-display);font-weight:700;font-size:clamp(66px,8vw,124px);line-height:.78;
+  letter-spacing:-.035em;color:#0D0C0A;-webkit-text-stroke:0;font-variant-numeric:tabular-nums;}
+.foc-num .u{font-size:17px;font-weight:500;color:var(--ink3);}
+.foc-desc{margin:14px 0 0;}
+.foc-beats{display:flex;flex-direction:column;gap:30px;padding-top:40px;}
+.foc-beat p{margin:9px 0 0;font-size:13px;line-height:1.55;color:var(--ink2);}
 
-/* ---------- pattern carousel ----------
-   Uniform cards on a snapping horizontal rail. The centred card is at
-   full size and full opacity; every step out recedes in scale, turns
-   slightly toward the centre and loses opacity, so the rail reads as a
-   stack of panels fanning out from a focal card. */
-/* full-bleed: the rail fills the viewport, escaping the .wrap gutter.
-   Generous vertical padding gives a dragged card room to lift before the
-   scroller's own clip catches it — a scroll container cannot leave one
-   axis visible, so the padding is the headroom. */
-#pat-car{position:relative;display:none;width:auto;margin:0 -20px;
-  overflow-x:auto;overflow-y:hidden;
-  scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none;
-  cursor:grab;padding:56px 0 72px;--car-w:min(453px,80vw);--car-h:600px;}
-#pat-car.panning{cursor:grabbing;scroll-snap-type:none;}
-#pat-car::-webkit-scrollbar{display:none;}
-#pat-car.on{display:block;}
-#pat-track{display:flex;align-items:stretch;gap:30px;width:max-content;
-  padding:0 calc(50% - var(--car-w) / 2);}
-/* the snap target stays untransformed so scroll-snap centres on the card's
-   real box; the perspective tilt lives on an inner wrapper */
-.cslot{flex:0 0 var(--car-w);width:var(--car-w);height:var(--car-h);scroll-snap-align:center;}
-.ctilt{width:100%;height:100%;
-  transform:perspective(1500px) translateZ(calc(var(--cz,0) * 1px))
-            rotateY(var(--cry,0deg)) scale(var(--csc,1));
-  opacity:var(--cop,1);will-change:transform,opacity;}
-.ctilt > .obj{height:100%;}
-.cslot .frame{flex:1 1 auto;min-height:90px;}
-#pat-car .obj.dragging,#pat-car .obj.returning{z-index:900;}
-@media (max-width:680px){#pat-car{--car-h:560px;}#pat-track{gap:18px;}}
-.car-hint{margin:10px 0 0;text-align:center;}
+/* ---------- home · plain list format ---------- */
+.lgroup{margin-bottom:46px;}
+.lrows{display:flex;flex-direction:column;gap:8px;max-width:1080px;margin:0 auto;}
+.lrow{display:grid;grid-template-columns:10px minmax(0,1fr) auto auto;align-items:center;gap:16px;
+  width:100%;text-align:left;padding:15px 22px;border-radius:20px;background:var(--panel);
+  box-shadow:0 10px 26px -20px rgba(40,36,28,.45);
+  transition:transform .18s var(--ease-out),box-shadow .18s var(--ease-out);}
+button.lrow:hover{transform:translateY(-2px);box-shadow:0 18px 36px -22px rgba(40,36,28,.5);}
+.lrow i.dot{display:block;width:10px;height:10px;border-radius:999px;}
+.lrow .ln{display:block;font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:15px;
+  letter-spacing:.045em;color:var(--ink);-webkit-text-stroke:0;line-height:1.15;}
+.lrow .ld{display:block;margin:4px 0 0;font-size:11.5px;color:var(--ink3);line-height:1.4;}
+.lrow .lv{font-family:var(--f-display);font-weight:700;font-size:23px;line-height:1;color:#0D0C0A;
+  letter-spacing:-.02em;-webkit-text-stroke:0;font-variant-numeric:tabular-nums;}
+.lrow .lv small{font-size:11px;font-weight:500;color:var(--ink3);margin-left:4px;letter-spacing:0;}
+@media (max-width:680px){.lrow{grid-template-columns:10px minmax(0,1fr) auto;}.lrow .chip{display:none;}}
+.lfocus{max-width:1080px;margin:0 auto;padding:24px 26px;border-radius:26px;background:var(--panel);
+  box-shadow:0 14px 34px -24px rgba(40,36,28,.45);}
+.lfocus .lf-beats{display:flex;flex-direction:column;gap:20px;margin-top:20px;}
+.lfocus .lf-beats p{margin:7px 0 0;font-size:13px;line-height:1.55;color:var(--ink2);}
 
 /* ---------- sticky settings panel ---------- */
 #panel{position:fixed;right:22px;bottom:22px;z-index:940;
@@ -341,39 +448,66 @@ body.scrubbing{user-select:none;-webkit-user-select:none;}
   background:var(--panel);transition:transform .2s var(--ease-out);}
 .sw-mini.on{background:var(--ink);}
 .sw-mini.on::after{transform:translateX(14px);}
-.pseg{display:flex;gap:4px;background:var(--well);border-radius:999px;padding:4px;margin-top:8px;}
-.pseg button{flex:1 1 0;border-radius:999px;padding:8px 10px;font-size:12px;font-weight:500;
-  color:var(--ink2);transition:background .18s var(--ease-out),color .18s var(--ease-out);}
-.pseg button.on{background:var(--ink);color:var(--panel);}
 
-/* ---------- sessions ---------- */
-.srow .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;}
-.srow .stat{display:flex;flex-direction:column;gap:6px;min-width:0;text-align:center;}
-.srow .stat b{font-family:var(--f-display);font-weight:700;font-size:26px;line-height:.85;color:#0D0C0A;
+/* ---------- sessions ----------
+   Sessions have their own card language and share nothing with the
+   rest of the app: a wide, low record strip, shaped for a log of
+   games rather than for a panel of charts. Date leads on the left,
+   the stat run sits inline, duration closes it on the right. */
+#sessions-rows{display:flex;flex-direction:column;gap:10px;max-width:1080px;margin:0 auto;}
+.srec{display:block;width:100%;text-align:left;background:var(--panel);border-radius:24px;
+  padding:20px 26px;box-shadow:0 12px 30px -22px rgba(40,36,28,.45);
+  transition:transform .18s var(--ease-out),box-shadow .18s var(--ease-out);}
+.srec:hover{transform:translateY(-2px);box-shadow:0 22px 44px -24px rgba(40,36,28,.5);}
+.srec:active{transform:translateY(0) scale(.997);}
+.srec-top{display:grid;grid-template-columns:96px minmax(0,1fr) auto;align-items:center;gap:20px;}
+.srec-date{font-family:var(--f-mono);font-size:9.5px;font-weight:500;text-transform:uppercase;
+  letter-spacing:.13em;color:var(--ink3);line-height:1.3;}
+.srec-name{font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:19px;
+  letter-spacing:.035em;line-height:1.1;color:var(--ink);-webkit-text-stroke:0;}
+.srec-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end;}
+.srec-dur{font-size:12.5px;font-weight:500;color:var(--ink2);font-variant-numeric:tabular-nums;}
+.srec-arrow{color:var(--ink3);display:flex;align-items:center;}
+.srec-arrow svg{width:17px;height:17px;}
+.srec-stats{display:flex;gap:30px;flex-wrap:wrap;margin-top:14px;padding-left:116px;}
+@media (max-width:760px){
+  .srec-top{grid-template-columns:minmax(0,1fr) auto;}
+  .srec-date{grid-column:1 / -1;}
+  .srec-stats{padding-left:0;gap:20px;}
+}
+.srec-stats .st{display:flex;align-items:baseline;gap:6px;}
+.srec-stats .st b{font-family:var(--f-display);font-weight:700;font-size:21px;line-height:1;color:#0D0C0A;
   letter-spacing:-.02em;-webkit-text-stroke:0;font-variant-numeric:tabular-nums;}
-.srow .sfoot{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 0 12px;}
-.srow .sdur{font-size:13px;font-weight:500;color:var(--ink2);font-variant-numeric:tabular-nums;}
-.srow .sarrow{color:var(--ink3);display:flex;align-items:center;}
-.srow .sarrow svg{width:18px;height:18px;}
-.srow .scand{margin:0 0 14px;text-align:center;}
-.srow .scand .sc-t{margin:9px 0 0;font-size:14px;font-weight:600;color:var(--ink);}
-.srow .scand .sc-d{margin:5px 0 0;font-size:12px;line-height:1.5;color:var(--ink3);}
+.srec-cand{margin-top:14px;padding:14px 18px;border-radius:16px;background:var(--well);}
+.srec-cand .sc-t{margin:8px 0 0;font-size:13.5px;font-weight:600;color:var(--ink);}
+.srec-cand .sc-d{margin:5px 0 0;font-size:12px;line-height:1.5;color:var(--ink3);}
 
-/* ---------- activity heatmap ---------- */
-.heat-stats{display:flex;gap:40px;flex-wrap:wrap;margin-bottom:18px;}
-.heat-stats b{display:block;font-family:var(--f-display);font-weight:700;font-size:38px;line-height:.85;
+/* ---------- activity ----------
+   Deliberately small — a compact strip, not a panel. */
+.actcard{width:fit-content;max-width:100%;margin:0 auto 26px;background:var(--panel);border-radius:22px;
+  padding:18px 22px 20px;box-shadow:0 12px 30px -22px rgba(40,36,28,.45);}
+.act-top{display:flex;align-items:baseline;gap:26px;flex-wrap:wrap;margin-bottom:12px;}
+.act-top .at{font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:13px;
+  letter-spacing:.07em;color:var(--ink3);-webkit-text-stroke:0;}
+.heat-stats{display:flex;gap:26px;flex-wrap:wrap;margin-left:auto;}
+.heat-stats div{display:flex;align-items:baseline;gap:7px;}
+.heat-stats b{font-family:var(--f-display);font-weight:700;font-size:19px;line-height:1;
   color:#0D0C0A;letter-spacing:-.02em;-webkit-text-stroke:0;font-variant-numeric:tabular-nums;}
-.heat-stats span{display:block;margin-top:8px;}
-.heat-wrap{position:relative;display:grid;grid-template-columns:14px minmax(0,1fr);gap:8px;align-items:stretch;}
-.heat-days{display:grid;grid-template-rows:repeat(7,1fr);gap:5px;}
-.heat-days span{display:flex;align-items:center;font-size:8px;font-weight:600;color:var(--ink3);line-height:1;}
-.heatgrid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,1fr);grid-auto-columns:1fr;
-  gap:5px;width:100%;aspect-ratio:18 / 7;}
-.heatgrid i{display:block;width:100%;height:100%;border-radius:6px;cursor:pointer;
+.heat-wrap{position:relative;display:grid;grid-template-columns:11px auto;gap:6px;
+  align-items:stretch;justify-content:start;}
+.heat-days{display:grid;grid-template-rows:repeat(7,21px);gap:3px;}
+@media (max-width:760px){.heat-days{grid-template-rows:repeat(7,14px);gap:2px;}}
+.heat-days span{display:flex;align-items:center;font-size:7px;font-weight:600;color:var(--ink3);line-height:1;}
+/* square cells at a fixed small size — the block stays a strip */
+.heatgrid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,21px);grid-auto-columns:21px;gap:3px;}
+@media (max-width:760px){.heatgrid{grid-template-rows:repeat(7,14px);grid-auto-columns:14px;gap:2px;}}
+.heatgrid i{display:block;width:100%;height:100%;border-radius:3px;cursor:pointer;
   transition:transform .24s cubic-bezier(.34,1.5,.5,1);}
-.heatgrid i:hover{transform:scale(1.15);}
-.heat-scale{display:flex;align-items:center;gap:6px;margin-top:18px;}
-.heat-scale i{display:block;width:12px;height:12px;border-radius:5px;}
+.heatgrid i:hover{transform:scale(1.25);}
+.act-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:11px;}
+.act-foot .legend{margin:0;justify-content:flex-start;}
+.act-foot .legend span{font-size:9px;}
+.act-foot .legend i{width:7px;height:7px;}
 .tip{position:absolute;z-index:40;pointer-events:none;opacity:0;transform:translate(-50%,-124%);
   background:#161512;color:#fff;border-radius:14px;padding:9px 12px;white-space:nowrap;font-size:11px;
   line-height:1.45;transition:opacity .14s var(--ease-out);}
@@ -419,13 +553,27 @@ body.scrubbing{user-select:none;-webkit-user-select:none;}
 .ask-seed button{border-radius:999px;background:var(--surface);padding:8px 13px;font-size:11.5px;color:var(--ink2);}
 .ask-seed button:hover{background:var(--surface2);color:var(--ink);}
 
-/* ---------- scoreboard ---------- */
+/* ---------- scoreboard ----------
+   Scoreboard has its own card language too: a flat, generous panel
+   whose content is pinned to the TOP of the surface and never nested
+   inside a second container. Charts sit directly on the panel. */
 #sb-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px;align-items:start;}
 @media (max-width:1080px){#sb-layout{grid-template-columns:1fr;}}
-#sb-right{display:flex;flex-direction:column;gap:20px;}
-.sb-section + .sb-section{margin-top:34px;}
-.sb-sub{font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:15px;
-  letter-spacing:.06em;color:var(--ink3);-webkit-text-stroke:0;margin:0 0 12px;}
+#sb-left,#sb-right{display:flex;flex-direction:column;gap:20px;align-items:stretch;}
+.sbcard{--k:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
+  background:var(--panel);border-radius:34px;padding:28px 30px 30px;
+  box-shadow:0 16px 40px -26px rgba(40,36,28,.45);}
+.sb-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px;}
+.sb-head h3{margin:0;font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:20px;
+  letter-spacing:.05em;color:var(--ink);-webkit-text-stroke:0;line-height:1.1;}
+.sb-head .chip{margin-left:auto;}
+.sbcard .bignum{justify-content:flex-start;margin:10px 0 4px;}
+.sbcard .legend{justify-content:flex-start;margin:14px 0 0;}
+.sbcard .ramp{justify-content:flex-start;}
+.sb-note{margin:0;font-size:11.5px;line-height:1.5;color:var(--ink3);}
+.sb-block{margin-top:22px;}
+.sb-sub{font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:13px;
+  letter-spacing:.07em;color:var(--ink3);-webkit-text-stroke:0;margin:0 0 12px;}
 
 .zonewrap{position:relative;width:100%;}
 .zonesvg{display:block;width:100%;height:auto;overflow:visible;}
@@ -434,16 +582,13 @@ body.scrubbing{user-select:none;-webkit-user-select:none;}
 .zonewrap.hovering .zoneseg.on{opacity:1;}
 .shotdot{cursor:pointer;transition:transform .26s cubic-bezier(.34,1.5,.5,1);transform-box:fill-box;transform-origin:center;}
 .shotdot:hover{transform:scale(1.3);}
-.ramp{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;margin:0 0 10px;}
-.ramp + .frame,.sb-legend + .frame{margin-top:0;}
-.sb-legend{margin-top:14px;}
+.ramp{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:14px 0 0;}
 .ramp .bar{display:flex;border-radius:999px;overflow:hidden;}
 .ramp .bar i{display:block;width:30px;height:7px;}
 .ramp .sizes{display:flex;align-items:flex-end;gap:8px;}
 .ramp .sizes i{display:block;border-radius:999px;background:var(--surface2);}
 
-.mech-rows{position:relative;display:flex;flex-direction:column;gap:26px;padding:4px 0;}
-.mech-path{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
+.mech-rows{position:relative;display:flex;flex-direction:column;gap:24px;padding:2px 0;}
 .mech-row{position:relative;z-index:1;}
 .mech-row .mr-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px;}
 .mech-row .mr-name{font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:13px;
@@ -560,7 +705,7 @@ body.scrubbing{user-select:none;-webkit-user-select:none;}
 #modal .hist .hbar{flex:1 1 auto;min-width:40px;height:7px;border-radius:999px;
   background:rgba(219,214,203,.7);position:relative;overflow:hidden;}
 #modal .hist .hbar i{position:absolute;inset:0 auto 0 0;border-radius:999px;}
-#toast-wrap{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:990;
+#toast-wrap{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);z-index:990;
   display:flex;flex-direction:column;gap:10px;align-items:center;}
 .toast{background:#161512;color:#fff;border-radius:999px;padding:12px 20px;font-size:12.5px;
   box-shadow:0 20px 44px -18px rgba(40,36,28,.6);animation:rise .24s var(--ease-out) both;}
@@ -574,63 +719,65 @@ body.scrubbing{user-select:none;-webkit-user-select:none;}
 <body>
 
 <div id="bg" aria-hidden="true">
-  <div id="bg-mesh"></div><div id="bg-veil"></div>
   <canvas id="bg-ascii"></canvas>
   <div id="bg-lines"></div>
   <div id="bg-grain"></div>
 </div>
 
-<div id="band">
-  <div id="ruler" role="slider" aria-label="Scroll position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
-    <div id="ruler-track"></div>
-    <span id="ruler-pill" class="num">0%</span>
-    <span id="ruler-live"><i></i><span id="ruler-count">live · 12 patterns</span></span>
-  </div>
-  <nav id="nav">
-    <div id="brand"><b>aera</b><i></i></div>
-    <div id="tabs">
-      <button data-go="home" class="on">Home</button>
-      <button data-go="sessions">Sessions</button>
-      <button data-go="insights">Insights</button>
-      <button data-go="scoreboard">Scoreboard</button>
-    </div>
-  </nav>
-</div>
-<div id="band-fade" aria-hidden="true"></div>
-
 <main id="main">
 
   <section class="screen on" id="s-home">
-    <div class="wrap">
-      <div class="home-head">
-        <h1 class="dsp">this is aera.</h1>
-        <p class="sub">A pattern is a behaviour your sessions keep repeating.</p>
-        <button id="quiet-toggle" class="switch" type="button" aria-pressed="false">
-          <span class="sw" aria-hidden="true"></span><span>quiet mode</span>
-        </button>
-      </div>
-      <div class="sec-block" id="patterns-block">
-        <div id="pat-car" class="on"><div id="pat-track"></div></div>
-        <p class="car-hint micro" id="car-hint">scroll or drag sideways · click a card for its full history</p>
-        <div class="masonry" id="patterns-grid" hidden></div>
-      </div>
-      <div class="sec-block" id="vitals-block">
-        <div class="sec-head"><h2 class="dsp">Vitals</h2></div>
-        <div id="vitals-row"></div>
-      </div>
-      <div class="sec-block" id="focus-block">
-        <div class="sec-head"><h2 class="dsp">Focus</h2></div>
-        <div id="focus-slot"></div>
+
+    <!-- STAGE 1 — patterns, and nothing but patterns -->
+    <div class="stage" id="stage1">
+      <div class="wrap">
+        <div class="screen-head">
+          <h1 class="dsp">Patterns</h1>
+          <span class="sub">A pattern is a behaviour your sessions keep repeating. Twelve of them are holding right now.</span>
+        </div>
+        <div id="fan-wrap"><div id="fan"></div></div>
+        <div id="ruler" role="slider" aria-label="Position in the pattern set" aria-valuemin="1" aria-valuemax="12" aria-valuenow="1" tabindex="0">
+          <div id="ruler-track"></div>
+          <span id="ruler-caret" aria-hidden="true"></span>
+          <span id="ruler-pill" class="num">1 / 12</span>
+        </div>
+        <p class="fn-hint micro" id="fan-hint">scroll to move through the set · drag a card loose · click one to open it</p>
       </div>
     </div>
+
+    <!-- STAGE 2 — focus + vitals, nothing else -->
+    <div class="stage" id="stage2">
+      <div class="wrap">
+        <div class="screen-head">
+          <h1 class="dsp">Focus &amp; vitals</h1>
+          <span class="sub">One thing worth attention this week, and the body readings underneath it.</span>
+        </div>
+        <div id="fv-grid">
+          <div id="focus-slot"></div>
+          <div id="vitals-row"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- plain list format -->
+    <div id="home-list">
+      <div class="wrap">
+        <div class="screen-head">
+          <h1 class="dsp">Everything</h1>
+          <span class="sub">The same data as a plain list — patterns, vitals and focus, nothing moving.</span>
+        </div>
+        <div id="home-list-body"></div>
+      </div>
+    </div>
+
   </section>
 
   <section class="screen" id="s-sessions">
     <div class="wrap">
       <div class="sub-view on" id="sessions-list">
-        <div class="screen-head"><h1 class="dsp">Sessions</h1><span class="sub">your recorded games · stored on device</span></div>
-        <div id="activity-slot" style="margin-bottom:34px"></div>
-        <div class="masonry" id="sessions-grid"></div>
+        <div class="screen-head"><h1 class="dsp">Sessions</h1><span class="sub">Every game you recorded, kept on the device. Open one to walk back through it.</span></div>
+        <div id="activity-slot"></div>
+        <div id="sessions-rows"></div>
       </div>
       <div class="sub-view" id="session-detail"></div>
     </div>
@@ -638,7 +785,7 @@ body.scrubbing{user-select:none;-webkit-user-select:none;}
 
   <section class="screen" id="s-insights">
     <div class="wrap">
-      <div class="screen-head"><h1 class="dsp">Insights</h1><span class="sub">built from your sessions · on-device</span></div>
+      <div class="screen-head"><h1 class="dsp">Insights</h1><span class="sub">Built from your own sessions, on-device. Pull what you want — nothing here is pushed at you.</span></div>
       <div id="ins-layout">
         <div>
           <div class="seg" id="ins-filter">
@@ -655,7 +802,7 @@ body.scrubbing{user-select:none;-webkit-user-select:none;}
 
   <section class="screen" id="s-scoreboard">
     <div class="wrap">
-      <div class="screen-head"><h1 class="dsp">Scoreboard</h1><span class="sub">session 14 · made for sharing</span></div>
+      <div class="screen-head"><h1 class="dsp">Scoreboard</h1><span class="sub">Session 14, sport stats only. This is the part that is safe to share.</span></div>
       <div id="sb-layout"><div id="sb-left"></div><div id="sb-right"></div></div>
     </div>
   </section>
@@ -667,15 +814,24 @@ body.scrubbing{user-select:none;-webkit-user-select:none;}
   <div id="drag-badge">dx: 0, dy: 0</div>
 </div>
 
+<div id="pat-open" class="hidden" role="dialog" aria-modal="true" aria-label="Pattern detail"></div>
+
+<div id="home-mode" role="group" aria-label="Home format">
+  <button type="button" data-mode="scroll" class="on">Fan</button>
+  <button type="button" data-mode="list">List</button>
+</div>
+
+<nav id="bnav" aria-label="Main">
+  <div class="track">
+    <button data-go="home" class="on" type="button">Home</button>
+    <button data-go="sessions" type="button">Sessions</button>
+    <button data-go="insights" type="button">Insights</button>
+    <button data-go="scoreboard" type="button">Scoreboard</button>
+  </div>
+</nav>
+
 <div id="panel" class="collapsed">
   <div id="panel-body" class="scaled squircle" data-sq="out" role="group" aria-label="Display settings">
-    <div class="pgroup">
-      <div class="pgroup-head"><span class="micro">Pattern layout</span></div>
-      <div class="pseg" id="layout-seg">
-        <button type="button" data-layout="carousel" class="on">Carousel</button>
-        <button type="button" data-layout="grid">Grid</button>
-      </div>
-    </div>
     <div class="pgroup" data-layer="lines">
       <div class="pgroup-head"><span class="micro">Vertical lines</span>
         <button class="sw-mini on" type="button" data-toggle="lines" role="switch" aria-checked="true" aria-label="Vertical lines"></button></div>
@@ -731,6 +887,21 @@ var HL_INK = { lime:'#15170A', sky:'#0A1620', coral:'#201006', pink:'#20101B',
                lavender:'#150F26', mint:'#062017', yellow:'#1F1804', tan:'#1E170C' };
 function fill(t){ return HL[t] || HL.lime; }
 function ink(t){ return HL_INK[t] || HL_INK.lime; }
+/* flat colour maths — used for card-face tints. Never a gradient: the
+   result is a single solid colour mixed toward paper or toward ink. */
+function hex2rgb(h){ h=h.replace('#',''); return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)]; }
+function rgb2hex(c){ return '#'+c.map(function(v){ return ('0'+Math.round(Math.max(0,Math.min(255,v))).toString(16)).slice(-2); }).join(''); }
+function mix(a,b,t){ var x=hex2rgb(a), y=hex2rgb(b); return rgb2hex([0,1,2].map(function(i){ return x[i]+(y[i]-x[i])*t; })); }
+/* a tint of the card's own colour, pushed toward paper or toward ink
+   depending on how light the card already is */
+function tintOf(hexc){
+  var c=hex2rgb(hexc), lum=(c[0]*0.299+c[1]*0.587+c[2]*0.114)/255;
+  return lum > 0.55 ? mix(hexc,'#141310',0.30) : mix(hexc,'#FFFFFC',0.42);
+}
+function inkOn(hexc){
+  var c=hex2rgb(hexc), lum=(c[0]*0.299+c[1]*0.587+c[2]*0.114)/255;
+  return lum > 0.5 ? '#141310' : '#FFFFFC';
+}
 function chip(tone,text,cls){
   if(tone==='neutral') return '<span class="chip neutral '+(cls||'')+'">'+text+'</span>';
   return '<span class="chip '+(cls||'')+'" style="background:'+fill(tone)+';color:'+ink(tone)+'">'+text+'</span>';
@@ -777,7 +948,7 @@ var STATE_LABEL = { improving:'Improving', steady:'Steady', 'new':'New', declini
 var STATE_HL    = { improving:'mint', steady:'sky', 'new':'yellow', declining:'coral' };
 
 var PATTERNS = [
-  { id:'rushing', name:'Rushing under pressure', state:'improving', hero:'0.42', unit:'s', kind:'Measured', tone:'mint', ch:150,
+  { id:'rushing', session:0, name:'Rushing under pressure', state:'improving', hero:'0.42', unit:'s', kind:'Measured', tone:'mint', ch:150,
     context:'release time under pressure · last 6 sessions',
     chart:{type:'line',tone:'mint',values:[61,58,55,51,46,42]},
     legend:[{tone:'mint',label:'now',value:'0.42s'},{tone:'sky',label:'baseline',value:'0.61s'},{tone:'tan',label:'outliers',value:'0.9s'}],
@@ -790,7 +961,7 @@ var PATTERNS = [
     context:'contested 3 FG% · last 5 sessions',
     chart:{type:'bars',items:[{value:71,tone:'mint',label:'open'},{value:57,tone:'yellow',label:'vs speed'},{value:48,tone:'coral',label:'vs length'}]},
     history:[['Session 10','58%',58],['Session 11','57%',57],['Session 12','55%',55],['Session 13','54%',54],['Session 14','52%',52]] },
-  { id:'leftwing', name:'Left-wing hesitation', state:'declining', hero:'0.3', unit:'s', kind:'Measured', tone:'coral', ch:140,
+  { id:'leftwing', session:2, name:'Left-wing hesitation', state:'declining', hero:'0.3', unit:'s', kind:'Measured', tone:'coral', ch:140,
     context:'pause before gather, left-wing catches',
     chart:{type:'area',tone:'coral',values:[12,16,19,24,27,30]},
     legend:[{tone:'coral',label:'left wing',value:'0.3s'},{tone:'sky',label:'right wing',value:'0.1s'}],
@@ -808,7 +979,7 @@ var PATTERNS = [
     context:'shot type mix, final 10 minutes',
     chart:{type:'bars',items:[{value:22,tone:'coral',label:'pull-ups'},{value:18,tone:'yellow',label:'catch & shoot'},{value:7,tone:'mint',label:'rim'}]},
     history:[['Session 11','+12',40],['Session 12','+15',50],['Session 13','+19',64],['Session 14','+22',74]] },
-  { id:'handle', name:'Handle tightens late', state:'steady', hero:'13', unit:'%', kind:'Measured', tone:'sky', ch:170,
+  { id:'handle', session:4, name:'Handle tightens late', state:'steady', hero:'13', unit:'%', kind:'Measured', tone:'sky', ch:170,
     context:'dribble variance, final 10 min',
     chart:{type:'bars',items:[{value:9,tone:'mint',label:'early'},{value:10,tone:'yellow',label:'mid'},{value:13,tone:'coral',label:'late'}]},
     history:[['Session 11','14%',56],['Session 12','13%',52],['Session 13','13%',52],['Session 14','13%',52]] },
@@ -972,7 +1143,7 @@ function inkify(el){
 function inkAll(root){ $$('.dsp', root||document).forEach(inkify); }
 
 /* ============================================================
-   SQUIRCLE + UNIVERSAL CARD SPEC
+   SQUIRCLE GEOMETRY (object shell only)
 
    Corner smoothing 100% is true superellipse geometry, never plain
    border-radius: |x/r|^n + |y/r|^n = 1. n = 4 is the same curve CSS
@@ -982,6 +1153,8 @@ function inkAll(root){ $$('.dsp', root||document).forEach(inkify); }
 
    Every spec number is measured against a 453px reference card and
    scaled by the card's own width, so the ratios hold at any size.
+   This applies to the object shell alone — sessions, scoreboard and
+   the pattern fan carry their own radii.
    ============================================================ */
 var SQ_N=4, SQ_STEPS=22;
 var REF_W = 453;
@@ -1202,87 +1375,23 @@ function vitalCard(v){
   return objWrap(v.label.toLowerCase(), inner, 'vcard');
 }
 
-function patternCard(p, uniform){
-  var inner =
-    cardOpen('hasdots')+
-      DOTS+
-      headHTML(p.name, chip(STATE_HL[p.state], STATE_LABEL[p.state]))+
-      '<div class="bignum"><span class="n">'+p.hero+'</span><span class="u">'+p.unit+'</span></div>'+
-      '<p class="pat-cap micro">'+p.context+'</p>'+
-      legendHTML(p.chart, p.legend)+
-      frameHTML(p.chart, 0, uniform ? '' : 'height:'+p.ch+'px')+
-    '</div>';
-  return objWrap(p.name.toLowerCase(), inner, 'pcard tappable');
-}
-
+/* Tall card, vertical read. The number carries the weight; the three
+   beats are a plain stacked sequence with air between them — no rail,
+   no nodes, no glow, no gradient. */
 function focusCard(){
   var inner =
     cardOpen()+
-      headHTML('Focus', chip('lavender', FOCUS.kicker))+
-      '<div class="bignum"><span class="n">'+FOCUS.stat+'</span><span class="u">'+FOCUS.unit+'</span></div>'+
-      '<p class="micro" style="margin:0">'+FOCUS.statLabel+'</p>'+
-      '<div class="focus-steps" data-focuspath>'+
-        '<svg class="focus-glow"><g></g></svg>'+
+      '<div class="foc-top"><span class="fl">Focus</span>'+chip('lavender', FOCUS.kicker)+'</div>'+
+      '<div class="foc-num"><span class="n">'+FOCUS.stat+'</span><span class="u">'+FOCUS.unit+'</span></div>'+
+      '<p class="foc-desc micro">'+FOCUS.statLabel+'</p>'+
+      '<div class="foc-beats">'+
         FOCUS.steps.map(function(s){
-          return '<div class="focus-step">'+chip(s.tone, s.label)+'<p class="fs-body">'+s.text+'</p></div>';
+          return '<div class="foc-beat"><span class="micro">'+s.label+'</span><p>'+s.text+'</p></div>';
         }).join('')+
       '</div>'+
     '</div>';
-  return objWrap('focus', inner, '');
+  return objWrap('focus', inner, 'foc');
 }
-
-/* one continuous luminous trail through the three focus blocks */
-function renderGlowPath(host, opts){
-  var svg = host.querySelector('svg'); if(!svg) return;
-  var w = host.clientWidth, h = host.clientHeight;
-  if(!w || !h) return;
-  var anchors = opts.anchors(host);
-  if(anchors.length < 2) return;
-  var box = host.getBoundingClientRect();
-  var pts = anchors.map(function(el){
-    var r = el.getBoundingClientRect();
-    return [r.left - box.left + r.width/2, r.top - box.top + r.height/2];
-  });
-  var col = opts.color || fill('lavender');
-  var d = smoothPath(pts, opts.tension == null ? 0.6 : opts.tension);
-  var uid = opts.uid;
-  var blobs = pts.map(function(p,i){
-    var c = (opts.dotColor ? opts.dotColor(i) : col);
-    return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="'+(opts.blob||34)+'" fill="'+c+'"/>';
-  }).join('');
-  svg.setAttribute('viewBox','0 0 '+w+' '+h);
-  svg.setAttribute('width',w); svg.setAttribute('height',h);
-  svg.innerHTML =
-    '<defs>'+
-      '<filter id="'+uid+'-bloom" x="-60%" y="-60%" width="220%" height="220%">'+
-        '<feGaussianBlur stdDeviation="'+(opts.blur||22)+'"/></filter>'+
-      '<filter id="'+uid+'-soft" x="-40%" y="-40%" width="180%" height="180%">'+
-        '<feGaussianBlur stdDeviation="'+(opts.blur2||7)+'"/></filter>'+
-    '</defs>'+
-    '<g filter="url(#'+uid+'-bloom)" opacity="'+(opts.bloomOpacity||0.55)+'">'+
-      blobs+
-      '<path d="'+d+'" fill="none" stroke="'+col+'" stroke-width="'+(opts.wide||42)+'" stroke-linecap="round" stroke-linejoin="round"/>'+
-    '</g>'+
-    '<g filter="url(#'+uid+'-soft)" opacity="'+(opts.midOpacity||0.75)+'">'+
-      '<path d="'+d+'" fill="none" stroke="'+col+'" stroke-width="'+(opts.mid||16)+'" stroke-linecap="round" stroke-linejoin="round"/>'+
-    '</g>'+
-    '<path d="'+d+'" fill="none" stroke="'+col+'" stroke-width="'+(opts.thin||3)+'" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>';
-}
-var glowHosts = [];
-function bindGlow(root, sel, opts){
-  $$(sel, root||document).forEach(function(el){
-    if(el._glowBound) return;
-    el._glowBound = true;
-    el._glowOpts = opts;
-    glowHosts.push(el);
-    renderGlowPath(el, opts);
-    if(glowRO) glowRO.observe(el);
-  });
-}
-var glowRO = ('ResizeObserver' in window) ? new ResizeObserver(function(en){
-  for(var i=0;i<en.length;i++) renderGlowPath(en[i].target, en[i].target._glowOpts);
-}) : null;
-function repaintGlow(){ glowHosts.forEach(function(el){ renderGlowPath(el, el._glowOpts); }); }
 
 /* ============================================================
    BUILDERS · ACTIVITY + SESSIONS
@@ -1291,55 +1400,54 @@ function heatCell(level){
   if(level===0) return 'background:rgba(226,221,210,.7)';
   return 'background:'+HL.mint+';opacity:'+[0,0.36,0.64,1][level];
 }
+/* compact strip — the activity block is a footnote, not a panel */
 function activityCard(){
   var cells = ACTIVITY.map(function(d,i){ return '<i data-day="'+i+'" style="'+heatCell(d.level)+'"></i>'; }).join('');
   var dayCol = ACTIVITY_DAY_LABELS.map(function(l,i){ return '<span>'+(i%2===1?l:'')+'</span>'; }).join('');
-  var inner =
-    cardOpen()+
-      headHTML('Activity', chip('neutral','Measured'))+
-      '<div class="legend"><span><i style="background:rgba(226,221,210,.9)"></i>rest</span>'+
-        '<span><i style="background:'+HL.mint+';opacity:.36"></i>light</span>'+
-        '<span><i style="background:'+HL.mint+';opacity:.64"></i>steady</span>'+
-        '<span><i style="background:'+HL.mint+'"></i>heavy</span></div>'+
-      '<div class="frame flow squircle" data-sq="frame">'+
-        '<div class="frame-in">'+
-          '<div class="heat-stats">'+
-            '<div><b>'+ACTIVITY_TOTAL+'</b><span class="micro">sessions · '+ACTIVITY_WEEKS+' weeks</span></div>'+
-            '<div><b>'+ACTIVITY_PEAK+'</b><span class="micro">most active week · wk '+ACTIVITY_PEAK_WEEK+'</span></div>'+
-          '</div>'+
-          '<div class="heat-wrap"><div class="heat-days">'+dayCol+'</div>'+
-            '<div class="heatgrid">'+cells+'</div>'+
-            '<div class="tip" id="heat-tip"></div></div>'+
-        '</div>'+
+  return '<div class="actcard">'+
+    '<div class="act-top"><span class="at">Activity</span>'+
+      '<div class="heat-stats">'+
+        '<div><b>'+ACTIVITY_TOTAL+'</b><span class="micro">sessions · '+ACTIVITY_WEEKS+' wks</span></div>'+
+        '<div><b>'+ACTIVITY_PEAK+'</b><span class="micro">busiest week</span></div>'+
       '</div>'+
-    '</div>';
-  return objWrap('activity', inner, '');
+    '</div>'+
+    '<div class="heat-wrap"><div class="heat-days">'+dayCol+'</div>'+
+      '<div class="heatgrid">'+cells+'</div>'+
+      '<div class="tip" id="heat-tip"></div></div>'+
+    '<div class="act-foot"><div class="legend">'+
+      '<span><i style="background:rgba(226,221,210,.9)"></i>rest</span>'+
+      '<span><i style="background:'+HL.mint+';opacity:.36"></i>light</span>'+
+      '<span><i style="background:'+HL.mint+';opacity:.64"></i>steady</span>'+
+      '<span><i style="background:'+HL.mint+'"></i>heavy</span></div></div>'+
+  '</div>';
 }
 
-/* 'Apr 12 · Tuesday scrimmage' -> chip 'Apr 12', title 'Tuesday scrimmage' */
+/* 'Apr 12 · Tuesday scrimmage' -> date 'Apr 12', title 'Tuesday scrimmage' */
 function sessionParts(s){
   var bits = s.d.split(' · ');
   return { date: bits[0], title: bits.slice(1).join(' · ') || bits[0] };
 }
+/* Sessions get their own shape: a wide record strip, low and scannable,
+   with nothing borrowed from the pattern / vital card. */
 function sessionCard(s,i){
-  var stats=[['shots',s.shots],['pts',s.pts],['reb',s.reb],['ast',s.ast],['to',s.to]];
+  var stats=[['shots',s.shots],['pts',s.pts],['reb',s.reb],['ast',s.ast],['to',s.to],['stl',s.stl]];
   var np = sessionParts(s);
-  var inner =
-    cardOpen()+
-      headHTML(np.title, chip('neutral', np.date))+
-      (s.cand ? '<div class="scand">'+chip('lavender','Pattern candidate')+
-        '<p class="sc-t">'+s.cand+'</p><p class="sc-d">'+s.cdesc+'</p></div>' : '')+
-      '<div class="sfoot"><span class="sdur">'+s.dur+'</span>'+
-        (s.tag ? chip('mint', s.tag) : '')+
-        '<span class="sarrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg></span>'+
-      '</div>'+
-      '<div class="frame flow squircle" data-sq="frame"><div class="frame-in">'+
-        '<div class="stats">'+stats.map(function(st){
-          return '<span class="stat"><b>'+(st[1]||'—')+'</b><span class="micro">'+st[0]+'</span></span>';
-        }).join('')+'</div>'+
-      '</div></div>'+
-    '</div>';
-  return objWrap(s.d.toLowerCase(), inner, 'srow tappable');
+  return '<button class="srec" type="button" data-session="'+i+'">'+
+    '<div class="srec-top">'+
+      '<span class="srec-date">'+np.date+'</span>'+
+      '<span class="srec-name">'+np.title+'</span>'+
+      '<span class="srec-right">'+(s.tag ? chip('mint', s.tag) : '')+
+        '<span class="srec-dur">'+s.dur+'</span>'+
+        '<span class="srec-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg></span>'+
+      '</span>'+
+    '</div>'+
+    /* a solo shooting hour has no assists — show only what was recorded */
+    '<div class="srec-stats">'+stats.filter(function(st,k){ return k===0 || st[1]; }).map(function(st){
+      return '<span class="st"><b>'+st[1]+'</b><span class="micro">'+st[0]+'</span></span>';
+    }).join('')+'</div>'+
+    (s.cand ? '<div class="srec-cand">'+chip('lavender','Pattern candidate')+
+      '<p class="sc-t">'+s.cand+'</p><p class="sc-d">'+s.cdesc+'</p></div>' : '')+
+  '</button>';
 }
 
 /* ============================================================
@@ -1493,10 +1601,27 @@ function rimChartSVG(){
     marks+'</svg>';
 }
 
-function scoreboardLeftCard(){
+/* one panel head — left-aligned, pinned to the top of the surface */
+function sbHead(title, chipHTML){
+  return '<div class="sb-head"><h3>'+title+'</h3>'+(chipHTML||'')+'</div>';
+}
+/* the shot chart sits directly on the panel — no inner container */
+function zonesCard(){
   var ramp = HOT_STEPS.map(function(s){return '<i style="background:'+fill(s.tone)+'"></i>';}).join('');
   var sizes = [1,2,3,4,5].map(function(a){ var r=4+(a-1)*1.8;
     return '<i style="width:'+(r*2).toFixed(0)+'px;height:'+(r*2).toFixed(0)+'px"></i>'; }).join('');
+  return '<div class="sbcard">'+
+    sbHead('Shot zones', chip('neutral','Measured'))+
+    '<div class="bignum"><span class="n">35</span><span class="u">% FG</span></div>'+
+    '<p class="sb-note num">'+ZONES.length+' zones · '+TOTAL_ATTEMPTS+' attempts</p>'+
+    /* cold → hot is the one place the semantic colour rule is set aside */
+    '<div class="ramp"><span class="micro">cold</span><span class="bar">'+ramp+'</span><span class="micro">hot</span></div>'+
+    '<div class="ramp"><span class="micro">attempts</span><span class="sizes">'+sizes+'</span>'+
+      '<span class="micro">1 / 2 / 3 / 4 / 5 &amp; up</span></div>'+
+    '<div class="sb-block"><div class="zonewrap">'+zonesSVG()+'<div class="tip" id="zone-tip"></div></div></div>'+
+  '</div>';
+}
+function mechanicsCard(){
   var mechRows = MECHANICS.map(function(m){
     var col = semFill(m.good);
     return '<div class="mech-row">'+
@@ -1507,44 +1632,24 @@ function scoreboardLeftCard(){
       '<p class="mr-note">'+m.note+'</p></div>';
   }).join('');
   var rimPct = Math.round(RIM_SUMMARY.made/RIM_SUMMARY.total*100);
-
-  var inner =
-    cardOpen()+
-      /* ---- shot zones ---- */
-      '<div class="sb-section">'+
-        headHTML('Shot zones', chip('neutral','Measured'))+
-        '<div class="bignum"><span class="n">35</span><span class="u">% FG</span></div>'+
-        '<p class="quiet num" style="margin:0 0 12px">'+ZONES.length+' zones · '+TOTAL_ATTEMPTS+' attempts</p>'+
-        '<div class="ramp sb-legend"><span class="micro">cold</span><span class="bar">'+ramp+'</span><span class="micro">hot</span></div>'+
-        '<div class="ramp"><span class="micro">attempts</span><span class="sizes">'+sizes+'</span>'+
-          '<span class="micro">1 / 2 / 3 / 4 / 5 &amp; up</span></div>'+
-        '<div class="frame flow squircle" data-sq="frame"><div class="frame-in">'+
-          '<div class="zonewrap">'+zonesSVG()+'<div class="tip" id="zone-tip"></div></div>'+
-        '</div></div>'+
-      '</div>'+
-      /* ---- mechanics ---- */
-      '<div class="sb-section">'+
-        headHTML('Mechanics', chip('neutral','Measured'))+
-        '<div class="legend sb-legend">'+MECHANICS.map(function(m){
-          return '<span><i style="background:'+semFill(m.good)+'"></i>'+m.key+' <b>'+m.value+m.unit+'</b></span>';
-        }).join('')+'</div>'+
-        '<div class="frame flow squircle" data-sq="frame"><div class="frame-in">'+
-          '<div class="mech-rows" data-mechpath><svg class="mech-path"><g></g></svg>'+mechRows+'</div>'+
-          '<div class="mech-rim">'+
-            '<p class="sb-sub" style="text-align:center;margin:0 0 8px">Where the ball crossed the rim</p>'+
-            rimChartSVG()+
-            '<p class="rim-sum">'+RIM_SUMMARY.made+' / '+RIM_SUMMARY.total+' · '+rimPct+'%</p>'+
-            '<p class="rim-note">shots that passed inside the ring vs. those that caught iron or missed it — '+
-              'a read on dispersion, not on whether the shot fell</p>'+
-          '</div>'+
-          '<div class="mech-stats">'+
-            '<div class="ms"><b>'+RELEASE_TIME.value+'</b><span class="micro">'+RELEASE_TIME.label+' · s</span></div>'+
-            '<div class="ms"><b>'+MOTION_CONSISTENCY.value+'</b><span class="micro">'+MOTION_CONSISTENCY.label+' · '+MOTION_CONSISTENCY.unit+'</span></div>'+
-          '</div>'+
-        '</div></div>'+
-      '</div>'+
-    '</div>';
-  return objWrap('shot zones + mechanics', inner, 'sb');
+  return '<div class="sbcard">'+
+    sbHead('Mechanics', chip('neutral','Measured'))+
+    '<div class="legend">'+MECHANICS.map(function(m){
+      return '<span><i style="background:'+semFill(m.good)+'"></i>'+m.key+' <b>'+m.value+m.unit+'</b></span>';
+    }).join('')+'</div>'+
+    '<div class="sb-block"><div class="mech-rows">'+mechRows+'</div></div>'+
+    '<div class="sb-block">'+
+      '<p class="sb-sub">Where the ball crossed the rim</p>'+
+      rimChartSVG()+
+      '<p class="rim-sum">'+RIM_SUMMARY.made+' / '+RIM_SUMMARY.total+' · '+rimPct+'%</p>'+
+      '<p class="rim-note">shots that passed inside the ring vs. those that caught iron or missed it — '+
+        'a read on dispersion, not on whether the shot fell</p>'+
+    '</div>'+
+    '<div class="mech-stats">'+
+      '<div class="ms"><b>'+RELEASE_TIME.value+'</b><span class="micro">'+RELEASE_TIME.label+' · s</span></div>'+
+      '<div class="ms"><b>'+MOTION_CONSISTENCY.value+'</b><span class="micro">'+MOTION_CONSISTENCY.label+' · '+MOTION_CONSISTENCY.unit+'</span></div>'+
+    '</div>'+
+  '</div>';
 }
 
 function skillRows(list){
@@ -1556,19 +1661,17 @@ function skillRows(list){
   }).join('');
 }
 function skillsCard(){
-  var inner =
-    cardOpen()+
-      headHTML('Skills', chip('neutral','Score'))+
-      '<div class="bignum"><span class="n">70</span><span class="u">/ 100 avg</span></div>'+
-      '<div class="legend"><span><i style="background:'+semFill(0.9)+'"></i>strong</span>'+
-        '<span><i style="background:'+semFill(0.55)+'"></i>holding</span>'+
-        '<span><i style="background:'+semFill(0.1)+'"></i>developing</span></div>'+
-      '<div class="frame flow squircle" data-sq="frame"><div class="frame-in">'+
-        '<p class="micro" style="margin:0 0 8px">Shooting</p>'+skillRows(SKILLS.shooting)+
-        '<p class="micro" style="margin:22px 0 8px">Handling &amp; movement</p>'+skillRows(SKILLS.handling)+
-      '</div></div>'+
-    '</div>';
-  return objWrap('skills', inner, 'sb');
+  return '<div class="sbcard">'+
+    sbHead('Skills', chip('neutral','Score'))+
+    '<div class="bignum"><span class="n">70</span><span class="u">/ 100 avg</span></div>'+
+    '<div class="legend"><span><i style="background:'+semFill(0.9)+'"></i>strong</span>'+
+      '<span><i style="background:'+semFill(0.55)+'"></i>holding</span>'+
+      '<span><i style="background:'+semFill(0.1)+'"></i>developing</span></div>'+
+    '<div class="sb-block">'+
+      '<p class="micro" style="margin:0 0 8px">Shooting</p>'+skillRows(SKILLS.shooting)+
+      '<p class="micro" style="margin:22px 0 8px">Handling &amp; movement</p>'+skillRows(SKILLS.handling)+
+    '</div>'+
+  '</div>';
 }
 function goalsCard(){
   var rows = GOALS.map(function(g){
@@ -1580,17 +1683,15 @@ function goalsCard(){
       '<div class="g-foot">'+chip(semTone(g.status==='on pace' ? 0.85 : 0.55), g.status)+
         '<span class="quiet">by '+g.when+'</span></div></div>';
   }).join('');
-  var inner =
-    cardOpen()+
-      headHTML('Goals', chip('neutral','Score'))+
-      '<div class="bignum"><span class="n">'+GOALS.length+'</span><span class="u">tracked</span></div>'+
-      '<p class="micro" style="margin:0 0 14px">a goal is a direction, not a deadline · remove one any time</p>'+
-      '<div class="legend">'+GOALS.map(function(g){
-        return '<span><i style="background:'+semFill((g.now/g.target-0.7)/0.3)+'"></i>'+g.n+' <b>'+g.now+'</b></span>';
-      }).join('')+'</div>'+
-      '<div class="frame flow squircle" data-sq="frame"><div class="frame-in">'+rows+'</div></div>'+
-    '</div>';
-  return objWrap('goals', inner, 'sb');
+  return '<div class="sbcard">'+
+    sbHead('Goals', chip('neutral','Score'))+
+    '<div class="bignum"><span class="n">'+GOALS.length+'</span><span class="u">tracked</span></div>'+
+    '<p class="sb-note">a goal is a direction, not a deadline · remove one any time</p>'+
+    '<div class="legend">'+GOALS.map(function(g){
+      return '<span><i style="background:'+semFill((g.now/g.target-0.7)/0.3)+'"></i>'+g.n+' <b>'+g.now+'</b></span>';
+    }).join('')+'</div>'+
+    '<div class="sb-block">'+rows+'</div>'+
+  '</div>';
 }
 
 /* ============================================================
@@ -1688,7 +1789,7 @@ function openSessionDetail(idx){
   inkAll($('#session-detail'));
   bindGeometry($('#session-detail'));
   requestAnimationFrame(function(){
-    repaintGeometry($('#session-detail')); collectTargets(); settle(); syncRuler();
+    repaintGeometry($('#session-detail')); collectTargets(); settle();
   });
   sdT = 0; stopPlay(); paintPlayhead();
 }
@@ -1697,7 +1798,7 @@ function closeSessionDetail(){
   $('#session-detail').classList.remove('on');
   $('#sessions-list').classList.add('on');
   window.scrollTo(0,0);
-  requestAnimationFrame(function(){ collectTargets(); settle(); syncRuler(); });
+  requestAnimationFrame(function(){ collectTargets(); settle(); });
 }
 function paintPlayhead(){
   var head=$('#sd-head'), time=$('#sd-time');
@@ -1737,103 +1838,532 @@ function seekMoment(i){
 var muted = {}, insFilter = 'all';
 function visiblePatterns(){ return PATTERNS.filter(function(p){ return !muted[p.id]; }); }
 
-function updateRulerCount(){
-  var n = visiblePatterns().length;
-  var el = $('#ruler-count');
-  if(el) el.textContent = 'live · '+n+' pattern'+(n===1?'':'s');
-  buildTicks(n);
-}
 /* ============================================================
-   PATTERN CAROUSEL
+   PATTERN FAN — stage one
 
-   Uniform cards on a snapping rail. Distance from the rail's centre,
-   measured in card widths, drives scale / rotation / depth / opacity,
-   so the neighbours fan outward from a single focal card. Native
-   overflow scrolling keeps trackpad and touch free; a horizontal
-   pointer drag is handed over from the card-drag gesture below.
+   Twelve cards laid out as a spread hand: overlapping horizontally,
+   each with its own small rotation, arced so the middle of the fan
+   sits higher, and scaled largest at the centre of the viewport.
+   Vertical scroll input is captured and translated into horizontal
+   movement of the whole hand, right to left.
    ============================================================ */
-var layoutMode = 'carousel';
-function carEl(){ return $('#pat-car'); }
-function paintCarousel(){
-  var car=carEl();
-  if(!car || !car.classList.contains('on')) return;
-  var box=car.getBoundingClientRect(), cx=box.left+box.width/2;
-  $$('.cslot', car).forEach(function(sl){
-    var r=sl.getBoundingClientRect(), w=sl.offsetWidth||1;
-    var d=Math.max(-3.2, Math.min(3.2, (r.left+r.width/2-cx)/w));
-    var k=Math.abs(d), st=sl.style;
-    st.setProperty('--csc', (1 - Math.min(0.36, k*0.14)).toFixed(4));
-    st.setProperty('--cry', (-d*16).toFixed(2)+'deg');
-    st.setProperty('--cz',  (-k*110).toFixed(1));
-    st.setProperty('--cop', (1 - Math.min(0.68, k*0.32)).toFixed(3));
-    sl.classList.toggle('active', k < 0.5);
-  });
-}
-function nearestSlotDelta(){
-  var car=carEl(); if(!car) return 0;
-  var box=car.getBoundingClientRect(), cx=box.left+box.width/2, best=0, bd=Infinity;
-  $$('.cslot', car).forEach(function(sl){
-    var r=sl.getBoundingClientRect(), d=(r.left+r.width/2)-cx;
-    if(Math.abs(d)<bd){ bd=Math.abs(d); best=d; }
-  });
-  return best;
-}
-function snapCarousel(){
-  var car=carEl(); if(!car) return;
-  car.scrollTo({ left: car.scrollLeft + nearestSlotDelta(), behavior:'smooth' });
-}
-var carPan=null;
-function startCarPan(car, e, startX){
-  carPan={ id:e.pointerId, x:startX, left:car.scrollLeft, car:car };
-  car.classList.add('panning');
-  try{ car.setPointerCapture(e.pointerId); }catch(err){}
-}
-function endCarPan(){
-  if(!carPan) return;
-  var car=carPan.car; carPan=null;
-  snapCarousel();
-  setTimeout(function(){ car.classList.remove('panning'); paintCarousel(); }, 420);
+var FAN_FILLS = ['#93EAC3','#FFE159','#FF9B68','#C4B5FF','#A6DBFF','#F0E9D8','#141310'];
+var FAN_ART   = ['lines','grid','dots'];
+var RSTEP = 46;                       /* px between ruler majors */
+var WHEEL_PER_CARD = 170;             /* wheel px that advance one card */
+var RELEASE_PUSH = 90;                /* extra push at the end before the snap */
+
+var fan = { prog:0, target:0, slots:[], list:[], step:0, raf:0, jit:[] };
+var fanEl = $('#fan');
+
+function clamp(v,a,b){ return v<a?a:v>b?b:v; }
+function fanMax(){ return Math.max(0, fan.list.length - 1); }
+
+/* deterministic per-card wobble, so the hand looks laid by a person */
+function jitter(i){
+  var h=(i*2654435761)>>>0;
+  return { rot:((h%1000)/1000-0.5)*5.2, dy:(((h>>>10)%1000)/1000-0.5)*16 };
 }
 
-function renderPatterns(){
-  var list = visiblePatterns();
-  var car=$('#pat-car'), grid=$('#patterns-grid'), track=$('#pat-track'), hint=$('#car-hint');
-  if(layoutMode === 'carousel'){
-    grid.innerHTML=''; grid.hidden=true;
-    car.classList.add('on'); hint.hidden=false;
-    track.innerHTML = list.map(function(p){
-      return '<div class="cslot"><div class="ctilt">'+patternCard(p,true)+'</div></div>';
-    }).join('');
-    bindGeometry(track); bindVectorCharts(track);
-    requestAnimationFrame(function(){ repaintGeometry(track); paintCarousel(); });
+/* an abstract mark in a tint of the card's own colour — no gradients */
+function fanArt(kind, tint){
+  var g='';
+  if(kind==='lines'){
+    for(var i=0;i<6;i++){
+      var w=30+((i*37)%60);
+      g+='<rect x="0" y="'+(i*15+3)+'" width="'+w+'%" height="4" rx="2" fill="'+tint+'"/>';
+    }
+  } else if(kind==='grid'){
+    for(var r=0;r<4;r++) for(var c=0;c<6;c++){
+      var on=((r*7+c*3)%4)!==0;
+      g+='<rect x="'+(c*17)+'%" y="'+(r*24)+'" width="12%" height="15" rx="4" fill="'+tint+'" opacity="'+(on?1:.4)+'"/>';
+    }
   } else {
-    track.innerHTML='';
-    car.classList.remove('on'); hint.hidden=true;
-    grid.hidden=false;
-    grid.innerHTML = list.map(function(p){ return patternCard(p,false); }).join('');
-    bindGeometry(grid); bindVectorCharts(grid);
+    for(var k=0;k<22;k++){
+      var x=(k*29)%94, y=((k*53)%78)+4, rr=2.4+((k*13)%5);
+      g+='<circle cx="'+x+'%" cy="'+y+'" r="'+rr+'" fill="'+tint+'"/>';
+    }
   }
-  updateRulerCount();
-  collectTargets(); settle();
+  return '<svg viewBox="0 0 100 96" preserveAspectRatio="none">'+g+'</svg>';
 }
-function setLayout(mode){
-  if(mode===layoutMode) return;
-  layoutMode = mode;
-  $$('#layout-seg button').forEach(function(b){ b.classList.toggle('on', b.dataset.layout===mode); });
-  renderPatterns();
-  requestAnimationFrame(function(){
-    repaintGeometry($('#s-home')); collectTargets(); settle(); syncRuler();
+
+function fanCardHTML(p,i){
+  var f = FAN_FILLS[i % FAN_FILLS.length];
+  var ic = inkOn(f), tint = tintOf(f);
+  return '<div class="fnslot" data-i="'+i+'" style="--fill:'+f+';--fink:'+ic+'">'+
+    '<div class="fncard" style="background:'+f+';color:'+ic+'">'+
+      '<div class="fn-face">'+
+        '<span class="fn-cat">'+p.kind+'</span>'+
+        '<div class="fn-art">'+fanArt(FAN_ART[i%FAN_ART.length], tint)+'</div>'+
+        '<h3 class="fn-name">'+p.name+'</h3>'+
+      '</div>'+
+      '<span class="fn-tag">'+p.name.toLowerCase()+'</span>'+
+    '</div></div>';
+}
+
+function renderFan(){
+  fan.list = visiblePatterns();
+  fanEl.innerHTML = fan.list.map(fanCardHTML).join('');
+  fan.slots = $$('.fnslot', fanEl);
+  fan.jit = fan.list.map(function(_,i){ return jitter(i); });
+  fan.target = clamp(fan.target, 0, fanMax());
+  fan.prog = clamp(fan.prog, 0, fanMax());
+  measureFan(); buildTicks(fan.list.length); layoutFan(true);
+}
+function measureFan(){
+  var w = fan.slots.length ? fan.slots[0].offsetWidth : 200;
+  fan.step = Math.max(72, w * 0.66);
+}
+function layoutFan(instant){
+  if(!fan.slots.length) return;
+  var d,i,sl,j,x,y,rot,sc,op;
+  for(i=0;i<fan.slots.length;i++){
+    sl=fan.slots[i]; j=fan.jit[i]; d=i-fan.prog;
+    x = d * fan.step;
+    /* arc: the middle of the hand rides higher than the ends */
+    y = Math.min(96, d*d*5.4) + j.dy;
+    rot = d*4.1 + j.rot;
+    sc = 1 - Math.min(0.34, Math.abs(d)*0.075);
+    op = Math.abs(d) > 4.4 ? 0 : 1;
+    sl.style.setProperty('--x', x.toFixed(1)+'px');
+    sl.style.setProperty('--y', y.toFixed(1)+'px');
+    sl.style.setProperty('--rot', rot.toFixed(2)+'deg');
+    sl.style.setProperty('--sc', sc.toFixed(4));
+    sl.style.opacity = op;
+    sl.style.visibility = op ? 'visible' : 'hidden';
+    sl.style.zIndex = String(600 - Math.round(Math.abs(d)*10));
+  }
+  paintRuler();
+}
+function fanTick(){
+  fan.raf = 0;
+  var d = fan.target - fan.prog;
+  if(Math.abs(d) < 0.0015){ fan.prog = fan.target; layoutFan(); return; }
+  fan.prog += d * 0.22;
+  layoutFan();
+  fan.raf = requestAnimationFrame(fanTick);
+}
+function fanTo(v, instant){
+  fan.target = clamp(v, 0, fanMax());
+  if(instant){ fan.prog = fan.target; layoutFan(); return; }
+  if(!fan.raf) fan.raf = requestAnimationFrame(fanTick);
+}
+
+/* ---------- the measure tape under the hand ---------- */
+function buildTicks(total){
+  var track=$('#ruler-track'); if(!track) return;
+  total=Math.max(1,total);
+  var html='', i, k;
+  for(i=0;i<total;i++){
+    html+='<span class="tk" style="left:'+(i*RSTEP)+'px;height:12px;opacity:.42"></span>';
+    html+='<span class="tl" style="left:'+(i*RSTEP)+'px">'+(i+1)+'</span>';
+    if(i<total-1) for(k=1;k<5;k++)
+      html+='<span class="tk" style="left:'+(i*RSTEP+k*RSTEP/5)+'px;height:5px;opacity:.18"></span>';
+  }
+  track.style.width=((total-1)*RSTEP+2)+'px';
+  track.innerHTML=html;
+}
+function paintRuler(){
+  var ruler=$('#ruler'), track=$('#ruler-track'), pill=$('#ruler-pill');
+  if(!ruler||!track) return;
+  var mid = ruler.offsetWidth/2;
+  track.style.transform = 'translateX('+(mid - fan.prog*RSTEP).toFixed(1)+'px)';
+  var n = Math.min(fan.list.length, Math.round(fan.prog)+1);
+  if(pill) pill.textContent = n+' / '+fan.list.length;
+  ruler.setAttribute('aria-valuemax', String(fan.list.length));
+  ruler.setAttribute('aria-valuenow', String(n));
+}
+
+/* ---------- scroll staging ----------
+   Stage one holds the page still and spends the scroll on the hand.
+   At the end of the set the lock releases and the page snaps, once
+   and decisively, down to stage two. Scrolling back up at the top of
+   stage two snaps back to the end of the hand. */
+var homeStage = 1, snapping = false, releasePush = 0, homeMode = 'scroll';
+function stage2Top(){ var el=$('#stage2'); return el ? el.offsetTop : window.innerHeight; }
+function animateScroll(to, ms){
+  snapping = true;
+  var from = window.scrollY, t0 = performance.now(), dt = to - from;
+  (function step(now){
+    var k = Math.min(1, (now-t0)/ms);
+    var e = k<0.5 ? 4*k*k*k : 1-Math.pow(-2*k+2,3)/2;
+    window.scrollTo(0, from + dt*e);
+    if(k<1) requestAnimationFrame(step);
+    else { snapping=false; homeStage = to>4 ? 2 : 1; releasePush=0; }
+  })(t0);
+}
+function homeActive(){ return $('#s-home').classList.contains('on') && homeMode==='scroll'; }
+function stageDelta(d){
+  if(snapping) return true;
+  if(openPat) return true;                       /* a card is open — the page holds */
+  if(homeStage === 1){
+    if(d > 0 && fan.target >= fanMax() - 0.001){
+      releasePush += d;
+      if(releasePush > RELEASE_PUSH){ releasePush=0; animateScroll(stage2Top(), 420); }
+      return true;
+    }
+    releasePush = 0;
+    fanTo(fan.target + d/WHEEL_PER_CARD);
+    return true;
+  }
+  if(d < 0 && window.scrollY <= stage2Top() + 2){
+    fanTo(fanMax(), true);
+    homeStage = 1;
+    animateScroll(0, 400);
+    return true;
+  }
+  return false;
+}
+window.addEventListener('wheel', function(e){
+  if(!homeActive()) return;
+  var d = e.deltaMode === 1 ? e.deltaY*16 : e.deltaMode === 2 ? e.deltaY*window.innerHeight : e.deltaY;
+  if(stageDelta(d)) e.preventDefault();
+}, {passive:false});
+var touchY = null;
+$('#s-home').addEventListener('touchstart', function(e){
+  touchY = e.touches[0].clientY;
+}, {passive:true});
+$('#s-home').addEventListener('touchmove', function(e){
+  if(!homeActive() || touchY===null) return;
+  var y = e.touches[0].clientY, d = (touchY - y) * 1.4;
+  touchY = y;
+  if(stageDelta(d)) e.preventDefault();
+}, {passive:false});
+window.addEventListener('scroll', function(){
+  if(!homeActive() || snapping) return;
+  homeStage = window.scrollY > stage2Top()*0.5 ? 2 : 1;
+}, {passive:true});
+
+/* ---------- ruler scrubbing ---------- */
+(function(){
+  var ruler=$('#ruler'), sc=null;
+  if(!ruler) return;
+  ruler.addEventListener('pointerdown', function(e){
+    sc={id:e.pointerId, x:e.clientX, p:fan.target};
+    ruler.classList.add('grabbing'); document.body.classList.add('scrubbing');
+    try{ ruler.setPointerCapture(e.pointerId); }catch(err){}
+    e.preventDefault();
+  });
+  ruler.addEventListener('pointermove', function(e){
+    if(!sc||e.pointerId!==sc.id) return;
+    fanTo(sc.p - (e.clientX - sc.x)/RSTEP);
+    e.preventDefault();
+  });
+  function up(e){
+    if(!sc||(e&&e.pointerId!==sc.id)) return;
+    sc=null; ruler.classList.remove('grabbing'); document.body.classList.remove('scrubbing');
+    fanTo(Math.round(fan.target));
+  }
+  ruler.addEventListener('pointerup', up);
+  ruler.addEventListener('pointercancel', up);
+  ruler.addEventListener('keydown', function(e){
+    if(e.key==='ArrowRight'){ fanTo(Math.round(fan.target)+1); e.preventDefault(); }
+    if(e.key==='ArrowLeft'){  fanTo(Math.round(fan.target)-1); e.preventDefault(); }
+  });
+})();
+
+/* ---------- hover, drag, tap on the cards ---------- */
+var fanDrag = null;
+fanEl.addEventListener('pointerover', function(e){
+  var sl = e.target.closest ? e.target.closest('.fnslot') : null;
+  $$('.fnslot.hov', fanEl).forEach(function(x){ if(x!==sl) x.classList.remove('hov'); });
+  if(sl && !openPat) sl.classList.add('hov');
+});
+fanEl.addEventListener('pointerout', function(e){
+  var sl = e.target.closest ? e.target.closest('.fnslot') : null;
+  if(sl && !sl.contains(e.relatedTarget)) sl.classList.remove('hov');
+});
+fanEl.addEventListener('pointerdown', function(e){
+  if(e.button) return;
+  var card = e.target.closest ? e.target.closest('.fncard') : null;
+  if(!card || openPat) return;
+  fanDrag = { card:card, id:e.pointerId, sx:e.clientX, sy:e.clientY, moved:false };
+  card.classList.remove('springing');
+});
+window.addEventListener('pointermove', function(e){
+  if(!fanDrag || e.pointerId!==fanDrag.id) return;
+  var dx=e.clientX-fanDrag.sx, dy=e.clientY-fanDrag.sy;
+  if(!fanDrag.moved){
+    if(Math.abs(dx)<4 && Math.abs(dy)<4) return;
+    fanDrag.moved = true;
+    fanDrag.card.classList.add('dragging');
+    fanDrag.card.style.transition='none';
+    fanDrag.card.closest('.fnslot').style.zIndex='800';
+    try{ fanDrag.card.setPointerCapture(e.pointerId); }catch(err){}
+  }
+  var st=fanDrag.card.style;
+  st.setProperty('--dx', dx+'px');
+  st.setProperty('--dy', dy+'px');
+  st.setProperty('--drot', clamp(dx*0.035,-13,13).toFixed(2)+'deg');
+  st.setProperty('--dsc','1.05');
+  e.preventDefault();
+});
+function endFanDrag(e){
+  if(!fanDrag || (e && e.pointerId!==fanDrag.id)) return;
+  var d=fanDrag; fanDrag=null;
+  if(!d.moved) return;
+  var card=d.card, slot=card.closest('.fnslot');
+  card.classList.remove('dragging');
+  card.style.transition='';
+  card.classList.add('springing');
+  card.style.setProperty('--dx','0px');
+  card.style.setProperty('--dy','0px');
+  card.style.setProperty('--drot','0deg');
+  card.style.setProperty('--dsc','1');
+  card._justDragged = true;
+  setTimeout(function(){
+    card.classList.remove('springing');
+    if(slot) slot.style.zIndex='';
+    layoutFan();
+    card._justDragged = false;
+  }, 660);
+}
+window.addEventListener('pointerup', endFanDrag);
+window.addEventListener('pointercancel', endFanDrag);
+fanEl.addEventListener('click', function(e){
+  var card = e.target.closest ? e.target.closest('.fncard') : null;
+  if(!card || card._justDragged || openPat) return;
+  var slot = card.closest('.fnslot');
+  openFanCard(+slot.getAttribute('data-i'));
+});
+
+/* ============================================================
+   OPENED PATTERN — settles into the middle of the viewport,
+   directly under the headline, and recalculates itself on arrival.
+   ============================================================ */
+var poEl = $('#pat-open'), openPat = null, openIdx = -1;
+
+function countUp(el, text, dur){
+  var m = String(text).match(/^([+\-]?)([\d.]+)(.*)$/);
+  if(!m){ el.textContent = text; return; }
+  var sign=m[1], target=parseFloat(m[2]), suffix=m[3];
+  var dec=(m[2].split('.')[1]||'').length, t0=performance.now();
+  (function step(now){
+    var k=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-k,3);
+    el.textContent = sign+(target*e).toFixed(dec)+suffix;
+    if(k<1) requestAnimationFrame(step);
+  })(performance.now());
+}
+function poChartHTML(p, base){
+  var mark = mix(base, inkOn(base), 0.5);
+  if(p.chart.type==='bars'){
+    var max = Math.max.apply(null, p.chart.items.map(function(x){return x.value;}))||1;
+    return '<div class="po-bars">'+p.chart.items.map(function(it){
+      return '<div class="b"><span class="bv">'+it.value+'</span>'+
+        '<span class="bf" data-h="'+Math.round(Math.max(6,it.value/max*100))+'" style="background:'+fill(it.tone)+'"></span>'+
+        '<span class="bl">'+it.label+'</span></div>';
+    }).join('')+'</div>';
+  }
+  var W=300,H=120,pad=8, pts=project(p.chart.values,W,H,pad);
+  var d=smoothPath(pts);
+  var area = p.chart.type==='area'
+    ? '<path d="'+d+' L '+(W-pad)+' '+(H-pad)+' L '+pad+' '+(H-pad)+' Z" fill="'+mark+'" opacity=".22"/>' : '';
+  return '<div class="po-chart"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+area+
+    '<path class="poline" d="'+d+'" fill="none" stroke="'+mark+'" stroke-width="4" '+
+    'stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg></div>';
+}
+function poSessionHTML(p){
+  if(p.session == null) return '';
+  var s = SESSIONS[p.session]; if(!s) return '';
+  var np = sessionParts(s);
+  return '<div class="po-sess">'+chip('neutral','Linked session')+
+    '<p class="ps-t">'+np.date+' · '+np.title+'</p>'+
+    '<p class="ps-d">'+(s.cand ? s.cdesc : 'The reps this pattern was measured on sit inside this session.')+'</p>'+
+    '<div class="ps-stats">'+
+      '<div><b>'+s.shots+'</b><span>shots</span></div>'+
+      '<div><b>'+(s.pts||'—')+'</b><span>pts</span></div>'+
+      '<div><b>'+s.dur.replace(' min','')+'</b><span>minutes</span></div>'+
+    '</div>'+
+    '<button class="po-go" type="button" data-goto-session="'+p.session+'">Open the session'+
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>'+
+    '</button>'+
+    '<p class="po-note">Nothing moves until you press it.</p>'+
+  '</div>';
+}
+function poHTML(p, base){
+  return DOTS+
+    '<button class="po-close" type="button" aria-label="Close">'+
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'+
+    '<div class="po-in">'+
+      '<span class="po-cat">'+p.kind+' · '+STATE_LABEL[p.state]+'</span>'+
+      '<h2 class="po-name">'+p.name+'</h2>'+
+      '<p class="po-ctx">'+p.context+'</p>'+
+      '<div class="po-grid">'+
+        '<div><div class="po-num"><span class="n">0</span><span class="u">'+p.unit+'</span></div>'+
+          '<p class="po-lab">current value</p>'+
+          poSessionHTML(p)+'</div>'+
+        '<div>'+poChartHTML(p, base)+
+          '<div class="po-hist"><p class="po-lab" style="margin-bottom:4px">full history · confirmed across sessions</p>'+
+            (p.history||[]).map(function(r){
+              return '<div class="hr"><span class="hn">'+r[0]+'</span>'+
+                '<span class="hb"><i data-w="'+Math.max(4,Math.min(100,r[2]))+'" style="background:'+mix(base,inkOn(base),0.42)+'"></i></span>'+
+                '<span class="hv" data-v="'+r[1]+'">0</span></div>';
+            }).join('')+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+}
+/* the fast recalculation pass — numbers run up, bars and lines draw */
+function poRecalc(p){
+  var n = poEl.querySelector('.po-num .n');
+  if(n) countUp(n, p.hero, 480);
+  $$('.po-bars .bf', poEl).forEach(function(b,i){
+    setTimeout(function(){ b.style.height = b.getAttribute('data-h')+'%'; }, 40+i*55);
+  });
+  var line = poEl.querySelector('.poline');
+  if(line){
+    try{
+      var len = line.getTotalLength();
+      line.style.strokeDasharray = len; line.style.strokeDashoffset = len;
+      line.getBoundingClientRect();
+      line.style.transition = 'stroke-dashoffset .55s cubic-bezier(.2,.85,.3,1)';
+      line.style.strokeDashoffset = 0;
+    }catch(err){}
+  }
+  $$('.po-hist .hr', poEl).forEach(function(row,i){
+    setTimeout(function(){
+      var bar=row.querySelector('i'), val=row.querySelector('.hv');
+      if(bar) bar.style.width = bar.getAttribute('data-w')+'%';
+      if(val) countUp(val, val.getAttribute('data-v'), 380);
+    }, 60+i*45);
   });
 }
+function poTargetRect(){
+  var head = $('#stage1 .screen-head');
+  var hb = head ? head.getBoundingClientRect() : {bottom:120};
+  var w = Math.min(760, window.innerWidth - 40);
+  var top = Math.max(20, hb.bottom + 22);
+  var h = Math.min(640, window.innerHeight - top - 84);
+  return { left:(window.innerWidth-w)/2, top:top, w:w, h:Math.max(340,h) };
+}
+function openFanCard(idx){
+  var p = fan.list[idx]; if(!p) return;
+  var slot = fan.slots[idx], card = slot.querySelector('.fncard');
+  var r = card.getBoundingClientRect();
+  var base = FAN_FILLS[idx % FAN_FILLS.length];
+  openPat = p; openIdx = idx;
+  $$('.fnslot.hov', fanEl).forEach(function(x){ x.classList.remove('hov'); });
+  fanEl.classList.add('dimmed');
+  poEl.style.setProperty('--fill', base);
+  poEl.style.setProperty('--fink', inkOn(base));
+  poEl.innerHTML = poHTML(p, base);
+  poEl.classList.remove('hidden');
+  poEl.style.left=r.left+'px'; poEl.style.top=r.top+'px';
+  poEl.style.width=r.width+'px'; poEl.style.height=r.height+'px';
+  poEl.style.borderRadius='22px';
+  poEl.getBoundingClientRect();
+  requestAnimationFrame(function(){
+    var t = poTargetRect();
+    poEl.classList.add('open');
+    poEl.style.left=t.left+'px'; poEl.style.top=t.top+'px';
+    poEl.style.width=t.w+'px'; poEl.style.height=t.h+'px';
+    poEl.style.borderRadius='30px';
+    setTimeout(function(){ poRecalc(p); }, 140);
+  });
+}
+function closeFanCard(){
+  if(!openPat) return;
+  var slot = fan.slots[openIdx], card = slot && slot.querySelector('.fncard');
+  openPat = null;
+  if(card){
+    var r = card.getBoundingClientRect();
+    poEl.classList.remove('open');
+    poEl.style.left=r.left+'px'; poEl.style.top=r.top+'px';
+    poEl.style.width=r.width+'px'; poEl.style.height=r.height+'px';
+    poEl.style.borderRadius='22px';
+  }
+  fanEl.classList.remove('dimmed');
+  setTimeout(function(){ poEl.classList.add('hidden'); poEl.innerHTML=''; }, 440);
+}
+poEl.addEventListener('click', function(e){
+  if(e.target.closest('.po-close')){ closeFanCard(); return; }
+  var g = e.target.closest('[data-goto-session]');
+  if(g){ var i=+g.getAttribute('data-goto-session'); closeFanCard(); go('sessions'); openSessionDetail(i); }
+});
+document.addEventListener('pointerdown', function(e){
+  if(!openPat) return;
+  if(poEl.contains(e.target)) return;
+  if(pmenu && pmenu.contains(e.target)) return;
+  closeFanCard();
+});
+
+/* ============================================================
+   HOME · plain list format
+   ============================================================ */
+function listRow(dot, name, desc, value, unit, chipHTML, attr){
+  return '<'+(attr?'button':'div')+' class="lrow"'+(attr?' type="button" '+attr:'')+'>'+
+    '<i class="dot" style="background:'+dot+'"></i>'+
+    '<span><span class="ln">'+name+'</span>'+(desc?'<span class="ld">'+desc+'</span>':'')+'</span>'+
+    (chipHTML||'<span></span>')+
+    '<span class="lv">'+value+(unit?'<small>'+unit+'</small>':'')+'</span>'+
+  '</'+(attr?'button':'div')+'>';
+}
+function renderHomeList(){
+  var host=$('#home-list-body'); if(!host) return;
+  var pats = visiblePatterns().map(function(p,i){
+    return listRow(FAN_FILLS[i%FAN_FILLS.length], p.name, p.context, p.hero, p.unit,
+      chip(STATE_HL[p.state], STATE_LABEL[p.state]), 'data-listpat="'+p.id+'"');
+  }).join('');
+  var vits = VITALS.map(function(v){
+    return listRow(fill(v.chart && v.chart.tone ? v.chart.tone : 'sky'), v.label, v.desc, v.value, v.unit,
+      chip('neutral', v.category));
+  }).join('');
+  host.innerHTML =
+    '<div class="lgroup"><div class="sec-head"><h2 class="dsp">Patterns</h2>'+
+      '<span class="sub">'+visiblePatterns().length+' behaviours your sessions keep repeating</span></div>'+
+      '<div class="lrows">'+pats+'</div></div>'+
+    '<div class="lgroup"><div class="sec-head"><h2 class="dsp">Vitals</h2>'+
+      '<span class="sub">measured on the body, kept private to this device</span></div>'+
+      '<div class="lrows">'+vits+'</div></div>'+
+    '<div class="lgroup"><div class="sec-head"><h2 class="dsp">Focus</h2>'+
+      '<span class="sub">one thing worth attention this week</span></div>'+
+      '<div class="lfocus">'+
+        '<div class="foc-top"><span class="fl">'+FOCUS.statLabel+'</span>'+chip('lavender',FOCUS.kicker)+'</div>'+
+        '<div class="foc-num"><span class="n">'+FOCUS.stat+'</span><span class="u">'+FOCUS.unit+'</span></div>'+
+        '<div class="lf-beats">'+FOCUS.steps.map(function(s){
+          return '<div><span class="micro">'+s.label+'</span><p>'+s.text+'</p></div>';
+        }).join('')+'</div>'+
+      '</div></div>';
+  inkAll(host);
+}
+$('#home-list-body').addEventListener('click', function(e){
+  var b = e.target.closest ? e.target.closest('[data-listpat]') : null;
+  if(!b) return;
+  var id=b.getAttribute('data-listpat');
+  var p=PATTERNS.filter(function(x){return x.id===id;})[0];
+  if(p) openPattern(p);
+});
+function setHomeMode(mode){
+  if(mode===homeMode) return;
+  homeMode = mode;
+  closeFanCard();
+  $('#s-home').classList.toggle('list', mode==='list');
+  $$('#home-mode button').forEach(function(b){ b.classList.toggle('on', b.dataset.mode===mode); });
+  window.scrollTo(0,0);
+  homeStage = 1;
+  if(mode==='list') renderHomeList();
+  else requestAnimationFrame(function(){ measureFan(); layoutFan(true); });
+  requestAnimationFrame(function(){ repaintGeometry($('#s-home')); collectTargets(); settle(); });
+}
+$('#home-mode').addEventListener('click', function(e){
+  var b = e.target.closest ? e.target.closest('button[data-mode]') : null;
+  if(b) setHomeMode(b.dataset.mode);
+});
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderPatterns(){ renderFan(); if(homeMode==='list') renderHomeList(); }
 
 function renderHome(){
   $('#focus-slot').innerHTML = focusCard();
   $('#vitals-row').innerHTML = VITALS.map(vitalCard).join('');
-  renderPatterns();
+  renderFan();
 }
 function renderSessions(){
   $('#activity-slot').innerHTML = activityCard();
-  $('#sessions-grid').innerHTML = SESSIONS.map(sessionCard).join('');
+  $('#sessions-rows').innerHTML = SESSIONS.map(sessionCard).join('');
 }
 function renderInsights(){
   var list = INSIGHTS.filter(function(c){ return insFilter==='all' || c.side===insFilter; });
@@ -1846,23 +2376,12 @@ function renderAsk(){
   askSay('aera','Ask for something to work on. I read your own sessions and patterns — nothing leaves the device.');
 }
 function renderScoreboard(){
-  $('#sb-left').innerHTML  = scoreboardLeftCard();
+  $('#sb-left').innerHTML  = zonesCard() + mechanicsCard();
   $('#sb-right').innerHTML = skillsCard() + goalsCard();
 }
 
 renderHome(); renderSessions(); renderInsights(); renderAsk(); renderScoreboard();
 inkAll(); bindGeometry(); bindVectorCharts();
-bindGlow(document, '[data-focuspath]', {
-  uid:'focus', color:fill('lavender'), blur:26, blur2:8, wide:46, mid:18, thin:3,
-  blob:38, bloomOpacity:.5, midOpacity:.6, tension:0.55,
-  anchors:function(h){ return $$('.focus-step .chip', h); }
-});
-bindGlow(document, '[data-mechpath]', {
-  uid:'mech', color:fill('mint'), blur:30, blur2:9, wide:54, mid:22, thin:3.5,
-  blob:44, bloomOpacity:.7, midOpacity:.75, tension:0.5,
-  dotColor:function(i){ return semFill(MECHANICS[i] ? MECHANICS[i].good : 0.6); },
-  anchors:function(h){ return $$('.mr-dot', h); }
-});
 
 /* ============================================================
    SCROLL SETTLE
@@ -1886,129 +2405,47 @@ function settle(){
 }
 
 /* ============================================================
-   NAV + QUIET MODE
+   NAV — floating bottom pill
    ============================================================ */
 function go(name){
   closeMenu();
   if(name !== 'sessions') { stopPlay(); }
+  if(name !== 'home') closeFanCard();
   $$('.screen').forEach(function(s){ s.classList.toggle('on', s.id==='s-'+name); });
-  $$('#tabs button').forEach(function(b){ b.classList.toggle('on', b.dataset.go===name); });
+  $$('#bnav button').forEach(function(b){ b.classList.toggle('on', b.dataset.go===name); });
+  document.body.classList.toggle('home', name==='home');
   window.scrollTo(0,0);
+  homeStage = 1;
   var active=$('#s-'+name);
   inkAll(active); bindGeometry(active); bindVectorCharts(active);
   requestAnimationFrame(function(){
-    repaintGeometry(active); repaintGlow(); collectTargets(); settle(); syncRuler();
-    paintCarousel();
+    repaintGeometry(active); collectTargets(); settle();
+    if(name==='home'){ measureFan(); layoutFan(true); }
   });
 }
-$$('#tabs button').forEach(function(b){ b.addEventListener('click', function(){ go(b.dataset.go); }); });
-
-var quiet=false;
-$('#quiet-toggle').addEventListener('click', function(){
-  quiet = !quiet;
-  this.classList.toggle('on', quiet);
-  this.setAttribute('aria-pressed', String(quiet));
-  $('#focus-block').style.display  = quiet ? 'none' : '';
-  $('#vitals-block').style.display = quiet ? 'none' : '';
-  requestAnimationFrame(function(){
-    repaintGeometry($('#s-home')); repaintGlow(); collectTargets(); settle(); syncRuler();
-  });
-});
-
-/* ============================================================
-   BAND + RULER
-   ============================================================ */
-function measureBand(){
-  document.documentElement.style.setProperty('--band-h',
-    Math.round($('#band').getBoundingClientRect().height)+'px');
-}
-measureBand();
-if('ResizeObserver' in window) new ResizeObserver(measureBand).observe($('#band'));
-
-var ruler=$("#ruler"), rulerPill=$('#ruler-pill');
-var FINE=5, scrubbing=false, scrubMoved=false, scrubId=null;
-function buildTicks(total){
-  var rulerTrack = $('#ruler-track');
-  if(!rulerTrack) return;
-  total = Math.max(1, total);
-  var html='', n=total*FINE, i;
-  for(i=0;i<=n;i++){
-    var major=i%FINE===0, at=(i/n)*100;
-    html+='<span class="tk" style="left:'+at+'%;height:'+(major?9:4)+'px;opacity:'+(major?0.4:0.18)+'"></span>';
-    if(major&&i>0) html+='<span class="tl" style="left:'+at+'%">'+(i/FINE)+'</span>';
-  }
-  rulerTrack.innerHTML=html;
-}
-buildTicks(PATTERNS.length);
-updateRulerCount();
-
-function maxScroll(){ return Math.max(0, document.documentElement.scrollHeight - window.innerHeight); }
-function setPill(p){
-  var pct=Math.round(p*100);
-  rulerPill.textContent=pct+'%';
-  rulerPill.style.left='clamp(22px, '+(p*100)+'%, calc(100% - 22px))';
-  ruler.setAttribute('aria-valuenow',String(pct));
-}
-function syncRuler(){
-  if(scrubbing) return;
-  var m=maxScroll();
-  setPill(m>0 ? Math.min(1, window.scrollY/m) : 0);
-}
-function fracFromEvent(e){
-  var box=ruler.getBoundingClientRect();
-  return Math.max(0,Math.min(1,(e.clientX-box.left)/box.width));
-}
-function scrubTo(e, smooth){
-  var m=maxScroll(), y=fracFromEvent(e)*m;
-  setPill(m>0?y/m:0);
-  window.scrollTo({top:y, behavior: smooth?'smooth':'auto'});
-}
-ruler.addEventListener('pointerdown', function(e){
-  scrubbing=true; scrubMoved=false; scrubId=e.pointerId;
-  ruler.classList.add('grabbing'); document.body.classList.add('scrubbing');
-  try{ ruler.setPointerCapture(e.pointerId); }catch(err){}
-  setPill(fracFromEvent(e)); e.preventDefault();
-});
-ruler.addEventListener('pointermove', function(e){
-  if(!scrubbing||e.pointerId!==scrubId) return;
-  scrubMoved=true; scrubTo(e,false); e.preventDefault();
-});
-function endScrub(e){
-  if(!scrubbing||(scrubId!=null&&e.pointerId!==scrubId)) return;
-  var moved=scrubMoved;
-  scrubbing=false; scrubId=null;
-  ruler.classList.remove('grabbing'); document.body.classList.remove('scrubbing');
-  if(!moved) scrubTo(e,true);
-  requestAnimationFrame(syncRuler);
-}
-ruler.addEventListener('pointerup', endScrub);
-ruler.addEventListener('pointercancel', endScrub);
-ruler.addEventListener('keydown', function(e){
-  var m=maxScroll(), step=window.innerHeight*0.5;
-  if(e.key==='ArrowRight'){ window.scrollTo({top:Math.min(m,window.scrollY+step),behavior:'smooth'}); e.preventDefault(); }
-  if(e.key==='ArrowLeft'){  window.scrollTo({top:Math.max(0,window.scrollY-step),behavior:'smooth'}); e.preventDefault(); }
-});
+$$('#bnav button').forEach(function(b){ b.addEventListener('click', function(){ go(b.dataset.go); }); });
+document.body.classList.add('home');
 
 var pumping=false;
 function pump(){
   if(pumping) return;
   pumping=true;
   requestAnimationFrame(function(){
-    pumping=false; syncRuler(); settle();
+    pumping=false; settle();
     if(hovered){ hovered._selw=-1; paintSelection(hovered); }
   });
 }
 window.addEventListener('scroll', pump, {passive:true});
 window.addEventListener('resize', function(){
-  measureBand(); repaintGeometry(); repaintGlow(); collectTargets(); settle(); syncRuler();
-  paintBackground(); paintCarousel();
+  repaintGeometry(); collectTargets(); settle();
+  paintBackground(); measureFan(); layoutFan(true);
+  if(openPat){
+    var t=poTargetRect();
+    poEl.style.left=t.left+'px'; poEl.style.top=t.top+'px';
+    poEl.style.width=t.w+'px'; poEl.style.height=t.h+'px';
+  }
 });
-$('#pat-car').addEventListener('scroll', function(){
-  if(carPaint) return;
-  carPaint = true;
-  requestAnimationFrame(function(){ carPaint=false; paintCarousel(); });
-}, {passive:true});
-var carPaint=false;
+
 
 /* ============================================================
    DRAG — 500ms hold, then spring home
@@ -2041,36 +2478,19 @@ document.addEventListener('pointerover', function(e){
 });
 document.addEventListener('pointerdown', function(e){
   if(e.button!==undefined && e.button!==0) return;
-  if(scrubbing||inControl(e.target)) return;
-  var car = e.target.closest ? e.target.closest('#pat-car') : null;
+  if(document.body.classList.contains('scrubbing')||inControl(e.target)) return;
   var el=objAt(e.target);
-  if(!el){
-    /* bare rail — no card under the pointer, but a sideways drag still pans */
-    if(car) drag={el:null,carOnly:true,car:car,id:e.pointerId,sx:e.clientX,sy:e.clientY,active:false};
-    return;
-  }
+  if(!el) return;
   if(el.classList.contains('returning')) return;
   var r=el.getBoundingClientRect();
-  drag={el:el,car:car,id:e.pointerId,sx:e.clientX,sy:e.clientY,scrollY:window.scrollY,
+  drag={el:el,id:e.pointerId,sx:e.clientX,sy:e.clientY,scrollY:window.scrollY,
         ox:r.left+r.width/2, oy:r.top+r.height/2, active:false};
 }, true);
 document.addEventListener('pointermove', function(e){
-  /* a horizontal drag inside the carousel pans the rail instead of
-     lifting the card — vertical and diagonal still pick the card up */
-  if(carPan && e.pointerId===carPan.id){
-    carPan.car.scrollLeft = carPan.left - (e.clientX - carPan.x);
-    paintCarousel(); e.preventDefault(); return;
-  }
   if(!drag||e.pointerId!==drag.id) return;
   var dx=e.clientX-drag.sx, dy=e.clientY-drag.sy;
   if(!drag.active){
     if(Math.abs(dx)<THRESH && Math.abs(dy)<THRESH) return;
-    if(drag.car && Math.abs(dx) > Math.abs(dy)*1.2){
-      var host=drag.car; drag=null;
-      startCarPan(host, e, e.clientX - dx);
-      e.preventDefault(); return;
-    }
-    if(drag.carOnly){ drag=null; return; }   // vertical on bare rail: leave it to the page
     drag.active=true;
     try{ drag.el.setPointerCapture(e.pointerId); }catch(err){}
     drag.el.classList.add('dragging');
@@ -2087,7 +2507,6 @@ document.addEventListener('pointermove', function(e){
   e.preventDefault();
 }, true);
 function endDrag(e){
-  if(carPan && (!e || e.pointerId===carPan.id)) endCarPan();
   if(!drag||(e&&e.pointerId!==drag.id)) return;
   var d=drag; drag=null;
   if(!d.active) return;
@@ -2174,10 +2593,6 @@ function openInsight(c){
 /* ============================================================
    CARD CLICKS
    ============================================================ */
-function patternFromObj(el){
-  var name=el.getAttribute('data-name');
-  return PATTERNS.filter(function(p){ return p.name.toLowerCase()===name; })[0];
-}
 document.addEventListener('click', function(e){
   /* session-detail controls */
   var ctl = e.target.closest ? e.target.closest('[data-moment]') : null;
@@ -2192,14 +2607,12 @@ document.addEventListener('click', function(e){
   }
   if(inControl(e.target)) return;
 
+  var rec = e.target.closest ? e.target.closest('.srec') : null;
+  if(rec){ openSessionDetail(+rec.getAttribute('data-session')); return; }
+
   var el=objAt(e.target);
   if(!el || !el.classList.contains('tappable') || el._justDragged) return;
-  if(el.classList.contains('pcard')){
-    var p=patternFromObj(el); if(p) openPattern(p);
-  } else if(el.classList.contains('srow')){
-    var n=el.getAttribute('data-name');
-    for(var i=0;i<SESSIONS.length;i++) if(SESSIONS[i].d.toLowerCase()===n){ openSessionDetail(i); break; }
-  } else if(el.classList.contains('ins')){
+  if(el.classList.contains('ins')){
     var t=el.getAttribute('data-name');
     for(var j=0;j<INSIGHTS.length;j++) if(INSIGHTS[j].t.toLowerCase()===t){ openInsight(INSIGHTS[j]); break; }
   }
@@ -2228,8 +2641,7 @@ document.addEventListener('click', function(e){
   var btn = e.target.closest ? e.target.closest('.more') : null;
   if(btn && btn.id!=='modal-close'){
     e.stopPropagation(); e.preventDefault();
-    var host=objAt(btn);
-    var p = host && host.classList.contains('pcard') ? patternFromObj(host) : null;
+    var p = poEl.contains(btn) ? openPat : null;
     if(!p) return;
     if(menuCtx && menuCtx.id===p.id) closeMenu(); else openMenu(btn,p);
     return;
@@ -2242,13 +2654,14 @@ pmenu.addEventListener('click', function(e){
   var p=menuCtx, act=b.dataset.act;
   closeMenu();
   if(act==='pin') toast('Pinned to focus · '+p.name);
-  else if(act==='mute'){ muted[p.id]=true; renderPatterns(); toast('Muted · '+p.name); }
+  else if(act==='mute'){ closeFanCard(); muted[p.id]=true; renderPatterns(); toast('Muted · '+p.name); }
   else if(act==='history') openPattern(p);
   else if(act==='share') toast('Shared sport stats only — no behavioural insight left the device');
 });
 document.addEventListener('keydown', function(e){
   if(e.key!=='Escape') return;
   if(!pmenu.classList.contains('hidden')){ closeMenu(); return; }
+  if(openPat){ closeFanCard(); return; }
   if(!modal.classList.contains('hidden')) closeModal();
 });
 
@@ -2460,10 +2873,6 @@ $('#panel-toggle').addEventListener('click', function(){
   this.setAttribute('aria-expanded', String(open));
   if(open) requestAnimationFrame(function(){ repaintGeometry(panel); });
 });
-$('#layout-seg').addEventListener('click', function(e){
-  var b = e.target.closest ? e.target.closest('button[data-layout]') : null;
-  if(b) setLayout(b.dataset.layout);
-});
 panel.addEventListener('click', function(e){
   var t = e.target.closest ? e.target.closest('[data-toggle]') : null;
   if(!t) return;
@@ -2495,16 +2904,15 @@ panel.addEventListener('input', function(e){
 /* ============================================================
    READY
    ============================================================ */
-collectTargets(); settle(); syncRuler(); paintCarousel();
+collectTargets(); settle(); measureFan(); layoutFan(true);
 if(document.fonts && document.fonts.ready){
   document.fonts.ready.then(function(){
-    repaintGeometry(); repaintGlow(); measureBand(); collectTargets(); settle(); syncRuler();
-    paintCarousel();
+    repaintGeometry(); collectTargets(); settle(); measureFan(); layoutFan(true);
   });
 }
 window.addEventListener('load', function(){
-  bindGeometry(); bindVectorCharts(); repaintGeometry(); repaintGlow();
-  measureBand(); collectTargets(); settle(); syncRuler(); paintCarousel();
+  bindGeometry(); bindVectorCharts(); repaintGeometry();
+  collectTargets(); settle(); measureFan(); layoutFan(true);
 });
 
 })();
