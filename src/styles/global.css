@@ -63,7 +63,7 @@ ul {
 
 ::selection {
   background: var(--aera-color-utility-highlight);
-  color: var(--aera-color-data-ink-lime, #15170a);
+  color: var(--aera-color-data-ink-lime);
 }
 
 ::-webkit-scrollbar {

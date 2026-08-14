@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { colorInk } from '../../tokens';
+import { withAlpha } from '../../lib/color';
 import { paintAscii } from './ascii';
 import type { BackgroundSettings } from './settings';
 import styles from './BackgroundLayers.module.css';
@@ -10,7 +11,7 @@ export interface BackgroundLayersProps {
 
 function linesImage(width: number, count: number, opacity: number): string {
   return (
-    `repeating-linear-gradient(to right, rgba(17,17,17,${(opacity * 0.22).toFixed(3)}) 0 ${width}px,` +
+    `repeating-linear-gradient(to right, ${withAlpha(colorInk.primary, opacity * 0.22)} 0 ${width}px,` +
     ` transparent ${width}px calc(100vw / ${count}))`
   );
 }

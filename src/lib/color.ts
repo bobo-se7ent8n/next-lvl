@@ -3,6 +3,7 @@
 import {
   colorData,
   colorDataInk,
+  colorOnFace,
   colorSemantic,
   shotZoneRamp,
   type DataTone,
@@ -34,6 +35,12 @@ export function mix(a: string, b: string, t: number): string {
   return rgbToHex([0, 1, 2].map((i) => x[i] + (y[i] - x[i]) * t));
 }
 
+/** a hex colour at an alpha — used where a token has to become rgba() */
+export function withAlpha(hex: string, alpha: number): string {
+  const [r, g, b] = hexToRgb(hex);
+  return `rgba(${r},${g},${b},${Number(alpha.toFixed(3))})`;
+}
+
 export function luminance(hex: string): number {
   const [r, g, b] = hexToRgb(hex);
   return (r * 0.299 + g * 0.587 + b * 0.114) / 255;
@@ -62,7 +69,7 @@ export function dataInk(tone: DataTone): string {
 /** a barely-there field behind a viz, so a mark can never disappear into
  *  a card face that happens to share its colour */
 export function vizWell(face: string): string {
-  return luminance(face) > 0.5 ? 'rgba(255,255,255,0.42)' : 'rgba(255,255,255,0.12)';
+  return luminance(face) > 0.5 ? colorOnFace.vizLight : colorOnFace.vizDark;
 }
 
 /* ------------------------------------------------------------

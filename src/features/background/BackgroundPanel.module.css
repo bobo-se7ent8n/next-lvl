@@ -27,7 +27,7 @@
   border-radius: var(--aera-radius-lg);
   background: var(--aera-color-surface-panel);
   color: var(--aera-color-ink-secondary);
-  box-shadow: 0 16px 34px -18px rgba(40, 36, 28, 0.55);
+  box-shadow: var(--aera-elevation-floating);
   transition: color var(--aera-duration-fast) var(--aera-ease-out);
 }
 

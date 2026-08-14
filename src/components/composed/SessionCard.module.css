@@ -6,13 +6,16 @@
    on the right. Nothing is borrowed from the pattern card.
    ============================================================ */
 .card {
+  /* the date column, and the offset everything below it lines up to */
+  --date-column: 104px;
+  --body-indent: calc(var(--date-column) + var(--aera-space-9));
   gap: var(--aera-space-8);
   text-align: left;
 }
 
 .top {
   display: grid;
-  grid-template-columns: 104px minmax(0, 1fr) auto;
+  grid-template-columns: var(--date-column) minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--aera-space-9);
 }
@@ -37,11 +40,11 @@
 }
 
 .stats {
-  padding-left: 128px;
+  padding-left: var(--body-indent);
 }
 
 .note {
-  padding-left: 128px;
+  padding-left: var(--body-indent);
 }
 
 .candidate {

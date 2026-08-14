@@ -28,6 +28,16 @@ export const elevation = {
     'inset 0 0 0 2px rgba(255,255,255,0.40)',
     'inset 0 0 0 1px rgba(120,110,92,0.05)',
   ].join(', '),
+  /** floating chrome — the nav track, the settings button */
+  floating: [
+    '0 18px 44px -22px rgba(40,36,28,0.55)',
+    '0 2px 6px -3px rgba(40,36,28,0.18)',
+  ].join(', '),
+  /** the white pill riding inside a track */
+  pill: [
+    '0 6px 16px -6px rgba(40,36,28,0.34)',
+    '0 1px 2px rgba(40,36,28,0.08)',
+  ].join(', '),
   /** the figma-style hover ring — a spread shadow, so it follows the radius */
   selectRing: '0 0 0 1.5px #0D99FF',
 } as const;

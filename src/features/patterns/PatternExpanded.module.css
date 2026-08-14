@@ -35,7 +35,7 @@
 
 .close:hover {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.32);
+  background: var(--aera-color-on-face-wash);
 }
 
 .close svg {
@@ -60,7 +60,7 @@
 .measured {
   padding: var(--aera-space-7) var(--aera-space-8);
   border-radius: var(--aera-radius-md);
-  background: rgba(255, 255, 255, 0.36);
+  background: var(--aera-color-on-face-wash);
   display: flex;
   flex-direction: column;
   gap: var(--aera-space-3);
@@ -95,7 +95,7 @@
   min-width: 40px;
   height: 7px;
   border-radius: var(--aera-radius-pill);
-  background: rgba(0, 0, 0, 0.09);
+  background: var(--aera-color-on-face-track);
   overflow: hidden;
 }
 
@@ -128,7 +128,7 @@
   gap: var(--aera-space-4);
   border-radius: var(--aera-radius-pill);
   padding: var(--aera-space-5) var(--aera-space-8);
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--aera-color-on-face-wash);
   color: inherit;
   font-family: var(--aera-text-body-family);
   font-size: var(--aera-text-body-sm-size);
@@ -137,7 +137,7 @@
 }
 
 .link:hover {
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--aera-color-on-face-wash-strong);
 }
 
 .link svg {

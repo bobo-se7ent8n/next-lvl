@@ -8,6 +8,8 @@
 
 export const radius = {
   none: '0px',
+  /** the smallest corner in the system — a calendar cell */
+  xxs: '3px',
   xs: '5px',
   sm: '10px',
   md: '16px',

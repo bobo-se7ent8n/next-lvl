@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useRef, useState, type CSSProperties } from 'react';
 import { cx } from '../../lib/css';
 import { colorData, colorUtility } from '../../tokens';
 import { Label } from '../primitives/Text';
@@ -20,12 +20,18 @@ export interface HeatmapProps {
 /** the activity calendar — one square per day, seven rows deep */
 export function Heatmap({ days, dayLabels, cell = 21, gap = 3, className }: HeatmapProps) {
   const [hover, setHover] = useState<{ day: ActivityDay; x: number; y: number } | null>(null);
+  const outer = useRef<HTMLDivElement>(null);
 
   return (
     <div
-      className={cx(styles.heatmap, className)}
-      style={{ '--cell': `${cell}px`, '--cell-gap': `${gap}px` } as CSSProperties}
+      ref={outer}
+      className={cx(styles.heatmapOuter, className)}
       onPointerLeave={() => setHover(null)}
+    >
+    <div className={styles.heatmapScroll}>
+    <div
+      className={styles.heatmap}
+      style={{ '--cell': `${cell}px`, '--cell-gap': `${gap}px` } as CSSProperties}
     >
       <div className={styles.heatDays}>
         {dayLabels.map((l, i) => (
@@ -45,8 +51,8 @@ export function Heatmap({ days, dayLabels, cell = 21, gap = 3, className }: Heat
               } as CSSProperties
             }
             onPointerEnter={(e) => {
-              const rect = (e.target as HTMLElement).getBoundingClientRect();
-              const host = (e.currentTarget.offsetParent as HTMLElement)?.getBoundingClientRect();
+              const rect = e.currentTarget.getBoundingClientRect();
+              const host = outer.current?.getBoundingClientRect();
               setHover({
                 day: d,
                 x: rect.left - (host?.left ?? 0) + rect.width / 2,
@@ -56,6 +62,9 @@ export function Heatmap({ days, dayLabels, cell = 21, gap = 3, className }: Heat
           />
         ))}
       </div>
+
+    </div>
+    </div>
 
       {hover ? (
         <div className={cx(tip.tip, tip.on)} style={{ left: hover.x, top: hover.y }}>

@@ -29,7 +29,7 @@
   aspect-ratio: var(--ratio);
   border-radius: var(--aera-radius-lg);
   background-color: var(--aera-color-surface-well);
-  background-image: radial-gradient(rgba(200, 194, 182, 0.9) 1px, transparent 1px);
+  background-image: radial-gradient(var(--aera-color-utility-placeholder-dot) 1px, transparent 1px);
   background-size: 7px 7px;
   box-shadow: var(--aera-elevation-inset);
 }

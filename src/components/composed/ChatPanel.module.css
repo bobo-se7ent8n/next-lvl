@@ -119,9 +119,10 @@
   outline: none;
   background: transparent;
   padding: var(--aera-space-5) var(--aera-space-7);
-  font-family: var(--aera-text-body-family);
-  font-size: 15px;
-  font-weight: var(--aera-weight-medium);
+  font-family: var(--aera-text-body-lg-family);
+  font-size: var(--aera-text-body-lg-size);
+  line-height: var(--aera-text-body-lg-leading);
+  font-weight: var(--aera-text-body-lg-weight);
   color: var(--aera-color-ink-primary);
 }
 

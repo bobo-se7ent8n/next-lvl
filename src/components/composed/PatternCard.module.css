@@ -36,7 +36,7 @@
   bottom: -24px;
   border-radius: var(--aera-radius-xs);
   background: var(--aera-color-utility-select);
-  color: #fff;
+  color: var(--aera-color-utility-on-select);
   font-family: var(--aera-text-label-family);
   font-size: var(--aera-text-label-size);
   font-weight: var(--aera-weight-medium);

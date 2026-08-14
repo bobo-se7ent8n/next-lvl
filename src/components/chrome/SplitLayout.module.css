@@ -15,6 +15,7 @@
 
 .aside {
   position: sticky;
+  min-width: 0;
   top: calc(var(--aera-layout-nav-height) + var(--aera-space-9));
   align-self: start;
   display: flex;
@@ -34,7 +35,7 @@
 
 @media (max-width: 1080px) {
   .split {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--aera-space-10);
   }
   .aside {

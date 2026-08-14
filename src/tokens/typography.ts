@@ -99,6 +99,14 @@ export const textStyle = {
     letterSpacing: '-0.02em',
     fontWeight: fontWeight.bold,
   },
+  /** the one size above body — reserved for a dominant input */
+  bodyLG: {
+    fontFamily: fontFamily.body,
+    fontSize: '15px',
+    lineHeight: '1.5',
+    letterSpacing: '0',
+    fontWeight: fontWeight.medium,
+  },
   body: {
     fontFamily: fontFamily.body,
     fontSize: '14px',
@@ -136,6 +144,14 @@ export const textStyle = {
     letterSpacing: '0.14em',
     textTransform: 'uppercase',
     fontWeight: fontWeight.medium,
+  },
+  /** chart annotation — axis ticks and calendar day letters */
+  tick: {
+    fontFamily: fontFamily.body,
+    fontSize: '8px',
+    lineHeight: '1',
+    letterSpacing: '0.02em',
+    fontWeight: fontWeight.semibold,
   },
   mono: {
     fontFamily: fontFamily.mono,

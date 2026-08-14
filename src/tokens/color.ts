@@ -94,9 +94,30 @@ export const shotZoneRamp = [
   { name: 'hot', color: colorShotZone.hot, max: Infinity },
 ] as const;
 
+/* ------------------------------------------------------------
+   ON-FACE — washes used on top of a coloured card, where a surface
+   token would fight the face underneath it.
+   ------------------------------------------------------------ */
+export const colorOnFace = {
+  /** a recessed panel on a coloured card */
+  wash: 'rgba(255,255,255,0.34)',
+  /** the same panel, lifted — a hovered link */
+  washStrong: 'rgba(255,255,255,0.72)',
+  /** an empty track on a coloured card */
+  track: 'rgba(0,0,0,0.09)',
+  /** the barely-there field behind a viz on a light face */
+  vizLight: 'rgba(255,255,255,0.42)',
+  /** the same field on a dark face */
+  vizDark: 'rgba(255,255,255,0.12)',
+} as const;
+
 export const colorUtility = {
   /** figma-style selection outline */
   select: '#0D99FF',
+  /** text on the selection outline */
+  onSelect: '#FFFFFF',
+  /** the dotted field standing in for artwork that has not been made */
+  placeholderDot: 'rgba(200,194,182,0.9)',
   /** hairline on a light surface */
   hairline: 'rgba(120,110,92,0.14)',
   /** an empty track / rest day */
@@ -112,6 +133,7 @@ export const color = {
   dataInk: colorDataInk,
   semantic: colorSemantic,
   shotZone: colorShotZone,
+  onFace: colorOnFace,
   utility: colorUtility,
 } as const;
 
