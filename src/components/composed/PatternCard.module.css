@@ -15,8 +15,10 @@
 
 .viz {
   margin-top: auto;
-  padding-bottom: var(--aera-space-4);
-  opacity: 0.9;
+  margin-bottom: var(--aera-space-4);
+  padding: var(--aera-space-5);
+  border-radius: var(--aera-radius-md);
+  background: var(--viz-well);
 }
 
 .trend {

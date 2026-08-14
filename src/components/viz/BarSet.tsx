@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
-import { contrastOn, dataColor } from '../../lib/color';
+import { dataColor } from '../../lib/color';
 import { Label, Text } from '../primitives/Text';
 import type { SeriesPoint } from '../../data/types';
 import styles from './Charts.module.css';
@@ -16,8 +16,6 @@ export interface BarSetProps {
   radius?: 'pill' | 'md';
   /** inherit the card's ink for the labels */
   inherit?: boolean;
-  /** the card face these bars sit on — keeps a bar from vanishing into it */
-  face?: string;
   className?: string;
   style?: CSSProperties;
 }
@@ -30,7 +28,6 @@ export function BarSet({
   showLabels = false,
   radius = 'pill',
   inherit,
-  face,
   className,
   style,
 }: BarSetProps) {
@@ -61,7 +58,7 @@ export function BarSet({
             className={styles.barFill}
             style={
               {
-                '--bar-color': face ? contrastOn(dataColor(item.tone), face) : dataColor(item.tone),
+                '--bar-color': dataColor(item.tone),
                 '--bar-radius': `var(--aera-radius-${radius})`,
                 '--bar-height': `calc((100% - ${chromeH}px) * ${Math.max(0.08, item.value / max).toFixed(3)})`,
               } as CSSProperties

@@ -51,21 +51,18 @@ export function tintOf(hex: string): string {
     : mix(hex, '#FFFFFC', 0.42);
 }
 
-/** keep a data colour readable when it sits on a coloured card face —
- *  if the two are too close, pull the mark toward that face's ink */
-export function contrastOn(hex: string, face: string): string {
-  const a = hexToRgb(hex);
-  const b = hexToRgb(face);
-  const distance = Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
-  return distance < 96 ? mix(hex, inkOn(face), 0.42) : hex;
-}
-
 export function dataColor(tone: DataTone): string {
   return colorData[tone];
 }
 
 export function dataInk(tone: DataTone): string {
   return colorDataInk[tone];
+}
+
+/** a barely-there field behind a viz, so a mark can never disappear into
+ *  a card face that happens to share its colour */
+export function vizWell(face: string): string {
+  return luminance(face) > 0.5 ? 'rgba(255,255,255,0.42)' : 'rgba(255,255,255,0.12)';
 }
 
 /* ------------------------------------------------------------

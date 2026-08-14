@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
-import { inkOn, mix, tintOf } from '../../lib/color';
+import { inkOn, mix, tintOf, vizWell } from '../../lib/color';
 import { Card } from '../../components/primitives/Card';
 import { Metric } from '../../components/primitives/Metric';
 import { Display, Label, Text } from '../../components/primitives/Text';
@@ -93,13 +93,15 @@ export function PatternExpanded({
           </div>
 
           <div className={styles.column}>
+            <div className={styles.viz} style={{ '--viz-well': vizWell(pattern.fill) } as CSSProperties}>
             {pattern.viz === 'bars' ? (
-              <BarSet items={pattern.bars} height={132} showLabels face={pattern.fill} inherit />
+              <BarSet items={pattern.bars} height={132} showLabels inherit />
             ) : pattern.viz === 'dots' ? (
               <AreaChart values={pattern.series} color={mark} height={120} />
             ) : (
               <Sparkline values={pattern.series} color={mark} height={120} weight={3} />
             )}
+            </div>
 
             <div>
               <Label tone="inherit" style={{ opacity: 0.66 }}>

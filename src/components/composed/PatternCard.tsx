@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
-import { inkOn, tintOf } from '../../lib/color';
+import { inkOn, tintOf, vizWell } from '../../lib/color';
 import { Card } from '../primitives/Card';
 import { Display, Label, Text } from '../primitives/Text';
 import { Metric } from '../primitives/Metric';
@@ -24,16 +24,7 @@ export interface PatternCardProps {
 /** the compact viz on a card front, chosen by the pattern's own shape */
 function CardViz({ pattern, tint }: { pattern: Pattern; tint: string }) {
   if (pattern.viz === 'bars') {
-    return (
-      <BarSet
-        items={pattern.bars}
-        height={62}
-        showValues={false}
-        radius="md"
-        face={pattern.fill}
-        inherit
-      />
-    );
+    return <BarSet items={pattern.bars} height={62} showValues={false} radius="md" inherit />;
   }
   if (pattern.viz === 'dots') {
     const filled = Math.round((pattern.series[pattern.series.length - 1] / 100) * 24);
@@ -88,7 +79,10 @@ export function PatternCard({
         {pattern.trend}
       </Text>
 
-      <div className={styles.viz}>
+      <div
+        className={styles.viz}
+        style={{ '--viz-well': vizWell(pattern.fill) } as CSSProperties}
+      >
         <CardViz pattern={pattern} tint={tint} />
       </div>
 

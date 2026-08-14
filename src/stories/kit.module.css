@@ -1,0 +1,82 @@
+.frame {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-7);
+  max-width: 100%;
+}
+
+.frameHead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-2);
+  padding-bottom: var(--aera-space-4);
+  border-bottom: 1px solid var(--aera-color-utility-hairline);
+}
+
+.frameBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-8);
+}
+
+.variant {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: var(--aera-space-8);
+  align-items: center;
+  padding: var(--aera-space-5) 0;
+}
+
+.variant + .variant {
+  border-top: 1px solid var(--aera-color-utility-hairline);
+}
+
+.variantName {
+  padding-top: var(--aera-space-2);
+}
+
+.variantBody {
+  min-width: 0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.tokenGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: var(--aera-space-8);
+}
+
+.tokenCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-5);
+}
+
+.tokenSample {
+  display: flex;
+  align-items: flex-end;
+  min-height: 56px;
+}
+
+.tokenMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-1);
+}
+
+.swatch {
+  width: 100%;
+  height: 56px;
+  border-radius: var(--aera-radius-md);
+  box-shadow: inset 0 0 0 1px var(--aera-color-utility-hairline);
+}

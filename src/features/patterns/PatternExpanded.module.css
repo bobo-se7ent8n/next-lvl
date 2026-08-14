@@ -66,6 +66,12 @@
   gap: var(--aera-space-3);
 }
 
+.viz {
+  padding: var(--aera-space-6);
+  border-radius: var(--aera-radius-md);
+  background: var(--viz-well);
+}
+
 .history {
   display: flex;
   flex-direction: column;

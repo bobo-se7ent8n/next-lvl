@@ -1,22 +1,13 @@
 import { useEffect, useState } from 'react';
-import { NavBar } from '../components/chrome/NavBar';
-import { BackgroundLayers } from '../features/background/BackgroundLayers';
 import { BackgroundPanel } from '../features/background/BackgroundPanel';
 import { BACKGROUND_DEFAULTS, type BackgroundSettings } from '../features/background/settings';
+import { ScreenFrame } from '../screens/ScreenFrame';
 import { Home } from '../screens/Home';
 import { Sessions } from '../screens/Sessions';
 import { Insights } from '../screens/Insights';
 import { Scoreboard } from '../screens/Scoreboard';
-import styles from './App.module.css';
 
 export type ScreenName = 'home' | 'sessions' | 'insights' | 'scoreboard';
-
-const NAV = [
-  { value: 'home' as const, label: 'Home' },
-  { value: 'sessions' as const, label: 'Sessions' },
-  { value: 'insights' as const, label: 'Insights' },
-  { value: 'scoreboard' as const, label: 'Scoreboard' },
-];
 
 export function App() {
   const [screen, setScreen] = useState<ScreenName>('home');
@@ -30,10 +21,11 @@ export function App() {
 
   return (
     <>
-      <BackgroundLayers settings={background} />
-      <NavBar items={NAV} value={screen} onChange={setScreen} />
-
-      <main className={styles.main}>
+      <ScreenFrame
+        active={screen}
+        background={background}
+        onNavigate={(next) => setScreen(next as ScreenName)}
+      >
         {screen === 'home' ? (
           <Home
             onOpenSessions={() => setScreen('sessions')}
@@ -44,7 +36,7 @@ export function App() {
         {screen === 'sessions' ? <Sessions /> : null}
         {screen === 'insights' ? <Insights /> : null}
         {screen === 'scoreboard' ? <Scoreboard /> : null}
-      </main>
+      </ScreenFrame>
 
       <BackgroundPanel settings={background} onChange={setBackground} />
     </>
