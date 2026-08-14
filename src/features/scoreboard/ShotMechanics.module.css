@@ -1,0 +1,55 @@
+.card {
+  gap: var(--aera-space-6);
+  text-align: left;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--aera-space-5);
+}
+
+.arc {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-8);
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-3);
+}
+
+.row + .row {
+  border-top: 1px solid var(--aera-color-utility-hairline);
+  padding-top: var(--aera-space-7);
+}
+
+.rowHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--aera-space-6);
+}
+
+.mark {
+  display: block;
+  width: 34px;
+  height: 4px;
+  border-radius: var(--aera-radius-pill);
+}
+
+.source {
+  padding-top: var(--aera-space-2);
+  opacity: 0.75;
+}

@@ -1,0 +1,23 @@
+.card {
+  gap: var(--aera-space-6);
+  text-align: left;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--aera-space-5);
+}
+
+.legend {
+  margin-top: auto;
+}
+
+.well {
+  margin-top: auto;
+}
+
+.legend + .well {
+  margin-top: var(--aera-space-2);
+}

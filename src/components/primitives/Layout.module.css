@@ -1,0 +1,21 @@
+.stack {
+  display: flex;
+  gap: var(--gap);
+  flex-direction: var(--direction);
+  align-items: var(--align);
+  justify-content: var(--justify);
+  flex-wrap: var(--wrap);
+  min-width: 0;
+}
+
+.grid {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: var(--columns);
+  align-items: var(--align);
+  min-width: 0;
+}
+
+.fill {
+  height: 100%;
+}

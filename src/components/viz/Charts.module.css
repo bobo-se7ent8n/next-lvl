@@ -1,0 +1,187 @@
+.chart {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.chartBox {
+  position: relative;
+  width: 100%;
+  height: var(--chart-h);
+}
+
+/* ---------- BarSet ---------- */
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--aera-space-5);
+  width: 100%;
+  height: var(--chart-h);
+}
+
+.bar {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  min-width: 0;
+}
+
+.barValue {
+  flex: 0 0 auto;
+  text-align: center;
+  margin-bottom: var(--aera-space-3);
+}
+
+.barFill {
+  display: block;
+  flex: 0 0 auto;
+  width: 100%;
+  border-radius: var(--bar-radius);
+  background: var(--bar-color);
+  height: var(--bar-height);
+  transition: height var(--aera-duration-slow) var(--aera-ease-out);
+}
+
+.barLabel {
+  flex: 0 0 auto;
+  margin-top: var(--aera-space-3);
+  text-align: center;
+}
+
+/* ---------- DotMatrix ---------- */
+.dots {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  gap: var(--aera-space-2);
+  width: 100%;
+}
+
+.dot {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: var(--aera-radius-pill);
+  background: var(--dot-color);
+}
+
+/* ---------- Heatmap ---------- */
+.heatmap {
+  position: relative;
+  display: grid;
+  grid-template-columns: 11px auto;
+  gap: var(--aera-space-3);
+  justify-content: start;
+  align-items: stretch;
+}
+
+.heatDays {
+  display: grid;
+  grid-template-rows: repeat(7, var(--cell));
+  gap: var(--cell-gap);
+}
+
+.heatDays span {
+  display: flex;
+  align-items: center;
+  font-family: var(--aera-text-label-family);
+  font-size: 7px;
+  font-weight: var(--aera-weight-semibold);
+  color: var(--aera-color-ink-tertiary);
+  line-height: 1;
+}
+
+.heatGrid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, var(--cell));
+  grid-auto-columns: var(--cell);
+  gap: var(--cell-gap);
+}
+
+.heatCell {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--cell-bg);
+  opacity: var(--cell-opacity);
+  transition: transform var(--aera-duration-base) var(--aera-ease-spring);
+}
+
+.heatCell:hover {
+  transform: scale(1.25);
+}
+
+/* ---------- Legend ---------- */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--aera-space-3) var(--aera-space-7);
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--aera-space-3);
+  white-space: nowrap;
+}
+
+.legendSwatch {
+  display: block;
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: var(--aera-radius-pill);
+  background: var(--swatch);
+}
+
+/* ---------- Ruler ---------- */
+.ruler {
+  position: relative;
+  height: 46px;
+  width: min(760px, 92vw);
+  margin: 0 auto;
+  overflow: hidden;
+  user-select: none;
+}
+
+.rulerTrack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  will-change: transform;
+}
+
+.tick {
+  position: absolute;
+  top: 4px;
+  width: 1px;
+  background: var(--aera-color-ink-primary);
+}
+
+.tickLabel {
+  position: absolute;
+  top: 17px;
+  transform: translateX(-50%);
+  font-family: var(--aera-text-body-family);
+  font-size: 8px;
+  font-weight: var(--aera-weight-semibold);
+  line-height: 1;
+  color: var(--aera-color-ink-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.caret {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 13px;
+  border-radius: 2px;
+  background: var(--aera-color-ink-primary);
+  transform: translateX(-50%);
+}

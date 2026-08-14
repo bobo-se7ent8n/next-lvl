@@ -1,0 +1,93 @@
+/* ============================================================
+   THE FAN
+
+   Five cards visible at rest, the hand centred on the screen. The
+   set cycles: as the position moves, cards leave one edge and are
+   replaced from the other. Each slot has its own Y offset, its own
+   rotation and its own scale, so the hand is asymmetric — laid down
+   by a person rather than plotted on an even arc.
+
+   There is no drag. Hovering a card shows a Figma-style outline and
+   its name tag; clicking opens it.
+   ============================================================ */
+.wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-8);
+}
+
+.stage {
+  --card-w: clamp(158px, 15.5vw, 226px);
+  --card-h: clamp(228px, 22vw, 316px);
+  position: relative;
+  width: 100%;
+  height: clamp(340px, 46vh, 440px);
+  /* the ends of the hand sit outside the viewport by design */
+  overflow: clip;
+}
+
+/* a card is open — the hand needs room for the panel and the peek */
+.stageOpen {
+  height: clamp(560px, 68vh, 680px);
+}
+
+@supports not (overflow: clip) {
+  .stage {
+    overflow: hidden;
+  }
+}
+
+.slot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--card-w);
+  height: var(--card-h);
+  margin-left: calc(var(--card-w) / -2);
+  margin-top: calc(var(--card-h) / -2);
+  transform: translate3d(var(--x), var(--y), 0) rotate(var(--rot)) scale(var(--sc));
+  opacity: var(--op);
+  visibility: var(--vis);
+  will-change: transform;
+  transition:
+    transform var(--aera-duration-slow) var(--aera-ease-out),
+    opacity var(--aera-duration-slow) var(--aera-ease-out);
+}
+
+/* while a card is open the rest of the hand tucks behind it */
+.slotTucked {
+  pointer-events: none;
+}
+
+.slot > * {
+  height: 100%;
+}
+
+.hint {
+  text-align: center;
+}
+
+.expanded {
+  animation: openCard var(--aera-duration-expand) var(--aera-ease-out) both;
+  position: absolute;
+  left: 50%;
+  top: var(--aera-space-9);
+  z-index: 40;
+  width: min(900px, 94vw);
+  height: clamp(420px, 58vh, 560px);
+  transform: translateX(-50%);
+  transform-origin: center top;
+}
+
+@keyframes openCard {
+  from {
+    transform: translateX(-50%) scale(0.62);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,42 @@
+.text {
+  margin: 0;
+  font-family: var(--family);
+  font-size: var(--size);
+  line-height: var(--leading);
+  letter-spacing: var(--tracking);
+  font-weight: var(--weight);
+  text-transform: var(--transform);
+  color: var(--tone);
+}
+
+.numeric {
+  font-variant-numeric: tabular-nums;
+}
+
+.align-start {
+  text-align: left;
+}
+.align-center {
+  text-align: center;
+}
+.align-end {
+  text-align: right;
+}
+
+.clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--lines);
+  line-clamp: var(--lines);
+  overflow: hidden;
+}
+
+/* ---- display, with per-letter weight variation ---- */
+.letter {
+  display: inline-block;
+  will-change: transform;
+}
+
+.measure {
+  max-width: var(--aera-layout-max-read-width);
+}

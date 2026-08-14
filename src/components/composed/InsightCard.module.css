@@ -1,0 +1,35 @@
+.card {
+  gap: var(--aera-space-6);
+  text-align: left;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--aera-space-6);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-4);
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: var(--aera-space-4);
+}
+
+.duration {
+  margin-left: auto;
+}
+
+.thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--ratio);
+  border-radius: var(--aera-radius-lg);
+  background-color: var(--aera-color-surface-well);
+  background-image: radial-gradient(rgba(200, 194, 182, 0.9) 1px, transparent 1px);
+  background-size: 7px 7px;
+  box-shadow: var(--aera-elevation-inset);
+}

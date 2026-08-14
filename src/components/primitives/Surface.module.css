@@ -1,0 +1,16 @@
+.surface {
+  position: relative;
+  background: var(--surface-bg);
+  color: var(--surface-ink);
+  border-radius: var(--surface-radius);
+  box-shadow: var(--surface-shadow);
+  padding: var(--surface-pad);
+}
+
+.clip {
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+}

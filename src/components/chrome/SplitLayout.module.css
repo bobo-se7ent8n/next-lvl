@@ -1,0 +1,45 @@
+/* ============================================================
+   SPLIT LAYOUT
+
+   The two-column shape shared by Focus & Vitals, Sessions and
+   Insights: a sticky left column that stays put, and a right
+   column that scrolls with the page.
+   ============================================================ */
+.split {
+  display: grid;
+  grid-template-columns: var(--split-columns);
+  gap: var(--aera-space-12);
+  align-items: start;
+  width: 100%;
+}
+
+.aside {
+  position: sticky;
+  top: calc(var(--aera-layout-nav-height) + var(--aera-space-9));
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-8);
+  /* a tall panel still needs to be reachable */
+  max-height: calc(100svh - var(--aera-layout-nav-height) - var(--aera-space-12));
+  overflow-y: auto;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-8);
+  min-width: 0;
+}
+
+@media (max-width: 1080px) {
+  .split {
+    grid-template-columns: 1fr;
+    gap: var(--aera-space-10);
+  }
+  .aside {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}

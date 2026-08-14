@@ -1,0 +1,25 @@
+.card {
+  gap: var(--aera-space-9);
+  text-align: left;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-5);
+  flex-wrap: wrap;
+}
+
+.beats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-11);
+  padding-top: var(--aera-space-9);
+  margin-top: auto;
+}
+
+.beat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-4);
+}

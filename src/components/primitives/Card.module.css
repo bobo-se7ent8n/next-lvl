@@ -1,0 +1,63 @@
+/* ============================================================
+   CARD
+
+   One element carries the background, the radius, the clip and the
+   shadow. Nothing paints a shadow on a different box from the one
+   holding the radius — that is exactly what produced the sharp
+   corner artefact on the fan cards, at rest and on hover.
+
+   The hover ring is a spread box-shadow rather than an outline, so
+   it follows the radius too.
+   ============================================================ */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--card-bg);
+  color: var(--card-ink);
+  border-radius: var(--card-radius);
+  padding: var(--card-pad);
+  box-shadow: var(--card-shadow);
+  transition:
+    box-shadow var(--aera-duration-base) var(--aera-ease-out),
+    transform var(--aera-duration-base) var(--aera-ease-out);
+}
+
+.clip {
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+}
+
+.interactive {
+  cursor: pointer;
+  text-align: inherit;
+  width: 100%;
+}
+
+.interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--aera-elevation-high);
+}
+
+.interactive:active {
+  transform: translateY(0) scale(0.997);
+}
+
+/* figma-style hover outline — a ring that follows the radius exactly */
+.outlined:hover,
+.outlined:focus-visible {
+  box-shadow: var(--card-shadow), var(--aera-elevation-select-ring);
+}
+
+.interactive.outlined:hover {
+  box-shadow: var(--aera-elevation-high), var(--aera-elevation-select-ring);
+}
+
+.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}

@@ -1,0 +1,8 @@
+.main {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: var(--aera-layout-max-width);
+  margin: 0 auto;
+  padding: 0 var(--aera-layout-gutter) var(--aera-space-16);
+}

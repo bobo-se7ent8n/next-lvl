@@ -1,0 +1,54 @@
+/* ============================================================
+   BENTO — compact blocks on one grid. Nothing runs full width
+   except the skills row, and no block is taller than its content.
+   ============================================================ */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--aera-space-8);
+  align-items: start;
+}
+
+.zones {
+  grid-column: span 3;
+  grid-row: span 2;
+}
+
+.points {
+  grid-column: span 3;
+}
+
+.mechanics {
+  grid-column: span 3;
+}
+
+.skills {
+  grid-column: span 6;
+}
+
+@media (max-width: 1080px) {
+  .bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .zones,
+  .points,
+  .mechanics {
+    grid-column: span 1;
+    grid-row: auto;
+  }
+  .skills {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 720px) {
+  .bento {
+    grid-template-columns: 1fr;
+  }
+  .zones,
+  .points,
+  .mechanics,
+  .skills {
+    grid-column: span 1;
+  }
+}

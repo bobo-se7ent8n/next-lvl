@@ -1,0 +1,26 @@
+.tip {
+  position: absolute;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -118%);
+  background: var(--aera-color-surface-inverse);
+  color: var(--aera-color-ink-on-inverse);
+  border-radius: var(--aera-radius-md);
+  padding: var(--aera-space-4) var(--aera-space-6);
+  white-space: nowrap;
+  font-family: var(--aera-text-body-family);
+  font-size: var(--aera-text-body-xs-size);
+  line-height: 1.45;
+  transition: opacity var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.on {
+  opacity: 1;
+}
+
+.tipHead {
+  display: block;
+  margin-bottom: var(--aera-space-2);
+  opacity: 0.62;
+}

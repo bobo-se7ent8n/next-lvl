@@ -1,0 +1,154 @@
+/* ============================================================
+   CHAT PANEL
+
+   Four deliberate levels, loudest first:
+
+   1  the input        — the dominant object. Largest type, white
+                         field on a recessed well, a filled send.
+   2  the messages     — aera reads as a spoken answer on a quiet
+                         surface with an attribution; you read as an
+                         inverse pill, right-aligned. The two are
+                         never the same shape or the same tone.
+   3  the suggestions  — outlined, small, clearly a third layer.
+   4  the system line  — the recessed footnote. Nothing competes
+                         with it because nothing is quieter.
+   ============================================================ */
+.panel {
+  gap: var(--aera-space-8);
+  text-align: left;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--aera-space-6);
+}
+
+/* ---- 2 · thread ---- */
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-7);
+  max-height: 42vh;
+  overflow-y: auto;
+  padding-right: var(--aera-space-3);
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-3);
+  max-width: 92%;
+}
+
+.fromAera {
+  align-self: flex-start;
+}
+
+.fromYou {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.bubbleAera {
+  padding: var(--aera-space-7) var(--aera-space-8);
+  border-radius: var(--aera-radius-lg) var(--aera-radius-lg) var(--aera-radius-lg) var(--aera-space-4);
+  background: var(--aera-color-surface-well);
+  color: var(--aera-color-ink-primary);
+  box-shadow: var(--aera-elevation-inset);
+}
+
+.bubbleYou {
+  padding: var(--aera-space-5) var(--aera-space-8);
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-surface-inverse);
+  color: var(--aera-color-ink-on-inverse);
+}
+
+.attribution {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-3);
+}
+
+.source {
+  padding-left: var(--aera-space-2);
+}
+
+/* ---- 3 · suggestions ---- */
+.seeds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--aera-space-4);
+}
+
+.seed {
+  border-radius: var(--aera-radius-pill);
+  padding: var(--aera-space-4) var(--aera-space-6);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--aera-color-utility-hairline);
+  font-family: var(--aera-text-body-family);
+  font-size: var(--aera-text-body-xs-size);
+  color: var(--aera-color-ink-tertiary);
+  transition:
+    color var(--aera-duration-fast) var(--aera-ease-out),
+    box-shadow var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.seed:hover {
+  color: var(--aera-color-ink-primary);
+  box-shadow: inset 0 0 0 1px var(--aera-color-ink-tertiary);
+}
+
+/* ---- 1 · the input, the loudest thing in the panel ---- */
+.composer {
+  display: flex;
+  gap: var(--aera-space-5);
+  align-items: center;
+  padding: var(--aera-space-4);
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-surface-well);
+  box-shadow: var(--aera-elevation-inset);
+}
+
+.input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  padding: var(--aera-space-5) var(--aera-space-7);
+  font-family: var(--aera-text-body-family);
+  font-size: 15px;
+  font-weight: var(--aera-weight-medium);
+  color: var(--aera-color-ink-primary);
+}
+
+.input::placeholder {
+  color: var(--aera-color-ink-tertiary);
+  font-weight: var(--aera-weight-regular);
+}
+
+.send {
+  flex: 0 0 auto;
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-surface-inverse);
+  color: var(--aera-color-ink-on-inverse);
+  padding: var(--aera-space-5) var(--aera-space-9);
+  font-family: var(--aera-text-body-family);
+  font-size: var(--aera-text-body-sm-size);
+  font-weight: var(--aera-weight-semibold);
+  transition: opacity var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.send:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ---- 4 · the recessed system line ---- */
+.systemLine {
+  opacity: 0.55;
+  padding: 0 var(--aera-space-6);
+}

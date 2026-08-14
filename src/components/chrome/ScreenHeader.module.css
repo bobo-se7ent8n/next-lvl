@@ -1,0 +1,32 @@
+/* ============================================================
+   SCREEN HEADER
+
+   One fixed-height block. The headline row starts at exactly
+   --aera-layout-header-title-offset on every screen, so PATTERNS,
+   SESSIONS, INSIGHTS, FOCUS & VITALS and SCOREBOARD all share one
+   baseline and nothing jumps when the screen changes. A longer
+   description grows downward into the slack, never upward.
+   ============================================================ */
+.header {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  align-content: start;
+  text-align: center;
+  gap: var(--aera-space-6);
+  height: var(--aera-layout-header-height);
+  padding-top: var(--aera-layout-header-title-offset);
+  width: 100%;
+}
+
+.sub {
+  max-width: var(--aera-layout-max-read-width);
+}
+
+@media (max-width: 760px) {
+  .header {
+    height: auto;
+    min-height: var(--aera-layout-header-height);
+    padding-top: calc(var(--aera-layout-header-title-offset) - var(--aera-space-9));
+  }
+}

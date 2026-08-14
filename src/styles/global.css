@@ -1,0 +1,98 @@
+/* ============================================================
+   GLOBAL — reset + page base.
+   Every value here is a token. The only literals are structural
+   (0, 100%, none) or the scrollbar geometry.
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+html {
+  background: var(--aera-color-surface-background);
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--aera-text-body-family);
+  font-size: var(--aera-text-body-size);
+  line-height: var(--aera-text-body-leading);
+  color: var(--aera-color-ink-primary);
+  background: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+input {
+  font: inherit;
+  color: inherit;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+::selection {
+  background: var(--aera-color-utility-highlight);
+  color: var(--aera-color-data-ink-lime, #15170a);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--aera-color-surface-level2);
+  border-radius: var(--aera-radius-pill);
+  border: 3px solid var(--aera-color-surface-background);
+}
+
+:focus-visible {
+  outline: 2px solid var(--aera-color-ink-primary);
+  outline-offset: 3px;
+  border-radius: var(--aera-radius-md);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

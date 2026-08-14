@@ -1,0 +1,12 @@
+.card {
+  gap: var(--aera-space-9);
+  text-align: left;
+  width: 100%;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--aera-space-5);
+}

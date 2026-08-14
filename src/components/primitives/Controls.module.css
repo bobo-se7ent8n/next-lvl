@@ -1,0 +1,165 @@
+/* ---------- Toggle ---------- */
+.toggle {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  flex: 0 0 auto;
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-surface-level2);
+  transition: background var(--aera-duration-base) var(--aera-ease-out);
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-surface-panel);
+  transition: transform var(--aera-duration-base) var(--aera-ease-out);
+}
+
+.toggleOn {
+  background: var(--aera-color-ink-primary);
+}
+
+.toggleOn::after {
+  transform: translateX(14px);
+}
+
+.toggleDisabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ---------- SegmentedControl ---------- */
+.segmented {
+  display: inline-flex;
+  gap: var(--aera-space-2);
+  background: var(--aera-color-surface-level2);
+  border-radius: var(--aera-radius-pill);
+  padding: var(--aera-space-2);
+}
+
+.segment {
+  border-radius: var(--aera-radius-pill);
+  padding: var(--aera-space-4) var(--aera-space-7);
+  font-family: var(--aera-text-body-family);
+  font-size: var(--aera-text-body-sm-size);
+  font-weight: var(--aera-weight-medium);
+  color: var(--aera-color-ink-secondary);
+  white-space: nowrap;
+  transition:
+    background var(--aera-duration-fast) var(--aera-ease-out),
+    color var(--aera-duration-fast) var(--aera-ease-out),
+    box-shadow var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.segment:hover:not(.segmentOn):not(:disabled) {
+  color: var(--aera-color-ink-primary);
+}
+
+.segmentOn {
+  background: var(--aera-color-surface-panel);
+  color: var(--aera-color-ink-primary);
+  font-weight: var(--aera-weight-semibold);
+  box-shadow: var(--aera-elevation-low);
+}
+
+.segment:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ---------- Slider ---------- */
+.slider {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-5);
+  min-width: 0;
+}
+
+.sliderName {
+  width: 64px;
+  flex: 0 0 auto;
+}
+
+.sliderInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 4px;
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-surface-level2);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.sliderInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-ink-primary);
+  cursor: pointer;
+}
+
+.sliderInput::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-ink-primary);
+  cursor: pointer;
+}
+
+.sliderInput:disabled {
+  opacity: 0.4;
+}
+
+.sliderValue {
+  width: 40px;
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+/* ---------- ProgressBar ---------- */
+.progress {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: var(--bar-h);
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-surface-level2);
+  overflow: hidden;
+}
+
+.progressFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--aera-radius-pill);
+  width: var(--bar-w);
+  background: var(--bar-color);
+  transition: width var(--aera-duration-slow) var(--aera-ease-out);
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-7);
+  padding: var(--aera-space-4) 0;
+}
+
+.progressRowName {
+  width: 132px;
+  flex: 0 0 auto;
+}
+
+.progressRowValue {
+  width: 36px;
+  flex: 0 0 auto;
+  text-align: right;
+}

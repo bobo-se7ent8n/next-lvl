@@ -1,0 +1,70 @@
+/* ============================================================
+   SESSION CARD
+
+   Sessions have their own card language: a wide record, date
+   leading on the left, the stat run inline, duration closing it
+   on the right. Nothing is borrowed from the pattern card.
+   ============================================================ */
+.card {
+  gap: var(--aera-space-8);
+  text-align: left;
+}
+
+.top {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--aera-space-9);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-6);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.arrow {
+  display: flex;
+  align-items: center;
+  color: var(--aera-color-ink-tertiary);
+}
+
+.arrow svg {
+  width: 17px;
+  height: 17px;
+}
+
+.stats {
+  padding-left: 128px;
+}
+
+.note {
+  padding-left: 128px;
+}
+
+.candidate {
+  margin-top: var(--aera-space-2);
+  padding: var(--aera-space-8) var(--aera-space-9);
+  border-radius: var(--aera-radius-lg);
+  background: var(--aera-color-surface-well);
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-4);
+  align-items: flex-start;
+  text-align: left;
+}
+
+@media (max-width: 860px) {
+  .top {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .date {
+    grid-column: 1 / -1;
+  }
+  .stats,
+  .note {
+    padding-left: 0;
+  }
+}

@@ -1,0 +1,36 @@
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--aera-space-6);
+  padding: var(--aera-space-4) 0;
+  min-width: 0;
+}
+
+.row + .row {
+  border-top: 1px solid var(--aera-color-utility-hairline);
+}
+
+.label {
+  min-width: 0;
+}
+
+.value {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+.inline {
+  padding: 0;
+  border: 0;
+  gap: var(--aera-space-3);
+}
+
+.inline + .inline {
+  border-top: 0;
+}
+
+.set {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--aera-space-4) var(--aera-space-11);
+}

@@ -1,0 +1,55 @@
+.card {
+  height: 100%;
+  gap: var(--aera-space-4);
+  text-align: left;
+  align-items: stretch;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--aera-space-4);
+  opacity: 0.62;
+}
+
+.viz {
+  margin-top: auto;
+  padding-bottom: var(--aera-space-4);
+  opacity: 0.9;
+}
+
+.trend {
+  opacity: 0.66;
+}
+
+.title {
+  margin-top: var(--aera-space-2);
+}
+
+/* the figma-style name tag, pinned under the card's own corner */
+.nameTag {
+  position: absolute;
+  left: -1px;
+  bottom: -24px;
+  border-radius: var(--aera-radius-xs);
+  background: var(--aera-color-utility-select);
+  color: #fff;
+  font-family: var(--aera-text-label-family);
+  font-size: var(--aera-text-label-size);
+  font-weight: var(--aera-weight-medium);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: var(--aera-space-2) var(--aera-space-4);
+  white-space: nowrap;
+  max-width: 150%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.tagOn {
+  opacity: 1;
+}
