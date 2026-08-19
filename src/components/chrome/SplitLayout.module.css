@@ -1,9 +1,11 @@
 /* ============================================================
    SPLIT LAYOUT
 
-   The two-column shape shared by Focus & Vitals, Sessions and
-   Insights: a sticky left column that stays put, and a right
-   column that scrolls with the page.
+   A sticky left column beside a scrolling right one. The sticky
+   column settles against the top of the scroll region and stays
+   there; when it is much shorter than what it sits beside it can
+   stretch to the pinned height instead of being left stranded at
+   the top of a very long page.
    ============================================================ */
 .split {
   display: grid;
@@ -26,6 +28,17 @@
   overflow-y: auto;
 }
 
+/* fill the pinned viewport rather than floating at the top of it */
+.asideStretch {
+  height: calc(100svh - var(--aera-layout-nav-height) - var(--aera-space-13));
+  overflow: visible;
+}
+
+.asideStretch > * {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .main {
   display: flex;
   flex-direction: column;
@@ -38,8 +51,10 @@
     grid-template-columns: minmax(0, 1fr);
     gap: var(--aera-space-10);
   }
-  .aside {
+  .aside,
+  .asideStretch {
     position: static;
+    height: auto;
     max-height: none;
     overflow: visible;
   }

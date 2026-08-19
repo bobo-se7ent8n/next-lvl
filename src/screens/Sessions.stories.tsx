@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Sessions } from './Sessions';
 import { ScreenFrame } from './ScreenFrame';
 
-const meta = {
+const meta: Meta<typeof Sessions> = {
   title: 'Screens/Sessions',
   component: Sessions,
   parameters: {
@@ -10,7 +10,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'The activity calendar sticks on the left while the session log scrolls on the right.',
+          'The month calendar runs full width above the log, and every session card opens its own detail view — the replay stage, the moment pager, and the multi-track timeline.',
       },
     },
   },
@@ -19,7 +19,7 @@ const meta = {
       <Sessions />
     </ScreenFrame>
   ),
-} satisfies Meta<typeof Sessions>;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;

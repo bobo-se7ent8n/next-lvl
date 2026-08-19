@@ -1,14 +1,25 @@
 /* ============================================================
    TYPOGRAPHY
 
-   Three families and a small set of composed text tokens. Every
-   piece of type in the product is one of these — components never
-   set a font-size or a letter-spacing of their own.
+   Three families and eight composed text tokens — every piece of
+   type in the product is one of these. Components never set a
+   font-size or a letter-spacing of their own.
+
+   Collapsed from fifteen:
+     · metricXL dropped; metricLG carries the hero number instead
+       and clamps up to do it.
+     · bodyLG + body     → body    (14.5px, the middle of 15 and 14)
+     · bodySM + bodyXS   → bodySM  (12px, the middle of 12.5 and 11.5)
+     · displayMD + displaySM → displayMD (16px, between 20 and 13)
+     · metricMD + metricSM   → metricMD  (22px, between 26 and 19)
+     · label + labelLG + tick + mono → mono. The mono family keeps
+       the uppercase annotation voice the labels carried, so a
+       caption still reads as a caption.
 
    `display` is Oswald as a variable font. Headlines get per-letter
    weight variation (see `inkVariation`) so a headline reads as
-   something that was printed rather than typed. The randomisation
-   is deterministic — hashed from the string itself — so the same
+   something printed rather than typed. The randomisation is
+   deterministic — hashed from the string itself — so the same
    words always come out the same way.
    ============================================================ */
 
@@ -36,8 +47,9 @@ export const inkVariation = {
   shift: 1.3,
 } as const;
 
-/** composed text tokens — the full set a component may ask for */
+/** the eight composed text tokens — the full set a component may ask for */
 export const textStyle = {
+  /* ---- display · Oswald 700, uppercase ---- */
   displayXL: {
     fontFamily: fontFamily.display,
     fontSize: 'clamp(38px, 5vw, 74px)',
@@ -54,110 +66,56 @@ export const textStyle = {
     textTransform: 'uppercase',
     fontWeight: fontWeight.bold,
   },
+  /** every card heading and every small display line */
   displayMD: {
     fontFamily: fontFamily.display,
-    fontSize: '20px',
-    lineHeight: '1.1',
-    letterSpacing: '0.05em',
+    fontSize: '16px',
+    lineHeight: '1.12',
+    letterSpacing: '0.06em',
     textTransform: 'uppercase',
     fontWeight: fontWeight.bold,
   },
-  displaySM: {
-    fontFamily: fontFamily.display,
-    fontSize: '13px',
-    lineHeight: '1.15',
-    letterSpacing: '0.07em',
-    textTransform: 'uppercase',
-    fontWeight: fontWeight.bold,
-  },
-  /** the big number on a metric */
-  metricXL: {
-    fontFamily: fontFamily.display,
-    fontSize: 'clamp(48px, 7vw, 86px)',
-    lineHeight: '0.8',
-    letterSpacing: '-0.03em',
-    fontWeight: fontWeight.bold,
-  },
+
+  /* ---- metric · Oswald 700, tight leading ---- */
+  /** the headline reading of a card, and of the focus panel */
   metricLG: {
     fontFamily: fontFamily.display,
-    fontSize: '38px',
-    lineHeight: '0.85',
-    letterSpacing: '-0.025em',
+    fontSize: 'clamp(34px, 3.6vw, 52px)',
+    lineHeight: '0.84',
+    letterSpacing: '-0.028em',
     fontWeight: fontWeight.bold,
   },
   metricMD: {
     fontFamily: fontFamily.display,
-    fontSize: '26px',
+    fontSize: '22px',
     lineHeight: '1',
     letterSpacing: '-0.02em',
     fontWeight: fontWeight.bold,
   },
-  metricSM: {
-    fontFamily: fontFamily.display,
-    fontSize: '19px',
-    lineHeight: '1',
-    letterSpacing: '-0.02em',
-    fontWeight: fontWeight.bold,
-  },
-  /** the one size above body — reserved for a dominant input */
-  bodyLG: {
-    fontFamily: fontFamily.body,
-    fontSize: '15px',
-    lineHeight: '1.5',
-    letterSpacing: '0',
-    fontWeight: fontWeight.medium,
-  },
+
+  /* ---- body · Inter ---- */
   body: {
     fontFamily: fontFamily.body,
-    fontSize: '14px',
-    lineHeight: '1.6',
+    fontSize: '14.5px',
+    lineHeight: '1.55',
     letterSpacing: '0',
     fontWeight: fontWeight.regular,
   },
   bodySM: {
     fontFamily: fontFamily.body,
-    fontSize: '12.5px',
-    lineHeight: '1.55',
-    letterSpacing: '0',
-    fontWeight: fontWeight.regular,
-  },
-  bodyXS: {
-    fontFamily: fontFamily.body,
-    fontSize: '11.5px',
+    fontSize: '12px',
     lineHeight: '1.5',
     letterSpacing: '0',
     fontWeight: fontWeight.regular,
   },
-  /** the mono label style — every micro caption in the product */
-  label: {
-    fontFamily: fontFamily.mono,
-    fontSize: '9px',
-    lineHeight: '1.35',
-    letterSpacing: '0.16em',
-    textTransform: 'uppercase',
-    fontWeight: fontWeight.medium,
-  },
-  labelLG: {
-    fontFamily: fontFamily.mono,
-    fontSize: '10.5px',
-    lineHeight: '1.35',
-    letterSpacing: '0.14em',
-    textTransform: 'uppercase',
-    fontWeight: fontWeight.medium,
-  },
-  /** chart annotation — axis ticks and calendar day letters */
-  tick: {
-    fontFamily: fontFamily.body,
-    fontSize: '8px',
-    lineHeight: '1',
-    letterSpacing: '0.02em',
-    fontWeight: fontWeight.semibold,
-  },
+
+  /* ---- mono · the annotation voice of the whole product ---- */
   mono: {
     fontFamily: fontFamily.mono,
-    fontSize: '11px',
-    lineHeight: '1.5',
-    letterSpacing: '0.02em',
+    fontSize: '10px',
+    lineHeight: '1.4',
+    letterSpacing: '0.12em',
+    textTransform: 'uppercase',
     fontWeight: fontWeight.medium,
   },
 } as const;

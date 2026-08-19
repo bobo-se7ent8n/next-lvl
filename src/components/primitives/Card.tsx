@@ -21,6 +21,7 @@ export interface CardProps {
   disabled?: boolean;
   onClick?: () => void;
   ariaLabel?: string;
+  id?: string;
   className?: string;
   style?: CSSProperties;
 }
@@ -30,7 +31,7 @@ export interface CardProps {
 export function Card({
   children,
   face,
-  radius = 'panel',
+  radius = 'card',
   elevation = 'medium',
   padding = '10',
   clip = true,
@@ -40,12 +41,14 @@ export function Card({
   disabled,
   onClick,
   ariaLabel,
+  id,
   className,
   style,
 }: CardProps) {
   const Tag = interactive ? 'button' : 'div';
   return (
     <Tag
+      id={id}
       type={interactive ? 'button' : undefined}
       onClick={onClick}
       aria-label={ariaLabel}
@@ -61,7 +64,7 @@ export function Card({
       )}
       style={
         {
-          '--card-bg': face ?? 'var(--aera-color-surface-panel)',
+          '--card-bg': face ?? 'var(--aera-color-surface-background)',
           '--card-ink': face ? inkOn(face) : 'var(--aera-color-ink-primary)',
           '--card-radius': tokenVar('radius', radius),
           '--card-shadow': tokenVar('elevation', elevation),

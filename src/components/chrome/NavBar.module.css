@@ -1,7 +1,13 @@
 /* ============================================================
    NAV — one capsule track, centred at the TOP of the page.
-   The active item is a white pill riding inside it; nothing else
-   in the chrome is white.
+
+   No shadow: the track and the active pill are told apart by fill
+   contrast alone, which is the same rule the rest of the product
+   follows now that cards and paper share a colour.
+
+   Padding is equal on all four sides. It used to be roughly half
+   as much horizontally as vertically, which made the track look
+   pinched around the first and last item.
    ============================================================ */
 .nav {
   position: fixed;
@@ -17,8 +23,7 @@
   gap: var(--aera-space-2);
   background: var(--aera-color-surface-level2);
   border-radius: var(--aera-radius-pill);
-  padding: var(--aera-space-3) var(--aera-space-8);
-  box-shadow: var(--aera-elevation-floating);
+  padding: var(--aera-space-3);
 }
 
 .item {
@@ -33,18 +38,24 @@
   transition:
     color var(--aera-duration-fast) var(--aera-ease-out),
     background var(--aera-duration-fast) var(--aera-ease-out),
-    box-shadow var(--aera-duration-fast) var(--aera-ease-out);
+    transform var(--aera-duration-press) var(--aera-ease-firm);
 }
 
+/* the fill shifts under the pointer; nothing lifts and nothing grows */
 .item:hover {
   color: var(--aera-color-ink-primary);
+  background: var(--aera-color-utility-hover);
 }
 
-.itemOn {
-  background: var(--aera-color-surface-panel);
+.item:active {
+  transform: scale(0.97);
+}
+
+.itemOn,
+.itemOn:hover {
+  background: var(--aera-color-surface-background);
   color: var(--aera-color-ink-primary);
   font-weight: var(--aera-weight-semibold);
-  box-shadow: var(--aera-elevation-pill);
 }
 
 .item:disabled {
@@ -60,10 +71,10 @@
 
 @media (max-width: 560px) {
   .track {
-    padding: var(--aera-space-2) var(--aera-space-4);
+    padding: var(--aera-space-2);
   }
   .item {
     padding: var(--aera-space-4) var(--aera-space-6);
-    font-size: var(--aera-text-body-xs-size);
+    font-size: var(--aera-text-body-sm-size);
   }
 }

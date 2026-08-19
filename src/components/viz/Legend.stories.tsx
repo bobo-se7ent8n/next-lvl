@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Legend } from './Legend';
 import { StoryFrame, Variant } from '../../stories/kit';
-import { colorData, shotZoneRamp } from '../../tokens';
+import { accuracyRamp, colorData } from '../../tokens';
 
 const meta = {
   title: 'Components/Legend',
@@ -21,7 +21,7 @@ const meta = {
   args: {
     items: [
       { label: 'now', value: '74ms', color: colorData.mint },
-      { label: '7-day low', value: '61ms', color: colorData.tan },
+      { label: '7-day low', value: '61ms', color: colorData.blue },
     ],
     justify: 'start',
   },
@@ -39,20 +39,20 @@ export const Variants: Story = {
         <Legend
           items={[
             { label: 'now', value: '74ms', color: colorData.mint },
-            { label: '7-day low', value: '61ms', color: colorData.tan },
+            { label: '7-day low', value: '61ms', color: colorData.blue },
           ]}
         />
       </Variant>
       <Variant name="plain">
         <Legend
           items={[
-            { label: 'rest', color: 'rgba(226,221,210,0.72)' },
+            { label: 'rest', color: 'var(--aera-color-surface-level2)' },
             { label: 'light', color: colorData.mint },
           ]}
         />
       </Variant>
-      <Variant name="shot zones">
-        <Legend items={shotZoneRamp.map((s) => ({ label: s.name, color: s.color }))} />
+      <Variant name="accuracy ramp">
+        <Legend items={accuracyRamp.map((stop) => ({ label: stop.name, color: stop.color }))} />
       </Variant>
     </StoryFrame>
   ),

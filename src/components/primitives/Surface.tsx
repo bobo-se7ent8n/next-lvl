@@ -3,31 +3,20 @@ import type { ElevationLevel, RadiusStep, SpaceStep } from '../../tokens';
 import { cx, tokenVar } from '../../lib/css';
 import styles from './Surface.module.css';
 
-export type SurfaceLevel =
-  | 'background'
-  | 'panel'
-  | 'level1'
-  | 'level2'
-  | 'well'
-  | 'inverse'
-  | 'transparent';
+export type SurfaceLevel = 'background' | 'level1' | 'level2' | 'inverse' | 'transparent';
 
 const LEVEL_BG: Record<SurfaceLevel, string> = {
   background: 'var(--aera-color-surface-background)',
-  panel: 'var(--aera-color-surface-panel)',
   level1: 'var(--aera-color-surface-level1)',
   level2: 'var(--aera-color-surface-level2)',
-  well: 'var(--aera-color-surface-well)',
   inverse: 'var(--aera-color-surface-inverse)',
   transparent: 'transparent',
 };
 
 const LEVEL_INK: Record<SurfaceLevel, string> = {
   background: 'var(--aera-color-ink-primary)',
-  panel: 'var(--aera-color-ink-primary)',
   level1: 'var(--aera-color-ink-primary)',
   level2: 'var(--aera-color-ink-secondary)',
-  well: 'var(--aera-color-ink-primary)',
   inverse: 'var(--aera-color-ink-on-inverse)',
   transparent: 'inherit',
 };
@@ -52,8 +41,8 @@ export interface SurfaceProps {
 /** the raw surface — a background, a radius and an elevation, nothing else */
 export function Surface({
   children,
-  level = 'panel',
-  radius = 'panel',
+  level = 'background',
+  radius = 'card',
   elevation = 'medium',
   padding = '0',
   clip,
@@ -91,15 +80,18 @@ export interface WellProps extends Omit<SurfaceProps, 'level' | 'elevation'> {
   ratio?: string;
 }
 
-/** the recessed frame inside a card — a cream well with an inset light */
-export function Well({ ratio, radius = 'lg', padding = '8', style, ...rest }: WellProps) {
+/** The recessed frame inside a card. Its padding is one step for the
+ *  whole product and its content is bottom-aligned, so a chart sits on
+ *  the floor of the well instead of floating at the top of it. */
+export function Well({ ratio, radius = 'lg', padding = '6', style, ...rest }: WellProps) {
   return (
     <Surface
       {...rest}
-      level="well"
-      elevation="inset"
+      level="level1"
+      elevation="none"
       radius={radius}
       padding={padding}
+      className={cx(styles.well, rest.className)}
       style={{ ...(ratio ? { aspectRatio: ratio } : null), ...style }}
     />
   );

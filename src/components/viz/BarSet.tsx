@@ -46,8 +46,8 @@ export function BarSet({
           {showValues ? (
             <Text
               as="span"
-              variant="metricSM"
-              tone={inherit ? 'inherit' : 'numeral'}
+              variant="metricMD"
+              tone={inherit ? 'inherit' : 'primary'}
               numeric
               className={styles.barValue}
             >

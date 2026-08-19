@@ -1,0 +1,150 @@
+/* ============================================================
+   THE SHOT FIELD
+
+   A real half court — baseline, sidelines, the arc and its corner
+   lines, the key, the free-throw circle, the restricted area, the
+   ring and the backboard — drawn in ONE neutral ink OVER a
+   continuous dot field.
+
+   There are no zone polygons, no coloured outlines and no tags.
+   Dot size is how often a shot is taken from that spot and dot
+   colour is how often it drops, so the two readings the eight
+   zones used to carry are both still here, in a form that has no
+   edges to clip a label against.
+   ============================================================ */
+.card {
+  gap: var(--aera-space-6);
+  text-align: left;
+  height: 100%;
+  min-height: 0;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--aera-space-5);
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--aera-space-7);
+  flex-wrap: wrap;
+}
+
+/* the graphic is the elastic part of the card: it takes whatever the
+   readings and the legends leave, which is what keeps the whole
+   scoreboard on one screen */
+.court {
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--aera-radius-lg);
+  background: var(--aera-color-surface-level1);
+}
+
+.legends {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--aera-space-4) var(--aera-space-11);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-5);
+}
+
+.sizes {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-4);
+}
+
+.sizes i {
+  display: block;
+  flex: 0 0 auto;
+  border-radius: var(--aera-radius-xs);
+  background: var(--aera-color-ink-tertiary);
+}
+
+/* ---- interaction ----
+   A zone lifts by having every other zone drop, so the active
+   neighbourhood is the only thing at full strength. The dots never
+   move and nothing is outlined: the reading changes, the map does
+   not. */
+.zone {
+  opacity: 1;
+  /* drawing only — the hit layer above takes every pointer event */
+  pointer-events: none;
+  transition: opacity var(--aera-duration-base) var(--aera-ease-out);
+}
+
+.hit {
+  cursor: pointer;
+}
+
+.zone[data-muted] {
+  opacity: 0.22;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zone {
+    transition: none;
+  }
+}
+
+/* the zone reading, in the header where the session line was */
+.readout {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--aera-space-1);
+  text-align: right;
+  min-width: 0;
+}
+
+.ramp {
+  position: relative;
+  display: flex;
+  border-radius: var(--aera-radius-pill);
+}
+
+.ramp i {
+  display: block;
+  width: var(--aera-space-12);
+  height: var(--aera-space-4);
+}
+
+.ramp i:first-child {
+  border-top-left-radius: var(--aera-radius-pill);
+  border-bottom-left-radius: var(--aera-radius-pill);
+}
+
+.ramp i:last-child {
+  border-top-right-radius: var(--aera-radius-pill);
+  border-bottom-right-radius: var(--aera-radius-pill);
+}
+
+/* where the active zone's FG% falls on the ramp */
+.mark {
+  position: absolute;
+  top: 50%;
+  width: var(--aera-space-3);
+  height: var(--aera-space-3);
+  margin-left: calc(var(--aera-space-3) / -2);
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-ink-primary);
+  transform: translateY(-50%);
+  transition: left var(--aera-duration-base) var(--aera-ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark {
+    transition: none;
+  }
+}

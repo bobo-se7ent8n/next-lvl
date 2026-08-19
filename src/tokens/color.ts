@@ -1,70 +1,73 @@
 /* ============================================================
    COLOR TOKENS
 
-   Four groups, and the rules that govern them:
+   The scale is eight values and no more: four surfaces and four
+   inks. Everything else in this file is a mapping onto the AERA
+   palette rather than a new colour.
 
-   · surface / ink   — the paper and the text on it. Never tinted.
-   · data            — the five-colour muted palette used for charts,
-                       card faces and chips. Carries no meaning on its own.
-   · semantic        — green = good, red/orange = bad. GLOBAL RULE.
-   · shotZones       — cold → hot FG% ramp. The ONE deliberate exemption
-                       from the semantic rule, because it follows the
-                       basketball convention rather than ours. Never reuse
-                       this scale for anything but shot zones.
+   · surface / ink   — the paper and the text on it. Eight tokens.
+                       Cards and the page now share a fill; a card
+                       reads as a distinct object because of its
+                       elevation and its radius, not because it is
+                       a different colour.
+   · data            — the AERA palette. Five hues, nothing else.
+                       Carries no meaning on its own.
+   · semantic        — green = good, orange = bad. GLOBAL RULE.
+   · accuracy        — the ordered three-step ramp the shot field
+                       is coloured by. It is the semantic scale, in
+                       order: mint is accurate, orange is not. There
+                       is no cold → hot exemption any more — that
+                       scale ran through blue, and blue does not sit
+                       on an ordered axis with mint and orange.
+   · onFace          — alpha washes for use ON a coloured card face,
+                       where a surface token would fight the face.
+   · utility         — the handful of functional colours that are
+                       not part of the scale: a hairline, the dim,
+                       the wireframe dash, the selection ring.
    ============================================================ */
 
 export const colorSurface = {
-  /** the paper — flat, never a colour wash */
+  /** the paper, and the face of every card resting on it */
   background: '#FFFFFC',
-  /** raised card face */
-  panel: '#FFFFFF',
-  /** level 1 — chips, quiet fills */
+  /** the first step up — chips, quiet fills, wells */
   level1: '#F3F2EE',
-  /** level 2 — tracks, inactive rails */
+  /** the second — tracks, inactive rails, empty cells */
   level2: '#E9E7E1',
-  /** recessed well inside a card */
-  well: '#F5F4F0',
   /** the darkest surface — inverted pills, tooltips */
   inverse: '#141310',
 } as const;
 
 export const colorInk = {
-  /** primary text and headlines */
+  /** headlines, body copy and every numeral */
   primary: '#111111',
-  /** body copy, secondary labels */
+  /** secondary labels and quieter running text */
   secondary: '#615E58',
-  /** micro labels, captions, disabled */
+  /** micro annotation, captions, disabled */
   tertiary: '#96928B',
-  /** big numerals — a touch denser than primary so they read as objects */
-  numeral: '#0D0C0A',
   /** text on an inverse surface */
   onInverse: '#FFFFFC',
 } as const;
 
-/** the muted data palette — five named hues plus two neutral extenders */
+/** the AERA palette — five hues, and nothing outside them */
 export const colorData = {
   mint: '#93EAC3',
   yellow: '#FFE159',
   orange: '#FF9B68',
   lilac: '#C4B5FF',
   blue: '#A6DBFF',
-  lime: '#D7F24B',
-  tan: '#E7D2AC',
 } as const;
 
-/** legible ink for text sitting directly on each data colour */
+/** legible ink for text sitting directly on each palette colour */
 export const colorDataInk = {
   mint: '#062017',
   yellow: '#1F1804',
   orange: '#201006',
   lilac: '#150F26',
   blue: '#0A1620',
-  lime: '#15170A',
-  tan: '#1E170C',
 } as const;
 
 /* ------------------------------------------------------------
-   SEMANTIC — the global rule. Green is good, red/orange is bad,
+   SEMANTIC — the global rule. Green is good, orange is bad,
    yellow is the middle. Nothing else may claim these meanings.
    ------------------------------------------------------------ */
 export const colorSemantic = {
@@ -76,27 +79,21 @@ export const colorSemantic = {
 } as const;
 
 /* ------------------------------------------------------------
-   SHOT ZONES — cold → hot FG% ramp.
-   EXEMPT from the semantic rule by design. Four stops, cold first.
+   ACCURACY — three ordered stops, and they are the semantic ones.
+   A scale that has to be read in order can only use hues that
+   have an order: mint, yellow, orange. Lilac and blue are on the
+   palette but not on this axis, so they are not on this ramp.
+   Highest first — mint is the accurate end.
    ------------------------------------------------------------ */
-export const colorShotZone = {
-  cold: '#A6DBFF',
-  cool: '#93EAC3',
-  warm: '#FFE159',
-  hot: '#FF9B68',
-} as const;
-
-/** ordered stops + the FG% ceiling each one covers */
-export const shotZoneRamp = [
-  { name: 'cold', color: colorShotZone.cold, max: 0.28 },
-  { name: 'cool', color: colorShotZone.cool, max: 0.52 },
-  { name: 'warm', color: colorShotZone.warm, max: 0.74 },
-  { name: 'hot', color: colorShotZone.hot, max: Infinity },
+export const accuracyRamp = [
+  { name: 'accurate', color: colorSemantic.positive, min: 0.42 },
+  { name: 'holding', color: colorSemantic.neutral, min: 0.33 },
+  { name: 'cold', color: colorSemantic.negative, min: 0 },
 ] as const;
 
 /* ------------------------------------------------------------
-   ON-FACE — washes used on top of a coloured card, where a surface
-   token would fight the face underneath it.
+   ON-FACE — washes used on top of a coloured card, where a
+   surface token would fight the face underneath it.
    ------------------------------------------------------------ */
 export const colorOnFace = {
   /** a recessed panel on a coloured card */
@@ -116,14 +113,18 @@ export const colorUtility = {
   select: '#0D99FF',
   /** text on the selection outline */
   onSelect: '#FFFFFF',
-  /** the dotted field standing in for artwork that has not been made */
-  placeholderDot: 'rgba(200,194,182,0.9)',
-  /** hairline on a light surface */
+  /** the one hairline in the system — court markings, chart axes */
   hairline: 'rgba(120,110,92,0.14)',
-  /** an empty track / rest day */
-  empty: 'rgba(226,221,210,0.72)',
+  /** the flat ground that drops behind a focused object. Never a blur. */
+  dim: 'rgba(20,19,16,0.52)',
+  /** the dashed scaffolding line of a wireframe — annotation, not design */
+  wireframe: 'rgba(120,110,92,0.40)',
   /** text-selection highlight */
-  highlight: colorData.lime,
+  highlight: colorData.yellow,
+  /** the fill shift a surface makes when the pointer is over it */
+  hover: 'rgba(20,19,16,0.045)',
+  /** the same, pressed */
+  press: 'rgba(20,19,16,0.085)',
 } as const;
 
 export const color = {
@@ -132,11 +133,10 @@ export const color = {
   data: colorData,
   dataInk: colorDataInk,
   semantic: colorSemantic,
-  shotZone: colorShotZone,
   onFace: colorOnFace,
   utility: colorUtility,
 } as const;
 
 export type DataTone = keyof typeof colorData;
 export type SemanticTone = keyof typeof colorSemantic;
-export type ShotZoneStop = keyof typeof colorShotZone;
+export type AccuracyStop = (typeof accuracyRamp)[number]['name'];

@@ -32,7 +32,7 @@ export const Scale: Story = {
             <Text as="span" variant="bodySM" style={{ fontWeight: 'var(--aera-weight-semibold)' }}>
               {`space.${step}`}
             </Text>
-            <Text as="span" variant="bodyXS" tone="secondary" numeric>
+            <Text as="span" variant="bodySM" tone="secondary" numeric>
               {value}
             </Text>
             <span
@@ -60,7 +60,7 @@ export const Layout: Story = {
             <Text as="span" variant="bodySM" style={{ fontWeight: 'var(--aera-weight-semibold)' }}>
               {`layout.${name}`}
             </Text>
-            <Text as="span" variant="bodyXS" tone="secondary" numeric>
+            <Text as="span" variant="bodySM" tone="secondary" numeric>
               {value}
             </Text>
             <Label>{`--aera-layout-${kebab(name)}`}</Label>

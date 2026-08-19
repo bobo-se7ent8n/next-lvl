@@ -1,12 +1,37 @@
 /* ============================================================
    FAN GEOMETRY
 
-   Five slots, each with its own Y offset, rotation and scale. The
-   table is deliberately uneven — an even arc reads as plotted, and
-   a hand of cards never is. Fractional positions interpolate
-   between neighbouring slots, and anything past the ends carries
-   on with the slope of the last pair so a card entering the fan
-   moves continuously.
+   The set holds every pattern — twelve of them — and the window
+   shows eight at a time.
+
+   THE ACTIVE CARD IS ALWAYS CENTRED. There is no anchoring: the
+   slot a card sits in is a pure function of its distance from the
+   active card, and the active card's distance from itself is zero,
+   so it stands in the middle of the stage at every point in the
+   scroll. Scrolling flows the whole hand leftward THROUGH that
+   centre — the next card arrives at the middle, the previous one
+   moves off to the left, and a new one enters from the right.
+
+   The composition is asymmetric at the two ends by CONSEQUENCE
+   rather than by construction: card one has nothing to its left
+   and card twelve has nothing to its right, because those cards
+   have no neighbours on that side, not because the set has been
+   pushed against an edge.
+
+   Three things combine:
+
+   · the SLOT — where a card sits relative to the active one. A
+     smooth function of the distance `d`. Scale falls off toward
+     the edges of the window; opacity does not fall off at all.
+
+   · the CARD's own tilt and stagger. A pure function of the card
+     INDEX, never of `d` and never of anything random, so a card
+     carries the same hand-dropped angle for the life of the page.
+
+   · the WINDOW — how far from the centre a card is still in the
+     hand. A card crossing that boundary fades and shrinks across
+     the same transition every other slot property uses, so it
+     arrives and leaves rather than popping.
    ============================================================ */
 
 export interface SlotShape {
@@ -15,70 +40,117 @@ export interface SlotShape {
   scale: number;
 }
 
-const TABLE: Array<{ d: number } & SlotShape> = [
-  { d: -2, y: 64, rot: -13.5, scale: 0.78 },
-  { d: -1, y: 2, rot: -4.5, scale: 0.95 },
-  { d: 0, y: -26, rot: 2.0, scale: 1.08 },
-  { d: 1, y: 34, rot: 8.5, scale: 0.89 },
-  { d: 2, y: 86, rot: 15.0, scale: 0.74 },
-];
+/** how many cards the window shows at once */
+export const VISIBLE_CARDS = 8;
 
-const FIRST = TABLE[0];
-const LAST = TABLE[TABLE.length - 1];
+/* Eight is an even number and the active card is one of them, so the
+   window cannot be symmetric about it. The extra card goes on the
+   INCOMING side, because that is the side new cards arrive from and
+   the side the eye is travelling toward. */
+export const WINDOW_BEHIND = 3;
+export const WINDOW_AHEAD = VISIBLE_CARDS - 1 - WINDOW_BEHIND;
 
-function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * t;
+/** how far out the scale has fallen all the way to its edge value */
+export const SCALE_REACH = 3.4;
+
+/** the outermost card in the window, and the one in the middle */
+const EDGE_SCALE = 0.78;
+const CENTRE_SCALE = 1.06;
+
+/** deterministic 0..1 from one integer — the card's own hand */
+function hash01(n: number): number {
+  let h = (n + 0x9e3779b9) >>> 0;
+  h = Math.imul(h ^ (h >>> 16), 2246822507);
+  h = Math.imul(h ^ (h >>> 13), 3266489909);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
 
-/** the shape of the slot at a (possibly fractional) offset from centre */
-export function slotShape(d: number): SlotShape {
-  if (d <= FIRST.d) {
-    const t = FIRST.d - d;
-    const next = TABLE[1];
-    return {
-      y: FIRST.y + (FIRST.y - next.y) * t,
-      rot: FIRST.rot + (FIRST.rot - next.rot) * t,
-      scale: Math.max(0.4, FIRST.scale + (FIRST.scale - next.scale) * t),
-    };
-  }
-  if (d >= LAST.d) {
-    const t = d - LAST.d;
-    const prev = TABLE[TABLE.length - 2];
-    return {
-      y: LAST.y + (LAST.y - prev.y) * t,
-      rot: LAST.rot + (LAST.rot - prev.rot) * t,
-      scale: Math.max(0.4, LAST.scale + (LAST.scale - prev.scale) * t),
-    };
-  }
+export interface CardHand {
+  /** the card's own tilt, roughly ±8°, alternating by index */
+  rot: number;
+  /** its staggered vertical offset, in px */
+  dy: number;
+  /** a small, stable shuffle of the stacking order */
+  lift: number;
+}
 
-  const i = Math.floor(d) - FIRST.d;
-  const a = TABLE[i];
-  const b = TABLE[i + 1];
-  const t = d - a.d;
+/** the irregularity a card carries with it, wherever it sits */
+export function cardHand(index: number): CardHand {
+  const a = hash01(index);
+  const b = hash01(index * 7919 + 13);
+  const c = hash01(index * 104729 + 71);
+  const sign = index % 2 === 0 ? 1 : -1;
   return {
-    y: lerp(a.y, b.y, t),
-    rot: lerp(a.rot, b.rot, t),
-    scale: lerp(a.scale, b.scale, t),
+    rot: Number((sign * (2.6 + a * 5.4)).toFixed(2)),
+    dy: Number(((b - 0.5) * 2 * 40).toFixed(1)),
+    lift: Math.round(c * 12),
   };
 }
 
-/** how many slots either side of centre stay fully visible */
-export const VISIBLE_REACH = 2;
-const FADE_REACH = 2.9;
-
-export function slotOpacity(d: number): number {
+/** the smooth part of the shape — the arc, and the scale falloff */
+export function slotShape(d: number): SlotShape {
   const a = Math.abs(d);
-  if (a <= VISIBLE_REACH + 0.2) return 1;
-  if (a >= FADE_REACH) return 0;
-  return 1 - (a - (VISIBLE_REACH + 0.2)) / (FADE_REACH - VISIBLE_REACH - 0.2);
+  const k = Math.min(1, a / SCALE_REACH);
+  return {
+    y: 26 * k * k,
+    rot: d * 1.15,
+    scale: CENTRE_SCALE - (CENTRE_SCALE - EDGE_SCALE) * k,
+  };
 }
 
-/** shortest signed distance from `index` to `position` around a ring of
- *  `total` cards — this is what makes the set cycle rather than end */
-export function ringDelta(index: number, position: number, total: number): number {
-  let d = index - position;
-  const half = total / 2;
-  while (d > half) d -= total;
-  while (d < -half) d += total;
-  return d;
+/** How solid a card is. Every card INSIDE the window is at full fill
+ *  and fully saturated — there is no falloff across the hand. The only
+ *  card that is not at 1 is one that has left the window, and it gets
+ *  there over the slot transition rather than by disappearing. */
+export function slotOpacity(d: number): number {
+  return d >= -WINDOW_BEHIND && d <= WINDOW_AHEAD ? 1 : 0;
+}
+
+/** a card far enough out that it no longer needs to be painted at all */
+export function slotHidden(d: number): boolean {
+  return d < -WINDOW_BEHIND - 1 || d > WINDOW_AHEAD + 1;
+}
+
+/** The horizontal step between neighbours, as a share of the card
+ *  width.
+ *
+ *  At 0.38 each trailing card showed only about a quarter of itself
+ *  and the hand read as one stuck-together block. At 0.48 a card
+ *  behind shows roughly two fifths of its own width — enough air to
+ *  read as separate cards, still enough overlap to read as a hand
+ *  rather than a row. The tilt is deliberately NOT increased to
+ *  compensate: this is a spacing change and nothing else. */
+export const FAN_STEP_RATIO = 0.48;
+
+export function fanStep(cardWidth: number): number {
+  return cardWidth * FAN_STEP_RATIO;
+}
+
+/** A tilted card reaches further than its own half-width. */
+const TILT_ALLOWANCE = 1.08;
+
+/** How much the whole hand has to shrink to stand inside the stage.
+
+    Widening the step makes the hand wider than some viewports, and the
+    instruction there is explicit: scale the fan down proportionally
+    rather than pulling the cards back together. So the step is a
+    constant and THIS is the thing that gives — the composition is
+    identical at every width, just smaller when it has to be.
+
+    The reach is measured on the busier side of the window, and the
+    same value is used both sides, so a card never fits on the right
+    and overflows on the left mid-scroll. */
+export function fanFit(stageWidth: number, cardWidth: number, gutter: number): number {
+  if (stageWidth <= 0 || cardWidth <= 0) return 1;
+  const step = fanStep(cardWidth);
+  const arm = Math.max(WINDOW_BEHIND, WINDOW_AHEAD);
+  const reach = arm * step + ((cardWidth * CENTRE_SCALE) / 2) * TILT_ALLOWANCE;
+  const room = (stageWidth - gutter * 2) / 2;
+  return Math.min(1, room / reach);
+}
+
+/** how far card `index` sits from the active card. Linear: the set has
+ *  a first card and a last card and does not wrap. */
+export function slotDelta(index: number, position: number): number {
+  return index - position;
 }

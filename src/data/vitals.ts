@@ -19,6 +19,13 @@ export const VITALS: Vital[] = [
         { label: 'peak', value: 15, tone: 'orange' },
       ],
     },
+    /* one entry per bar drawn, in the bars' own colours. The bars carry
+       the numbers and nothing else, so the legend is what names them. */
+    legend: [
+      { tone: 'mint', label: 'calm', value: '54%' },
+      { tone: 'yellow', label: 'elevated', value: '31%' },
+      { tone: 'orange', label: 'peak', value: '15%' },
+    ],
   },
   {
     id: 'hrv',
@@ -29,10 +36,9 @@ export const VITALS: Vital[] = [
     desc: 'beat-to-beat variation, rolling 7-day median',
     tone: 'mint',
     chart: { type: 'line', tone: 'mint', values: [64, 61, 68, 70, 69, 74] },
-    legend: [
-      { tone: 'mint', label: 'now', value: '74ms' },
-      { tone: 'tan', label: '7-day low', value: '61ms' },
-    ],
+    /* one line is drawn, so the legend names one series. The second
+       entry described a series that was never on the chart. */
+    legend: [{ tone: 'mint', label: '7-day median', value: '74ms' }],
   },
   {
     id: 'rhr',
@@ -43,10 +49,7 @@ export const VITALS: Vital[] = [
     desc: 'lowest sustained 10-min heart rate while still',
     tone: 'blue',
     chart: { type: 'line', tone: 'blue', values: [57, 56, 55, 56, 54, 54] },
-    legend: [
-      { tone: 'blue', label: 'now', value: '54' },
-      { tone: 'tan', label: 'range', value: '54–57' },
-    ],
+    legend: [{ tone: 'blue', label: 'resting hr', value: '54 bpm' }],
   },
   {
     id: 'cardio',
@@ -57,10 +60,7 @@ export const VITALS: Vital[] = [
     desc: 'estimated from pace + heart rate during live play',
     tone: 'mint',
     chart: { type: 'area', tone: 'mint', values: [44, 45, 46, 46, 47, 48] },
-    legend: [
-      { tone: 'mint', label: 'now', value: '48' },
-      { tone: 'tan', label: '6 wk ago', value: '44' },
-    ],
+    legend: [{ tone: 'mint', label: 'estimated vo₂', value: '48' }],
   },
   {
     id: 'resilience',
@@ -78,6 +78,11 @@ export const VITALS: Vital[] = [
         { label: 'lag', value: 22, tone: 'orange' },
       ],
     },
+    legend: [
+      { tone: 'mint', label: 'recovery', value: '71' },
+      { tone: 'yellow', label: 'hrv rebound', value: '44' },
+      { tone: 'orange', label: 'lag', value: '22' },
+    ],
   },
   {
     id: 'load',
@@ -95,6 +100,11 @@ export const VITALS: Vital[] = [
         { label: '4-wk avg', value: 48, tone: 'orange' },
       ],
     },
+    legend: [
+      { tone: 'yellow', label: 'volume', value: '62' },
+      { tone: 'mint', label: 'intensity', value: '84' },
+      { tone: 'orange', label: '4-wk avg', value: '48' },
+    ],
   },
 ];
 

@@ -1,0 +1,296 @@
+/* ============================================================
+   MOTION STAGE
+
+   Full width, no camera rail beside it, no camera presets and no
+   notes panel next to it. The figure is drawn in the dot language
+   and it genuinely moves: every frame is the volume model
+   evaluated at the playhead, so scrubbing is the same thing as
+   playing, slowly.
+
+   The figure is a CLOUD: dots scattered through the volume of
+   every limb, dense along the core and dissolving outward, so the
+   silhouette is implied by density rather than drawn as an
+   outline. Dragging the stage orbits the camera around the
+   action.
+
+   The stage, the transport and the timeline are ONE block. The
+   stage carries no card of its own: it is the picture and the
+   transport row, and the timeline follows in the same card with a
+   continuous background and no seam between them. Two elevated
+   cards with a gap read as two independent widgets, which is
+   exactly what a single time model must not look like.
+
+   Canvas approximation only — there is no 3D library in this
+   project and there is not going to be one.
+   ============================================================ */
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-6);
+  width: 100%;
+  min-width: 0;
+}
+
+/* the picture and its overlays — the only rounded, filled thing in
+   the block. The block itself is the card it sits in. */
+.frame {
+  position: relative;
+  border-radius: var(--aera-radius-lg);
+  background: var(--aera-color-surface-level1);
+  overflow: hidden;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: var(--stage-h, clamp(380px, 56vh, 660px));
+  cursor: grab;
+  touch-action: none;
+}
+
+.canvas:active {
+  cursor: grabbing;
+}
+
+/* the one instruction the stage carries, and it is a caption */
+.orbitHint {
+  position: absolute;
+  left: var(--aera-space-9);
+  bottom: var(--aera-space-8);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.phase {
+  position: absolute;
+  left: var(--aera-space-9);
+  top: var(--aera-space-8);
+  pointer-events: none;
+}
+
+.legend {
+  position: absolute;
+  right: var(--aera-space-9);
+  top: var(--aera-space-8);
+  pointer-events: none;
+}
+
+/* ---- the transport: a row of the block, not an overlay ---- */
+.transport {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-7);
+  padding: var(--aera-space-4) var(--aera-space-6);
+  border-radius: var(--aera-radius-lg);
+  background: var(--aera-color-surface-inverse);
+  color: var(--aera-color-ink-on-inverse);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--aera-space-12);
+  height: var(--aera-space-12);
+  border-radius: var(--aera-radius-sm);
+  color: inherit;
+  transition:
+    background var(--aera-duration-fast) var(--aera-ease-out),
+    transform var(--aera-duration-press) var(--aera-ease-firm);
+}
+
+.button:hover:not(:disabled) {
+  background: var(--aera-color-on-face-viz-dark);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.button:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+.button svg {
+  width: 14px;
+  height: 14px;
+}
+
+.play {
+  width: var(--aera-space-13);
+  height: var(--aera-space-13);
+  background: var(--aera-color-surface-background);
+  color: var(--aera-color-ink-primary);
+}
+
+.play:hover:not(:disabled) {
+  background: var(--aera-color-surface-background);
+}
+
+.small {
+  width: var(--aera-space-11);
+  height: var(--aera-space-11);
+}
+
+.clock {
+  flex: 0 0 auto;
+  opacity: 0.86;
+}
+
+/* ---- the scrubber: the same 0..1 the timeline draws ---- */
+.scrubber {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--aera-space-11);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.track,
+.fill {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 3px;
+  transform: translateY(-50%);
+  border-radius: var(--aera-radius-pill);
+}
+
+.track {
+  right: 0;
+  background: var(--aera-color-on-face-viz-dark);
+}
+
+.fill {
+  background: var(--aera-color-data-mint);
+}
+
+.thumb {
+  position: absolute;
+  top: 50%;
+  width: var(--aera-space-5);
+  height: var(--aera-space-5);
+  margin-left: calc(var(--aera-space-5) / -2);
+  transform: translateY(-50%);
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-surface-background);
+}
+
+/* ---- moments ---- */
+.pager {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-3);
+  flex: 0 0 auto;
+}
+
+.menu {
+  position: relative;
+}
+
+.select {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-5);
+  max-width: var(--aera-space-16);
+  padding: var(--aera-space-4) var(--aera-space-6);
+  border-radius: var(--aera-radius-sm);
+  color: inherit;
+  background: var(--aera-color-on-face-viz-dark);
+  transition: background var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.select:hover {
+  background: var(--aera-color-on-face-wash);
+}
+
+.select svg {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+}
+
+.selectName {
+  display: none;
+}
+
+.list {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--aera-space-4));
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-1);
+  min-width: var(--aera-space-16);
+  width: max-content;
+  max-width: 62vw;
+  padding: var(--aera-space-4);
+  border-radius: var(--aera-radius-md);
+  background: var(--aera-color-surface-background);
+  box-shadow: var(--aera-elevation-high);
+}
+
+.option {
+  display: flex;
+  align-items: baseline;
+  gap: var(--aera-space-6);
+  width: 100%;
+  padding: var(--aera-space-4) var(--aera-space-6);
+  border-radius: var(--aera-radius-xs);
+  color: var(--aera-color-ink-secondary);
+  text-align: left;
+  transition: background var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.option:hover {
+  background: var(--aera-color-surface-level1);
+}
+
+/* the moment the playhead is on */
+.optionOn {
+  background: var(--aera-color-surface-inverse);
+  color: var(--aera-color-ink-on-inverse);
+}
+
+.optionOn:hover {
+  background: var(--aera-color-surface-inverse);
+}
+
+.optionName {
+  font-family: var(--aera-text-body-family);
+  font-size: var(--aera-text-body-sm-size);
+  white-space: nowrap;
+}
+
+@media (min-width: 1100px) {
+  .selectName {
+    display: block;
+    font-family: var(--aera-text-body-family);
+    font-size: var(--aera-text-body-sm-size);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .select {
+    max-width: calc(var(--aera-space-16) * 3);
+  }
+}
+
+@media (max-width: 720px) {
+  .transport {
+    flex-wrap: wrap;
+    gap: var(--aera-space-5);
+  }
+  .scrubber {
+    order: 3;
+    flex-basis: 100%;
+  }
+  .legend {
+    display: none;
+  }
+}

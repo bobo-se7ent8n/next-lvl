@@ -1,92 +1,53 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Display, Label, Text } from '../components/primitives/Text';
-import { StoryFrame } from '../stories/kit';
-import { kebab } from '../lib/css';
-import { tokens } from './index';
-import type { TextStyleName } from './typography';
+import { Text } from '../components/primitives/Text';
+import { StoryFrame, TokenCard, TokenGrid } from '../stories/kit';
+import { textStyle, type TextStyleName } from './typography';
 
-const meta = {
+const SAMPLE: Record<TextStyleName, string> = {
+  displayXL: 'Rushing under pressure',
+  displayLG: 'Focus & vitals',
+  displayMD: 'Shot mechanics',
+  metricLG: '0.42',
+  metricMD: '18',
+  body: 'A pattern is a behaviour your sessions keep repeating.',
+  bodySM: 'Release time under a closeout has moved toward your baseline.',
+  mono: 'what was measured',
+};
+
+const meta: Meta = {
   title: 'Tokens/Typography',
   parameters: {
-    layout: 'padded',
+    layout: 'fullscreen',
     docs: {
       description: {
         component:
-          'Three families and the composed text tokens built from them. Display is Oswald as a variable font; headlines get deterministic per-letter weight variation so they read as printed rather than typed.',
+          'Eight composed text tokens, collapsed from fifteen. The two label sizes, the chart tick and the old mono all became one `mono` token — the mono family keeps the uppercase annotation voice, so a caption still reads as a caption. Display sizes carry per-letter weight variation hashed from the string itself.',
       },
     },
   },
-} satisfies Meta;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const SAMPLE: Partial<Record<TextStyleName, string>> = {
-  displayXL: 'Patterns',
-  displayLG: 'Rushing under pressure',
-  displayMD: 'Tuesday scrimmage',
-  displaySM: 'Arc angle',
-  metricXL: '0.42',
-  metricLG: '0.42',
-  metricMD: '46',
-  metricSM: '18',
-  body: 'A pattern is a behaviour your sessions keep repeating.',
-  bodySM: 'A pattern is a behaviour your sessions keep repeating.',
-  bodyXS: 'A pattern is a behaviour your sessions keep repeating.',
-  label: 'release time under pressure',
-  labelLG: 'what was measured',
-  mono: '00:42 / 30:00',
-};
-
-export const Families: Story = {
+export const Ramp: Story = {
   render: () => (
-    <StoryFrame name="fontFamily" note="display · body · mono">
-      {Object.entries(tokens.fontFamily).map(([name, value]) => (
-        <div key={name} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <Label>{`fontFamily.${name} · --aera-font-${kebab(name)}`}</Label>
-          <p style={{ margin: 0, fontFamily: value, fontSize: 26 }}>
-            aera — 0123456789
-          </p>
-          <Text variant="bodyXS" tone="tertiary">
-            {value}
-          </Text>
-        </div>
-      ))}
-    </StoryFrame>
-  ),
-};
-
-export const Scale: Story = {
-  render: () => (
-    <StoryFrame name="textStyle" note="every composed text token, at true size">
-      {(Object.keys(tokens.textStyle) as TextStyleName[]).map((name) => {
-        const style = tokens.textStyle[name] as Record<string, string | number>;
-        return (
-          <div key={name} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <Label>{`textStyle.${name} · --aera-text-${kebab(name)}-*`}</Label>
-            <Text variant={name}>{SAMPLE[name] ?? name}</Text>
-            <Text variant="bodyXS" tone="tertiary" numeric>
-              {`${style.fontSize} / ${style.lineHeight} · ${style.letterSpacing} · ${style.fontWeight}`}
-            </Text>
-          </div>
-        );
-      })}
-    </StoryFrame>
-  ),
-};
-
-export const InkVariation: Story = {
-  name: 'Ink variation',
-  render: () => (
-    <StoryFrame
-      name="inkVariation"
-      note={`per-letter weight ${tokens.inkVariation.weightMin}–${tokens.inkVariation.weightMax}, ±${tokens.inkVariation.rotate}° rotation, ±${tokens.inkVariation.shift}px shift — hashed from the string, so the same words always come out the same way`}
-    >
-      <Display size="xl">Patterns</Display>
-      <Display size="lg">Focus &amp; vitals</Display>
-      <Display size="lg" inked={false}>
-        The same headline, unvaried
-      </Display>
+    <StoryFrame name="Type" note="a component never sets a size of its own">
+      <TokenGrid>
+        {(Object.keys(textStyle) as TextStyleName[]).map((name) => {
+          const style = textStyle[name] as Record<string, string | number>;
+          return (
+            <TokenCard
+              key={name}
+              name={name}
+              value={`${style.fontSize} / ${style.lineHeight} · ${style.fontWeight}`}
+              cssVar={`--aera-text-${name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}-*`}
+            >
+              <Text variant={name}>{SAMPLE[name]}</Text>
+            </TokenCard>
+          );
+        })}
+      </TokenGrid>
     </StoryFrame>
   ),
 };

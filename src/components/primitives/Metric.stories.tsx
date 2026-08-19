@@ -15,7 +15,7 @@ const meta = {
     },
   },
   argTypes: {
-    size: { control: 'inline-radio', options: ['sm', 'md', 'lg', 'xl'] },
+    size: { control: 'inline-radio', options: ['md', 'lg'] },
     align: { control: 'inline-radio', options: ['start', 'center'] },
     inherit: { control: 'boolean' },
     value: { control: 'text' },
@@ -33,7 +33,7 @@ export const Playground: Story = {};
 export const Sizes: Story = {
   render: () => (
     <StoryFrame name="Metric" note="size">
-      {(['xl', 'lg', 'md', 'sm'] as const).map((size) => (
+      {(['lg', 'md'] as const).map((size) => (
         <Variant key={size} name={size}>
           <Metric value="0.42" unit="s" size={size} />
         </Variant>

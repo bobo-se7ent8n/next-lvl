@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { ScreenHeader } from '../components/chrome/ScreenHeader';
-import { SplitLayout } from '../components/chrome/SplitLayout';
+import { PageHeader } from '../components/chrome/PageHeader';
 import { ChatPanel, type ChatMessage } from '../components/composed/ChatPanel';
 import { InsightCard } from '../components/composed/InsightCard';
 import { askAera } from '../features/insights/askAera';
@@ -28,21 +27,23 @@ export function Insights() {
   };
 
   return (
-    <section>
-      <ScreenHeader
+    <section className={styles.screen}>
+      <PageHeader
         title="Insights"
-        description="Built from your own sessions, on-device. Pull what you want — nothing here is pushed at you."
+        subhead="Built from your own sessions, on-device. Pull what you want — nothing here is pushed at you."
       />
-      <SplitLayout
-        columns="minmax(340px, 0.9fr) minmax(0, 1.5fr)"
-        aside={<ChatPanel messages={messages} suggestions={ASK_SEEDS} onSend={send} />}
-      >
+
+      <div className={styles.split}>
+        <div className={styles.aside}>
+          <ChatPanel messages={messages} suggestions={ASK_SEEDS} onSend={send} />
+        </div>
+
         <div className={styles.grid}>
           {INSIGHTS.map((insight) => (
-            <InsightCard key={insight.id} insight={insight} />
+            <InsightCard key={insight.id} insight={insight} id={insight.id} />
           ))}
         </div>
-      </SplitLayout>
+      </div>
     </section>
   );
 }

@@ -1,0 +1,95 @@
+/* the main panel: a large Oswald title with a mono chip beside it, a
+   one-line mono description under it, then the content */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-12);
+  width: 100%;
+  max-width: var(--aera-layout-max-content-width);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-5);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-7);
+  flex-wrap: wrap;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-12);
+}
+
+/* ---- specimen grids ---- */
+.specimens {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--specimen-w, 168px), 1fr));
+  gap: var(--aera-space-9);
+}
+
+.specimen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-5);
+}
+
+/* The hairline is not decoration: `background` and `onInverse` are
+   both #FFFFFC, so on a paper-cream page they are invisible without
+   it and a specimen you cannot see is not a specimen. It follows the
+   swatch's own radius, and it is the one hairline in the system. */
+.swatch {
+  width: 100%;
+  height: var(--aera-space-16);
+  border-radius: var(--swatch-radius, var(--aera-radius-md));
+  background: var(--swatch-bg);
+  box-shadow: var(--swatch-shadow, none);
+  outline: 1px solid var(--aera-color-utility-hairline);
+  outline-offset: -1px;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-1);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-8);
+}
+
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-9);
+  padding: var(--aera-space-11);
+  border-radius: var(--aera-radius-card);
+  background: var(--aera-color-surface-level1);
+}
+
+.demoRow {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-9);
+  flex-wrap: wrap;
+}
+
+.demoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--aera-space-9);
+  align-items: start;
+}
+
+.stage {
+  position: relative;
+  min-height: var(--aera-space-16);
+}

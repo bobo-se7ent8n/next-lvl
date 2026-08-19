@@ -1,8 +1,41 @@
+/* ============================================================
+   THE APP CONTENT COLUMN
+
+   Full bleed. The page runs edge to edge and the only horizontal
+   inset is the page gutter; there is no centred shell and no
+   trailing band of padding under the last row. Regions that would
+   otherwise stretch uncontrolled carry their own cap.
+   ============================================================ */
 .main {
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: var(--aera-layout-max-width);
-  margin: 0 auto;
-  padding: 0 var(--aera-layout-gutter) var(--aera-space-16);
+  padding: 0 var(--aera-layout-gutter);
+}
+
+/* ---- page transition ------------------------------------------
+   The four tabs settle rather than swap. Uniform in both
+   directions — a directional slide would imply the tabs are
+   ordered, and they are not. Reduced motion is handled globally.
+
+   The fill is BACKWARDS, not both. A `both` fill left the final
+   keyframe's transform on the element for the life of the page,
+   and an element with a transform is a containing block: every
+   position: fixed inside a screen — the dim behind an opened
+   pattern, the opened card itself — was being positioned against
+   this div instead of against the viewport.
+   --------------------------------------------------------------- */
+.settle {
+  animation: settleIn var(--aera-duration-base) var(--aera-ease-firm) backwards;
+}
+
+@keyframes settleIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

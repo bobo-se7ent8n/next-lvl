@@ -1,23 +1,32 @@
-import { ScreenHeader } from '../components/chrome/ScreenHeader';
+import { PageHeader } from '../components/chrome/PageHeader';
 import { PointsBlock } from '../features/scoreboard/PointsBlock';
-import { ShotMechanics } from '../features/scoreboard/ShotMechanics';
-import { ShotZones } from '../features/scoreboard/ShotZones';
-import { SkillsPanel } from '../features/scoreboard/SkillsPanel';
+import { ShotArc } from '../features/scoreboard/ShotArc';
+import { ShotZonesField } from '../features/scoreboard/ShotZonesField';
+import { SkillRatings } from '../features/scoreboard/SkillRatings';
 import styles from './Scoreboard.module.css';
 
-/** the bento grid — compact blocks, sport statistics only */
+/** The bento — three columns, no bottom row, and the whole thing on
+ *  one screen. The court used to be clipped, the ratings ran past the
+ *  viewport and the mechanics footnote was below the fold; the bento
+ *  is now exactly one shared column tall and every card inside it
+ *  gives its graphic whatever the readings leave. Sport stats only. */
 export function Scoreboard() {
   return (
-    <section>
-      <ScreenHeader
+    <section className={styles.screen}>
+      <PageHeader
         title="Scoreboard"
-        description="Session 14, sport stats only. This is the part that is safe to share."
+        subhead="Session 14, sport stats only. This is the part of the product that is safe to share."
       />
+
       <div className={styles.bento}>
-        <ShotZones className={styles.zones} />
-        <PointsBlock className={styles.points} />
-        <ShotMechanics className={styles.mechanics} />
-        <SkillsPanel className={styles.skills} />
+        <ShotZonesField className={styles.zones} />
+
+        <SkillRatings className={styles.ratings} />
+
+        <div className={styles.stack}>
+          <PointsBlock />
+          <ShotArc />
+        </div>
       </div>
     </section>
   );

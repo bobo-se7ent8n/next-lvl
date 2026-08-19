@@ -23,13 +23,17 @@
   margin-left: auto;
 }
 
-.thumb {
+/* the graphic well. The radius and the shadow are on this one
+   element, so the inset light follows the corner exactly. */
+.graphic {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
   width: 100%;
   aspect-ratio: var(--ratio);
+  padding: var(--aera-space-6);
   border-radius: var(--aera-radius-lg);
-  background-color: var(--aera-color-surface-well);
-  background-image: radial-gradient(var(--aera-color-utility-placeholder-dot) 1px, transparent 1px);
-  background-size: 7px 7px;
-  box-shadow: var(--aera-elevation-inset);
+  background: var(--aera-color-surface-level1);
 }

@@ -1,91 +1,92 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { StoryFrame, Swatch, TokenCard, TokenGrid } from '../stories/kit';
-import { kebab } from '../lib/css';
-import { tokens, shotZoneRamp } from './index';
+import {
+  colorData,
+  colorDataInk,
+  colorInk,
+  colorSemantic,
+  accuracyRamp,
+  colorSurface,
+  colorUtility,
+} from './color';
 
-const meta = {
+const meta: Meta = {
   title: 'Tokens/Color',
   parameters: {
-    layout: 'padded',
+    layout: 'fullscreen',
     docs: {
       description: {
         component:
-          'Every colour in the product. Surface and ink are the paper and the text on it; the data palette carries no meaning on its own; the semantic scale is the global green-good / orange-bad rule; the Shot Zones ramp is the one deliberate exemption from that rule.',
+          'The scale is eight values: four surfaces and four inks. Cards and the page share a fill now — a card reads as a distinct object because of its elevation and its radius, not because it is a different colour. Everything below the scale is a mapping onto the AERA palette rather than a new colour.',
       },
     },
   },
-} satisfies Meta;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function Group({ group, note }: { group: keyof typeof tokens.color; note?: string }) {
-  const entries = Object.entries(tokens.color[group]) as Array<[string, string]>;
-  return (
-    <StoryFrame name={`color.${group}`} note={note}>
-      <TokenGrid>
-        {entries.map(([name, value]) => (
-          <TokenCard
-            key={name}
-            name={`color.${group}.${name}`}
-            value={value}
-            cssVar={`--aera-color-${kebab(group)}-${kebab(name)}`}
-          >
-            <Swatch color={value} />
-          </TokenCard>
-        ))}
-      </TokenGrid>
-    </StoryFrame>
-  );
-}
+const group = (obj: Record<string, string>, prefix: string) => (
+  <TokenGrid>
+    {Object.entries(obj).map(([name, value]) => (
+      <TokenCard
+        key={name}
+        name={name}
+        value={value}
+        cssVar={`--aera-color-${prefix}-${name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}`}
+      >
+        <Swatch color={value} />
+      </TokenCard>
+    ))}
+  </TokenGrid>
+);
 
-export const Surface: Story = {
-  render: () => <Group group="surface" note="the paper and the levels raised off it" />,
-};
-
-export const Ink: Story = {
-  render: () => <Group group="ink" note="text colours, densest first" />,
-};
-
-export const DataPalette: Story = {
-  name: 'Data palette',
+export const Scale: Story = {
+  name: 'The eight-token scale',
   render: () => (
-    <Group group="data" note="five muted hues plus two neutral extenders — no meaning attached" />
+    <>
+      <StoryFrame name="Surface" note="the paper, and the face of every card resting on it">
+        {group(colorSurface, 'surface')}
+      </StoryFrame>
+      <StoryFrame name="Ink" note="four inks — every numeral now uses primary">
+        {group(colorInk, 'ink')}
+      </StoryFrame>
+    </>
   ),
 };
 
-export const Semantic: Story = {
+export const Palette: Story = {
+  name: 'AERA palette',
   render: () => (
-    <Group
-      group="semantic"
-      note="the global rule: green is good, orange/red is bad, yellow is the middle. Nothing else may claim these meanings."
-    />
+    <>
+      <StoryFrame name="Data" note="five hues and nothing outside them — carries no meaning on its own">
+        {group(colorData, 'data')}
+      </StoryFrame>
+      <StoryFrame name="Data ink" note="legible text on each palette colour">
+        {group(colorDataInk, 'data-ink')}
+      </StoryFrame>
+    </>
   ),
 };
 
-export const ShotZoneRamp: Story = {
-  name: 'Shot zones ramp (semantic exemption)',
+export const Meaning: Story = {
   render: () => (
-    <StoryFrame
-      name="color.shotZone"
-      note="cold → hot FG%. This is the ONE scale exempt from the semantic rule, because it follows the basketball convention rather than ours. Never reuse it outside Shot Zones."
-    >
-      <TokenGrid>
-        {shotZoneRamp.map((stop) => (
-          <TokenCard
-            key={stop.name}
-            name={`color.shotZone.${stop.name}`}
-            value={`${stop.color} · up to ${stop.max === Infinity ? '∞' : `${Math.round(stop.max * 100)}%`}`}
-            cssVar={`--aera-color-shot-zone-${stop.name}`}
-          >
-            <Swatch color={stop.color} />
-          </TokenCard>
-        ))}
-      </TokenGrid>
-    </StoryFrame>
+    <>
+      <StoryFrame name="Semantic" note="green good, orange bad, yellow between — the global rule">
+        {group(colorSemantic, 'semantic')}
+      </StoryFrame>
+      <StoryFrame
+        name="Accuracy"
+        note="three ordered stops, and they are the semantic ones — a scale that reads in order can only use hues that have an order"
+      >
+        {group(
+          Object.fromEntries(accuracyRamp.map((stop) => [stop.name, stop.color])),
+          'accuracy',
+        )}
+      </StoryFrame>
+      <StoryFrame name="Utility" note="the functional colours that are not part of the scale">
+        {group(colorUtility, 'utility')}
+      </StoryFrame>
+    </>
   ),
-};
-
-export const Utility: Story = {
-  render: () => <Group group="utility" note="selection outline, hairlines, empty tracks" />,
 };

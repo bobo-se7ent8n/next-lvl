@@ -15,7 +15,7 @@ const preview: Preview = {
     docs: { toc: true },
     options: {
       storySort: {
-        order: ['Tokens', 'Primitives', 'Components', 'Screens'],
+        order: ['Tokens', 'Primitives', 'Components', 'Landing', 'Screens'],
       },
     },
   },

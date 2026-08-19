@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { clamp } from '../lib/chart';
-import { ScreenHeader } from '../components/chrome/ScreenHeader';
+import { PageHeader } from '../components/chrome/PageHeader';
 import { PatternFan } from '../features/patterns/PatternFan';
 import { FocusPanel } from '../features/home/FocusPanel';
 import { VitalCard } from '../features/home/VitalCard';
@@ -12,15 +12,9 @@ const WHEEL_PER_CARD = 170;
 /** the extra push at the end of the set before the page releases */
 const RELEASE_PUSH = 90;
 
-export interface HomeProps {
-  onOpenSessions: (sessionIndex?: number) => void;
-  onOpenInsights: (insightTitle?: string) => void;
-  onOpenScoreboard: () => void;
-}
-
 /** Stage one spends the scroll on the hand; at the end of the set the
  *  lock releases and the page moves, once, to stage two. */
-export function Home({ onOpenSessions, onOpenInsights, onOpenScoreboard }: HomeProps) {
+export function Home() {
   const [position, setPosition] = useState(0);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const stageTwo = useRef<HTMLDivElement>(null);
@@ -120,9 +114,9 @@ export function Home({ onOpenSessions, onOpenInsights, onOpenScoreboard }: HomeP
   return (
     <>
       <section className={styles.stageOne}>
-        <ScreenHeader
+        <PageHeader
           title="Patterns"
-          description="A pattern is a behaviour your sessions keep repeating. Twelve of them are holding right now."
+          subhead="A pattern is a behaviour your sessions keep repeating. Twelve of them are holding right now."
         />
         <PatternFan
           className={styles.fan}
@@ -131,16 +125,13 @@ export function Home({ onOpenSessions, onOpenInsights, onOpenScoreboard }: HomeP
           onPosition={(p) => setPosition(clamp(p, 0, max))}
           openIndex={openIndex}
           onOpen={setOpenIndex}
-          onOpenSessions={onOpenSessions}
-          onOpenInsights={onOpenInsights}
-          onOpenScoreboard={onOpenScoreboard}
         />
       </section>
 
       <section className={styles.stageTwo} ref={stageTwo}>
-        <ScreenHeader
+        <PageHeader
           title="Focus & vitals"
-          description="One thing worth attention this week, and the body readings underneath it."
+          subhead="One thing worth attention this week, and the body readings underneath it."
         />
         <div className={styles.grid}>
           <FocusPanel />

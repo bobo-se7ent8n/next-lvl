@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BarSet } from './BarSet';
 import { StoryFrame, Variant } from '../../stories/kit';
+import { colorData } from '../../tokens';
 
 const ITEMS = [
   { label: 'calm', value: 54, tone: 'mint' as const },
@@ -50,7 +51,13 @@ export const Variants: Story = {
         <BarSet items={ITEMS} height={62} showValues={false} radius="md" />
       </Variant>
       <Variant name="on a mint face">
-        <div style={{ background: '#93EAC3', borderRadius: 22, padding: 16 }}>
+        <div
+          style={{
+            background: colorData.mint,
+            borderRadius: 'var(--aera-radius-lg)',
+            padding: 'var(--aera-space-8)',
+          }}
+        >
           <div style={{ background: 'rgba(255,255,255,0.42)', borderRadius: 16, padding: 12 }}>
             <BarSet items={ITEMS} height={110} showLabels inherit />
           </div>

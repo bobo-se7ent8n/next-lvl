@@ -1,0 +1,16 @@
+/* The landing wireframe. Full-bleed sections with their content in a
+   centred column. The column-edge guide lines are gone: with a dashed
+   outline already on every section container, a second pair of dashed
+   lines running the page height was noise on top of noise. */
+.landing {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-inline: var(--aera-layout-gutter);
+}
+
+.sections {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}

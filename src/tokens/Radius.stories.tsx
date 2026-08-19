@@ -1,36 +1,35 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { StoryFrame, TokenCard, TokenGrid } from '../stories/kit';
-import { tokens } from './index';
+import { colorData } from './color';
+import { radius } from './radius';
 
-const meta = {
+const meta: Meta = {
   title: 'Tokens/Radius',
   parameters: {
-    layout: 'padded',
+    layout: 'fullscreen',
     docs: {
       description: {
         component:
-          'The squircle-family radii. The card scale is generous on purpose — the object language of this product is a soft rectangle, not a rounded box.',
+          'Seven squircle radii, collapsed from ten: xxs folded into xs, and panel and shell folded into card, because three near-identical large corners were three ways of saying the same thing. `pill` is the only fully round token.',
       },
     },
   },
-} satisfies Meta;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Scale: Story = {
   render: () => (
-    <StoryFrame name="radius" note="each sample is drawn with the token it names">
+    <StoryFrame name="Radius" note="every card, panel and object shell is one corner now">
       <TokenGrid>
-        {Object.entries(tokens.radius).map(([name, value]) => (
-          <TokenCard key={name} name={`radius.${name}`} value={value} cssVar={`--aera-radius-${name}`}>
+        {Object.entries(radius).map(([name, value]) => (
+          <TokenCard key={name} name={name} value={value} cssVar={`--aera-radius-${name}`}>
             <div
               style={{
-                width: '100%',
                 height: 72,
                 borderRadius: value,
-                background: 'var(--aera-color-surface-panel)',
-                boxShadow: 'var(--aera-elevation-medium)',
+                background: colorData.lilac,
               }}
             />
           </TokenCard>

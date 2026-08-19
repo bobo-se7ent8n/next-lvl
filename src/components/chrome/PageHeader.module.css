@@ -1,0 +1,43 @@
+/* ============================================================
+   PAGE HEADER
+
+   The one header every tab uses. Centre aligned, sitting at a
+   single offset under the fixed nav on all four screens, and
+   reserving --aera-layout-header-reserve beneath itself. Nothing
+   below it uses a negative offset and nothing is allowed to start
+   inside that reserve, which is what was clipping the subhead.
+   ============================================================ */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--aera-space-6);
+  width: 100%;
+  /* the band is a token, and this is what makes the token true: the
+     three screens with a left column all subtract exactly this from
+     the viewport to size that column */
+  min-height: var(--aera-layout-header-block);
+  padding-top: var(--aera-layout-header-title-offset);
+  /* the reserved band — the only thing between the subhead and
+     whatever the screen puts underneath it */
+  padding-bottom: var(--aera-layout-header-reserve);
+}
+
+/* wide enough to hold one line at desktop width; `pretty` keeps a
+   single word from being left alone on a second */
+.sub {
+  max-width: var(--aera-layout-max-subhead-width);
+  text-wrap: pretty;
+}
+
+.aside {
+  margin-top: var(--aera-space-5);
+}
+
+@media (max-width: 760px) {
+  .header {
+    padding-top: calc(var(--aera-layout-header-title-offset) - var(--aera-space-9));
+    padding-bottom: var(--aera-space-12);
+  }
+}

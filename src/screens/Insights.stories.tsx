@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Insights } from './Insights';
 import { ScreenFrame } from './ScreenFrame';
 
-const meta = {
+const meta: Meta<typeof Insights> = {
   title: 'Screens/Insights',
   component: Insights,
   parameters: {
@@ -19,7 +19,7 @@ const meta = {
       <Insights />
     </ScreenFrame>
   ),
-} satisfies Meta<typeof Insights>;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;

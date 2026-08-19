@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { PointsBlock } from './PointsBlock';
-import { StoryFrame, Variant } from '../../stories/kit';
 
-const meta = {
+const meta: Meta<typeof PointsBlock> = {
   title: 'Components/PointsBlock',
   component: PointsBlock,
   tags: ['autodocs'],
@@ -11,34 +10,18 @@ const meta = {
     docs: {
       description: {
         component:
-          'Points in three windows. A single scrimmage has nothing to trend against, so only the two wider windows carry a tendency — and the wording of it stays flat: a direction and a size, no praise and no warning.',
+          'One reading and the context around it. The three-state window toggle is gone: a control on this tile invited comparison, and comparison is not what the scoreboard is for. The register stays flat — notable, never praised, never ranked.',
       },
     },
   },
-  argTypes: { initialRange: { control: 'inline-radio', options: ['last', 'last5', 'all'] } },
-  args: { initialRange: 'last' },
-  render: (args) => (
-    <div style={{ width: 460 }}>
-      <PointsBlock {...args} />
+  render: () => (
+    <div style={{ maxWidth: 460 }}>
+      <PointsBlock />
     </div>
   ),
-} satisfies Meta<typeof PointsBlock>;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
-
-export const Windows: Story = {
-  render: () => (
-    <StoryFrame name="PointsBlock" note="last scrimmage (no tendency) · last 5 · all time">
-      {(['last', 'last5', 'all'] as const).map((range) => (
-        <Variant key={range} name={range}>
-          <div style={{ width: 460 }}>
-            <PointsBlock initialRange={range} />
-          </div>
-        </Variant>
-      ))}
-    </StoryFrame>
-  ),
-};
+export const Default: Story = {};

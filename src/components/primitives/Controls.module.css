@@ -17,7 +17,7 @@
   width: 12px;
   height: 12px;
   border-radius: var(--aera-radius-pill);
-  background: var(--aera-color-surface-panel);
+  background: var(--aera-color-surface-background);
   transition: transform var(--aera-duration-base) var(--aera-ease-out);
 }
 
@@ -62,7 +62,7 @@
 }
 
 .segmentOn {
-  background: var(--aera-color-surface-panel);
+  background: var(--aera-color-surface-background);
   color: var(--aera-color-ink-primary);
   font-weight: var(--aera-weight-semibold);
   box-shadow: var(--aera-elevation-low);
@@ -150,7 +150,7 @@
   display: flex;
   align-items: center;
   gap: var(--aera-space-7);
-  padding: var(--aera-space-4) 0;
+  padding: var(--aera-space-2) 0;
 }
 
 .progressRowName {

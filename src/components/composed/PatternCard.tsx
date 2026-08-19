@@ -6,7 +6,7 @@ import { Display, Label, Text } from '../primitives/Text';
 import { Metric } from '../primitives/Metric';
 import { Sparkline } from '../viz/Sparkline';
 import { BarSet } from '../viz/BarSet';
-import { DotMatrix } from '../viz/DotMatrix';
+import { DotCount } from '../viz/DotCount';
 import type { Pattern } from '../../data/types';
 import styles from './PatternCard.module.css';
 
@@ -29,7 +29,7 @@ function CardViz({ pattern, tint }: { pattern: Pattern; tint: string }) {
   if (pattern.viz === 'dots') {
     const filled = Math.round((pattern.series[pattern.series.length - 1] / 100) * 24);
     return (
-      <DotMatrix
+      <DotCount
         value={filled}
         total={24}
         columns={12}
@@ -60,7 +60,10 @@ export function PatternCard({
       face={pattern.fill}
       radius="card"
       padding="8"
-      elevation={hovered ? 'high' : 'medium'}
+      /* hover changes the outline and the fill, never the height —
+         a card that lifts under the pointer is playfulness, and the
+         register here is resistance */
+      elevation="medium"
       outlined={hovered}
       interactive
       onClick={onClick}
@@ -75,7 +78,7 @@ export function PatternCard({
 
       <Metric value={pattern.hero} unit={pattern.unit} size="md" inherit />
 
-      <Text variant="bodyXS" tone="inherit" className={styles.trend}>
+      <Text variant="bodySM" tone="inherit" className={styles.trend}>
         {pattern.trend}
       </Text>
 
@@ -86,7 +89,7 @@ export function PatternCard({
         <CardViz pattern={pattern} tint={tint} />
       </div>
 
-      <Display size="sm" as="h3" tone="inherit" className={styles.title}>
+      <Display size="md" as="h3" tone="inherit" className={styles.title}>
         {pattern.name}
       </Display>
 

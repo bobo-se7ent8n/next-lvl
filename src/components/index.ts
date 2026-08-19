@@ -12,14 +12,17 @@ export * from './primitives/Controls';
 export * from './viz/Sparkline';
 export * from './viz/AreaChart';
 export * from './viz/BarSet';
-export * from './viz/DotMatrix';
-export * from './viz/Heatmap';
+export * from './viz/DotCount';
 export * from './viz/Legend';
 export * from './viz/Ruler';
+export * from './viz/Tooltip';
+
+/* graphics — the one illustration language */
+export * from './graphics/DotMatrix';
 
 /* chrome */
 export * from './chrome/NavBar';
-export * from './chrome/ScreenHeader';
+export * from './chrome/PageHeader';
 
 /* composed */
 export * from './composed/PatternCard';

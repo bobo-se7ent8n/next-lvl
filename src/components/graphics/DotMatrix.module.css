@@ -1,0 +1,45 @@
+/* ============================================================
+   DOT MATRIX
+
+   One grid, five metaphors. The dot never changes; the spacing,
+   the opacity, the omission and the phase do. Flat fill, squircle
+   corner, no stroke, no gradient — and no photography anywhere in
+   the product to compete with it.
+   ============================================================ */
+.field {
+  display: block;
+  width: min(100%, var(--field-w));
+  height: auto;
+  color: var(--field-accent);
+}
+
+/* fills whatever box it is given, scaling uniformly — the dots keep
+   their proportions, they just get bigger or smaller together */
+.fieldFill {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.dot {
+  fill: currentColor;
+}
+
+/* the loop is a single brightening that walks the field once per
+   cycle. Duration is composed from the motion tokens; nothing here
+   moves, so it stays under the threshold of demanding attention. */
+.animated .dot {
+  animation: dotWalk calc(var(--aera-duration-settle) * 5) var(--aera-ease-in-out) infinite;
+  animation-delay: var(--dot-delay);
+}
+
+@keyframes dotWalk {
+  0%,
+  74%,
+  100% {
+    opacity: var(--dot-o);
+  }
+  84% {
+    opacity: 1;
+  }
+}

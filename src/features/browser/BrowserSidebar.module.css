@@ -1,0 +1,101 @@
+/* ============================================================
+   THE SIDEBAR
+
+   Product name, the route it is on, then two grouped, uppercase,
+   mono lists. The active row is a filled squircle with a chevron
+   closing it. Paper-cream throughout — the reference's dark shell
+   is a reference, not a decision.
+   ============================================================ */
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-11);
+  width: 100%;
+  height: 100svh;
+  padding: var(--aera-space-12) var(--aera-space-9);
+  overflow-y: auto;
+  background: var(--aera-color-surface-level1);
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-3);
+}
+
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-11);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-2);
+}
+
+.groupName {
+  padding: 0 var(--aera-space-6) var(--aera-space-4);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--aera-space-5);
+  padding: var(--aera-space-5) var(--aera-space-6);
+  border-radius: var(--aera-radius-sm);
+  color: var(--aera-color-ink-secondary);
+  text-decoration: none;
+  transition:
+    background var(--aera-duration-fast) var(--aera-ease-out),
+    color var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.item:hover {
+  background: var(--aera-color-surface-level2);
+  color: var(--aera-color-ink-primary);
+}
+
+.itemOn {
+  background: var(--aera-color-surface-inverse);
+  color: var(--aera-color-ink-on-inverse);
+}
+
+.itemOn:hover {
+  background: var(--aera-color-surface-inverse);
+  color: var(--aera-color-ink-on-inverse);
+}
+
+.chevron {
+  display: none;
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+}
+
+.itemOn .chevron {
+  display: block;
+}
+
+.back {
+  margin-top: auto;
+  padding-top: var(--aera-space-9);
+  color: var(--aera-color-ink-tertiary);
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--aera-color-ink-primary);
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    position: static;
+    height: auto;
+  }
+}

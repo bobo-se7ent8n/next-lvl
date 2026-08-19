@@ -1,54 +1,64 @@
 /* ============================================================
-   BENTO — compact blocks on one grid. Nothing runs full width
-   except the skills row, and no block is taller than its content.
+   BENTO — three columns, no bottom row, and ONE SCREEN.
+
+   The grid stands exactly one shared column tall, the same height
+   the left column takes on Home, Sessions and Insights, so the
+   page is a header and a bento and nothing below them. Every card
+   fills its cell and hands the slack to its graphic; nothing
+   scrolls and nothing is clipped.
    ============================================================ */
+.screen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 .bento {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--aera-space-8);
-  align-items: start;
+  align-items: stretch;
+  width: 100%;
+  height: var(--aera-layout-column-height);
+  min-height: 0;
 }
 
-.zones {
-  grid-column: span 3;
-  grid-row: span 2;
+.ratings {
+  min-width: 0;
+  min-height: 0;
 }
 
-.points {
-  grid-column: span 3;
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-8);
+  min-width: 0;
+  min-height: 0;
 }
 
-.mechanics {
-  grid-column: span 3;
+.stack > * {
+  min-height: 0;
 }
 
-.skills {
-  grid-column: span 6;
-}
-
-@media (max-width: 1080px) {
+/* below the three-column split one screen is neither possible nor
+   desirable, so the bento goes back to scrolling */
+@media (max-width: 1180px) {
   .bento {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    height: auto;
+    align-items: start;
   }
-  .zones,
-  .points,
-  .mechanics {
-    grid-column: span 1;
-    grid-row: auto;
-  }
-  .skills {
-    grid-column: span 2;
+  .zones {
+    grid-column: 1 / -1;
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 760px) {
   .bento {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .zones,
-  .points,
-  .mechanics,
-  .skills {
-    grid-column: span 1;
+  .ratings {
+    grid-column: 1;
   }
 }

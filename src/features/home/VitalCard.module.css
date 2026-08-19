@@ -1,6 +1,14 @@
+/* ============================================================
+   VITAL CARD
+
+   Six of these share two rows of one viewport, so everything in
+   here is sized to give the well the slack: the reading and the
+   legend take what they need and the graphic takes the rest.
+   ============================================================ */
 .card {
-  gap: var(--aera-space-6);
+  gap: var(--aera-space-5);
   text-align: left;
+  min-height: 0;
 }
 
 .head {
@@ -14,10 +22,16 @@
   margin-top: auto;
 }
 
+/* the well is the elastic part of the card. It never disappears —
+   the floor keeps a graphic legible — and it never leaves a gap
+   under the chart, because the chart fills it. */
 .well {
-  margin-top: auto;
+  flex: 1 1 auto;
+  min-height: var(--aera-space-14);
+  margin-top: var(--aera-space-2);
 }
 
-.legend + .well {
-  margin-top: var(--aera-space-2);
+.chart {
+  flex: 1 1 auto;
+  min-height: 0;
 }

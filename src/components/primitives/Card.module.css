@@ -1,13 +1,20 @@
 /* ============================================================
    CARD
 
-   One element carries the background, the radius, the clip and the
-   shadow. Nothing paints a shadow on a different box from the one
-   holding the radius — that is exactly what produced the sharp
-   corner artefact on the fan cards, at rest and on hover.
+   One element carries the background, the radius, the clip and
+   the shadow. Nothing paints a shadow on a different box from the
+   one holding the radius — that is exactly what produced the dark
+   wedge at the card corners.
 
-   The hover ring is a spread box-shadow rather than an outline, so
-   it follows the radius too.
+   TACTILITY. The register is resistance, not playfulness. A card
+   answers the pointer by shifting its own fill, never by lifting
+   or growing; a press compresses it a fraction and releases
+   cleanly. There is no overshoot anywhere in here, because a
+   product that pulls rather than pushes has no business bouncing.
+
+   Non-clickable cards get the same fill shift and keep the default
+   cursor, so a surface reads as responsive without reading as a
+   target.
    ============================================================ */
 .card {
   position: relative;
@@ -20,8 +27,24 @@
   padding: var(--card-pad);
   box-shadow: var(--card-shadow);
   transition:
-    box-shadow var(--aera-duration-base) var(--aera-ease-out),
-    transform var(--aera-duration-base) var(--aera-ease-out);
+    box-shadow var(--aera-duration-fast) var(--aera-ease-out),
+    transform var(--aera-duration-press) var(--aera-ease-firm);
+}
+
+/* the fill shift — a flat wash over the card's own face, never a
+   gradient and never a second colour */
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: transparent;
+  pointer-events: none;
+  transition: background var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.card:hover::after {
+  background: var(--aera-color-utility-hover);
 }
 
 .clip {
@@ -38,23 +61,19 @@
   width: 100%;
 }
 
-.interactive:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--aera-elevation-high);
+/* pressed: compress a little, and let go without a rebound */
+.interactive:active {
+  transform: scale(0.993);
 }
 
-.interactive:active {
-  transform: translateY(0) scale(0.997);
+.interactive:active::after {
+  background: var(--aera-color-utility-press);
 }
 
 /* figma-style hover outline — a ring that follows the radius exactly */
 .outlined:hover,
 .outlined:focus-visible {
   box-shadow: var(--card-shadow), var(--aera-elevation-select-ring);
-}
-
-.interactive.outlined:hover {
-  box-shadow: var(--aera-elevation-high), var(--aera-elevation-select-ring);
 }
 
 .disabled {

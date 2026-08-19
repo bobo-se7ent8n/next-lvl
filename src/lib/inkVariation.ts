@@ -28,3 +28,22 @@ export function inkLetters(text: string): InkedLetter[] {
     shift: Number(((next() * 2 - 1) * shift).toFixed(2)),
   }));
 }
+
+/** the same letters, grouped into words. A word is the unit that must
+ *  not be broken across lines; the spaces between words are the only
+ *  places a display headline may wrap. */
+export function inkWords(text: string): InkedLetter[][] {
+  const letters = inkLetters(text);
+  const words: InkedLetter[][] = [];
+  let current: InkedLetter[] = [];
+  for (const letter of letters) {
+    if (letter.char === ' ') {
+      words.push(current);
+      current = [];
+    } else {
+      current.push(letter);
+    }
+  }
+  words.push(current);
+  return words.filter((w) => w.length > 0);
+}

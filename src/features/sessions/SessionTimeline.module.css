@@ -1,0 +1,138 @@
+/* ============================================================
+   SESSION TIMELINE
+
+   Four tracks on one time axis with one playhead crossing all of
+   them. The phase segments are sized by how long each phase
+   actually takes; drawing them equal was the timeline's worst
+   lie, and the phase names are printed once, in the segments
+   themselves — the row of labels that used to sit under the
+   timeline said the same thing twice.
+
+   The opponents track is a density field of small round dots, and
+   the physiology trace is drawn heavily enough that its events —
+   the spike, the held breath, the decay — are the thing you see
+   first.
+   ============================================================ */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-7);
+  width: 100%;
+  text-align: left;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--aera-space-8);
+  flex-wrap: wrap;
+}
+
+.tracks {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--aera-space-16) minmax(0, 1fr);
+  gap: var(--aera-space-5) var(--aera-space-8);
+  align-items: center;
+}
+
+.trackName {
+  white-space: nowrap;
+}
+
+.lane {
+  position: relative;
+  width: 100%;
+  height: var(--lane-h);
+  border-radius: var(--aera-radius-sm);
+  background: var(--aera-color-surface-level1);
+  overflow: hidden;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.laneOpen {
+  overflow: visible;
+  background: transparent;
+}
+
+.phase {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--from);
+  width: var(--w);
+  display: flex;
+  align-items: center;
+  padding-inline: var(--aera-space-5);
+  border-radius: var(--aera-radius-md);
+  background: var(--phase-bg);
+  color: var(--phase-ink);
+  overflow: hidden;
+}
+
+.field {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.marker {
+  position: absolute;
+  top: 50%;
+  left: var(--x);
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-4);
+  transform: translate(-50%, -50%);
+  border-radius: var(--aera-radius-sm);
+  padding: var(--aera-space-3) var(--aera-space-6);
+  background: var(--aera-color-data-lilac);
+  color: var(--aera-color-data-ink-lilac);
+  white-space: nowrap;
+  transition:
+    background var(--aera-duration-fast) var(--aera-ease-out),
+    transform var(--aera-duration-press) var(--aera-ease-firm);
+}
+
+.marker:active {
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+.markerOn {
+  background: var(--aera-color-surface-inverse);
+  color: var(--aera-color-ink-on-inverse);
+}
+
+/* one playhead, laid over the lane column and crossing every track */
+.playfield {
+  position: absolute;
+  left: calc(var(--aera-space-16) + var(--aera-space-8));
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--x);
+  width: 2px;
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-ink-primary);
+}
+
+@media (max-width: 720px) {
+  .tracks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .trackName {
+    grid-column: 1;
+  }
+  .playfield {
+    left: 0;
+  }
+}

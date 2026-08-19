@@ -12,6 +12,7 @@ export * from './radius';
 export * from './typography';
 export * from './elevation';
 export * from './motion';
+export * from './graphic';
 
 import { color } from './color';
 import { space, layout } from './space';
@@ -19,6 +20,7 @@ import { radius } from './radius';
 import { fontFamily, fontWeight, textStyle, inkVariation } from './typography';
 import { elevation } from './elevation';
 import { duration, easing, transition } from './motion';
+import { dotMatrix, dotDensity } from './graphic';
 
 export const tokens = {
   color,
@@ -33,6 +35,8 @@ export const tokens = {
   duration,
   easing,
   transition,
+  dotMatrix,
+  dotDensity,
 } as const;
 
 export type Tokens = typeof tokens;

@@ -1,0 +1,90 @@
+/* ============================================================
+   The insight block under the timeline.
+
+   One block, and only while the playhead is standing on its
+   marker. Rendering all of them permanently — greyed out until
+   reached — meant the screen carried three or four blocks that
+   were not about the frame on the stage.
+
+   Everything stacks. The previous layout put the PATTERN
+   CANDIDATE chip and the pattern name in a fixed 96px column
+   beside the text, and both of them were wider than the column,
+   so both ran straight through the title.
+   ============================================================ */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-6);
+  width: 100%;
+  min-height: var(--aera-space-15);
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--aera-space-5);
+  width: 100%;
+  padding: var(--aera-space-9) var(--aera-space-10);
+  border-radius: var(--aera-radius-lg);
+  background: var(--aera-color-surface-level1);
+  text-align: left;
+  text-decoration: none;
+  color: inherit;
+  animation: blockIn var(--aera-duration-base) var(--aera-ease-out) both;
+  transition:
+    background var(--aera-duration-fast) var(--aera-ease-out),
+    transform var(--aera-duration-press) var(--aera-ease-firm);
+}
+
+.block:hover {
+  background: var(--aera-color-surface-level2);
+}
+
+.block:active {
+  transform: scale(0.996);
+}
+
+/* the chips, on their own line and never over the title */
+.tags {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-6);
+  flex-wrap: wrap;
+}
+
+.title {
+  font-weight: var(--aera-weight-semibold);
+}
+
+.go {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--aera-space-4);
+  margin-top: var(--aera-space-3);
+  color: var(--aera-color-ink-tertiary);
+  white-space: nowrap;
+}
+
+.go svg {
+  width: 12px;
+  height: 12px;
+}
+
+.empty {
+  display: block;
+  padding: var(--aera-space-9) var(--aera-space-10);
+  border-radius: var(--aera-radius-lg);
+  background: var(--aera-color-surface-level1);
+}
+
+@keyframes blockIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

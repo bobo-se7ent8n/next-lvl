@@ -16,11 +16,11 @@ const meta = {
     },
   },
   argTypes: {
-    size: { control: 'inline-radio', options: ['xl', 'lg', 'md', 'sm'] },
+    size: { control: 'inline-radio', options: ['xl', 'lg', 'md'] },
     inked: { control: 'boolean' },
     tone: {
       control: 'inline-radio',
-      options: ['primary', 'secondary', 'tertiary', 'numeral', 'inherit'],
+      options: ['primary', 'secondary', 'tertiary', 'primary', 'inherit'],
     },
     align: { control: 'inline-radio', options: [undefined, 'start', 'center', 'end'] },
     children: { control: 'text' },
@@ -36,7 +36,7 @@ export const Playground: Story = {};
 export const Sizes: Story = {
   render: (args) => (
     <StoryFrame name="Display" note="size">
-      {(['xl', 'lg', 'md', 'sm'] as const).map((size) => (
+      {(['xl', 'lg', 'md'] as const).map((size) => (
         <Variant key={size} name={size}>
           <Display {...args} size={size}>
             Rushing under pressure

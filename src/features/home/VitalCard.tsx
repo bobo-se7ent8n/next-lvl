@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { Card } from '../../components/primitives/Card';
 import { Chip } from '../../components/primitives/Chip';
 import { Well } from '../../components/primitives/Surface';
@@ -16,10 +17,15 @@ export interface VitalCardProps {
   className?: string;
 }
 
+/* the chart takes the height of the well rather than a fixed 92px:
+   six cards share two rows of a single viewport, so the graphic is
+   the part that has to give. */
+const FILL = { '--chart-h': '100%' } as CSSProperties;
+
 /** a body reading. Private to the device — never shareable. */
 export function VitalCard({ vital, className }: VitalCardProps) {
   return (
-    <Card radius="shell" padding="10" fill className={[styles.card, className].filter(Boolean).join(' ')}>
+    <Card radius="card" padding="10" fill className={[styles.card, className].filter(Boolean).join(' ')}>
       <div className={styles.head}>
         <Display size="md" as="h3">
           {vital.label}
@@ -29,7 +35,7 @@ export function VitalCard({ vital, className }: VitalCardProps) {
 
       <Metric value={vital.value} unit={vital.unit} size="lg" />
 
-      <Text variant="bodyXS" tone="tertiary">
+      <Text variant="bodySM" tone="tertiary">
         {vital.desc}
       </Text>
 
@@ -40,13 +46,23 @@ export function VitalCard({ vital, className }: VitalCardProps) {
         />
       ) : null}
 
-      <Well ratio="5 / 3" className={styles.well}>
+      <Well className={styles.well}>
         {vital.chart.type === 'bars' ? (
-          <BarSet items={vital.chart.items} height={92} />
+          <BarSet items={vital.chart.items} className={styles.chart} style={FILL} />
         ) : vital.chart.type === 'area' ? (
-          <AreaChart values={vital.chart.values} color={dataColor(vital.chart.tone)} height={92} />
+          <AreaChart
+            values={vital.chart.values}
+            color={dataColor(vital.chart.tone)}
+            className={styles.chart}
+            style={FILL}
+          />
         ) : (
-          <Sparkline values={vital.chart.values} color={dataColor(vital.chart.tone)} height={92} />
+          <Sparkline
+            values={vital.chart.values}
+            color={dataColor(vital.chart.tone)}
+            className={styles.chart}
+            style={FILL}
+          />
         )}
       </Well>
     </Card>

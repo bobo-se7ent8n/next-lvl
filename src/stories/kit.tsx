@@ -17,11 +17,11 @@ export function StoryFrame({
   return (
     <section className={styles.frame} style={{ width }}>
       <header className={styles.frameHead}>
-        <Label size="lg" tone="secondary">
+        <Label tone="secondary">
           {name}
         </Label>
         {note ? (
-          <Text variant="bodyXS" tone="tertiary">
+          <Text variant="bodySM" tone="tertiary">
             {note}
           </Text>
         ) : null}
@@ -80,7 +80,7 @@ export function TokenCard({
         <Text variant="bodySM" tone="primary" style={{ fontWeight: 'var(--aera-weight-semibold)' }}>
           {name}
         </Text>
-        <Text as="span" variant="bodyXS" tone="secondary" numeric>
+        <Text as="span" variant="bodySM" tone="secondary" numeric>
           {value}
         </Text>
         <Label>{cssVar}</Label>

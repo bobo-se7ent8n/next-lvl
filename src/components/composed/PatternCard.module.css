@@ -13,10 +13,14 @@
   opacity: 0.62;
 }
 
+/* a well holds its graphic on the floor, not floating at the top */
 .viz {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   margin-top: auto;
   margin-bottom: var(--aera-space-4);
-  padding: var(--aera-space-5);
+  padding: var(--aera-space-6);
   border-radius: var(--aera-radius-md);
   background: var(--viz-well);
 }
@@ -37,8 +41,8 @@
   border-radius: var(--aera-radius-xs);
   background: var(--aera-color-utility-select);
   color: var(--aera-color-utility-on-select);
-  font-family: var(--aera-text-label-family);
-  font-size: var(--aera-text-label-size);
+  font-family: var(--aera-text-mono-family);
+  font-size: var(--aera-text-mono-size);
   font-weight: var(--aera-weight-medium);
   letter-spacing: 0.02em;
   line-height: 1;

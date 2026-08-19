@@ -1,0 +1,76 @@
+/* ============================================================
+   SESSIONS — the same shape as Home: a tall sticky panel on the
+   left, and the thing you actually scroll on the right. Full
+   bleed, with no trailing band of padding under the last card.
+   ============================================================ */
+.screen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: var(--aera-layout-left-column) minmax(0, 1fr);
+  gap: var(--aera-space-12);
+  align-items: stretch;
+  width: 100%;
+}
+
+/* the calendar is pinned and never scrolls — it is the frame the
+   sessions are read against, not a list. Same width and same height
+   as Focus on Home and Ask AERA on Insights: one column, three
+   screens. */
+.aside {
+  position: sticky;
+  top: var(--aera-layout-column-top);
+  align-self: start;
+  height: var(--aera-layout-column-height);
+  min-width: 0;
+}
+
+/* BENTO PACKING — uniform column widths, independently packed.
+
+   A grid row-locks its cells: a short card ends and the whole column
+   waits for the tallest card in its row before the next one starts,
+   which opened a 300px void under any session without a pattern
+   candidate. Multi-column flows each column on its own instead, so a
+   short card is followed immediately by the next card in that column
+   and no column waits on its neighbours. `break-inside: avoid` keeps
+   a card whole, and the bottom margin is the single vertical gap. */
+.log {
+  column-count: 3;
+  column-gap: var(--aera-space-8);
+  min-width: 0;
+}
+
+.log > * {
+  display: block;
+  width: 100%;
+  break-inside: avoid;
+  /* the one vertical gap between stacked cards */
+  margin-bottom: var(--aera-space-8);
+}
+
+@media (max-width: 1280px) {
+  .log {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 1080px) {
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--aera-space-10);
+  }
+  .aside {
+    position: static;
+    height: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .log {
+    column-count: 1;
+  }
+}

@@ -1,0 +1,47 @@
+/* ============================================================
+   SESSION DETAIL LAYOUT
+
+   The fourth layout, and the only one in the product with no nav
+   bar. A session detail is a place you went to on purpose, so the
+   only chrome is the way back out of it. There is no page header
+   here either — the stage starts directly under the back button.
+   ============================================================ */
+.shell {
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  background: var(--aera-color-surface-background);
+  padding: var(--aera-space-9) var(--aera-layout-gutter) var(--aera-space-12);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--aera-space-5);
+  border-radius: var(--aera-radius-md);
+  padding: var(--aera-space-5) var(--aera-space-8);
+  background: var(--aera-color-surface-level1);
+  color: var(--aera-color-ink-secondary);
+  text-decoration: none;
+  transition:
+    background var(--aera-duration-fast) var(--aera-ease-out),
+    transform var(--aera-duration-press) var(--aera-ease-firm);
+}
+
+.back:hover {
+  background: var(--aera-color-surface-level2);
+  color: var(--aera-color-ink-primary);
+}
+
+.back:active {
+  transform: scale(0.985);
+}
+
+.back svg {
+  width: 13px;
+  height: 13px;
+}
+
+.body {
+  margin-top: var(--aera-space-9);
+}

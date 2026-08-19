@@ -19,7 +19,7 @@ const meta = {
   argTypes: {
     level: {
       control: 'select',
-      options: ['background', 'panel', 'level1', 'level2', 'well', 'inverse', 'transparent'],
+      options: ['background', 'level1', 'level2', 'inverse', 'transparent'],
     },
     radius: { control: 'select', options: Object.keys(tokens.radius) },
     elevation: { control: 'select', options: Object.keys(tokens.elevation) },
@@ -27,7 +27,7 @@ const meta = {
     clip: { control: 'boolean' },
     fill: { control: 'boolean' },
   },
-  args: { level: 'panel', radius: 'panel', elevation: 'medium', padding: '10' },
+  args: { level: 'background', radius: 'card', elevation: 'medium', padding: '10' },
   render: (args) => (
     <Surface {...args} style={{ width: 280 }}>
       <Text variant="bodySM" tone="inherit">
@@ -45,7 +45,7 @@ export const Playground: Story = {};
 export const Levels: Story = {
   render: () => (
     <StoryFrame name="Surface" note="every level of the surface scale">
-      {(['background', 'panel', 'level1', 'level2', 'well', 'inverse'] as const).map((level) => (
+      {(['background', 'level1', 'level2', 'inverse'] as const).map((level) => (
         <Variant key={level} name={level}>
           <Surface level={level} padding="8" radius="md" elevation="low" style={{ width: 240 }}>
             <Text variant="bodySM" tone="inherit">

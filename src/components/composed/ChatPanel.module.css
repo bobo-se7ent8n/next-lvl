@@ -13,9 +13,15 @@
    4  the system line  — the recessed footnote. Nothing competes
                          with it because nothing is quieter.
    ============================================================ */
+/* The panel never grows past the box it is given. The thread takes
+   the slack in the middle and scrolls; the composer and the
+   suggestions stay pinned to the bottom edge, so the whole surface is
+   usable without scrolling the page. */
 .panel {
   gap: var(--aera-space-8);
   text-align: left;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 .head {
@@ -30,7 +36,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--aera-space-7);
-  max-height: 42vh;
+  flex: 1 1 auto;
+  min-height: var(--aera-space-14);
   overflow-y: auto;
   padding-right: var(--aera-space-3);
 }
@@ -54,9 +61,8 @@
 .bubbleAera {
   padding: var(--aera-space-7) var(--aera-space-8);
   border-radius: var(--aera-radius-lg) var(--aera-radius-lg) var(--aera-radius-lg) var(--aera-space-4);
-  background: var(--aera-color-surface-well);
+  background: var(--aera-color-surface-level1);
   color: var(--aera-color-ink-primary);
-  box-shadow: var(--aera-elevation-inset);
 }
 
 .bubbleYou {
@@ -77,6 +83,12 @@
 }
 
 /* ---- 3 · suggestions ---- */
+.composer,
+.seeds,
+.systemLine {
+  flex: 0 0 auto;
+}
+
 .seeds {
   display: flex;
   flex-wrap: wrap;
@@ -89,7 +101,7 @@
   background: transparent;
   box-shadow: inset 0 0 0 1px var(--aera-color-utility-hairline);
   font-family: var(--aera-text-body-family);
-  font-size: var(--aera-text-body-xs-size);
+  font-size: var(--aera-text-body-sm-size);
   color: var(--aera-color-ink-tertiary);
   transition:
     color var(--aera-duration-fast) var(--aera-ease-out),
@@ -108,8 +120,7 @@
   align-items: center;
   padding: var(--aera-space-4);
   border-radius: var(--aera-radius-pill);
-  background: var(--aera-color-surface-well);
-  box-shadow: var(--aera-elevation-inset);
+  background: var(--aera-color-surface-level1);
 }
 
 .input {
@@ -119,10 +130,10 @@
   outline: none;
   background: transparent;
   padding: var(--aera-space-5) var(--aera-space-7);
-  font-family: var(--aera-text-body-lg-family);
-  font-size: var(--aera-text-body-lg-size);
-  line-height: var(--aera-text-body-lg-leading);
-  font-weight: var(--aera-text-body-lg-weight);
+  font-family: var(--aera-text-body-family);
+  font-size: var(--aera-text-body-size);
+  line-height: var(--aera-text-body-leading);
+  font-weight: var(--aera-text-body-weight);
   color: var(--aera-color-ink-primary);
 }
 

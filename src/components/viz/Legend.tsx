@@ -29,13 +29,13 @@ export function Legend({ items, inherit, justify = 'start', className }: LegendP
           <i className={styles.legendSwatch} style={{ '--swatch': item.color } as CSSProperties} />
           <Text
             as="span"
-            variant="bodyXS"
+            variant="bodySM"
             tone={inherit ? 'inherit' : 'tertiary'}
             style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}
           >
             {item.label}
             {item.value ? (
-              <Text as="b" variant="bodyXS" tone={inherit ? 'inherit' : 'secondary'} numeric style={{ display: 'inline', marginLeft: 'var(--aera-space-3)', fontWeight: 'var(--aera-weight-semibold)' }}>
+              <Text as="b" variant="bodySM" tone={inherit ? 'inherit' : 'secondary'} numeric style={{ display: 'inline', marginLeft: 'var(--aera-space-3)', fontWeight: 'var(--aera-weight-semibold)' }}>
                 {item.value}
               </Text>
             ) : null}

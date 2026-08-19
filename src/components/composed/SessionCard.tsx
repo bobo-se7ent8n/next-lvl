@@ -12,10 +12,9 @@ export interface SessionCardProps {
   className?: string;
 }
 
-/** one recorded session — date, title, duration, the stat run, and the
- *  pattern candidate block when the session produced one */
+/** one recorded session, read top to bottom */
 export function SessionCard({ session, onClick, className }: SessionCardProps) {
-  const stats: Array<{ label: string; value: number }> = [
+  const stats = [
     { label: 'shots', value: session.shots },
     { label: 'pts', value: session.pts },
     { label: 'reb', value: session.reb },
@@ -28,7 +27,7 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
 
   return (
     <Card
-      radius="panel"
+      radius="card"
       elevation="low"
       padding="10"
       interactive={Boolean(onClick)}
@@ -36,27 +35,18 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
       className={cx(styles.card, className)}
     >
       <div className={styles.top}>
-        <Label className={styles.date}>{session.date}</Label>
+        <div className={styles.dateRow}>
+          <Label>{session.date}</Label>
+          {session.tag ? <Chip tone="mint">{session.tag}</Chip> : null}
+        </div>
         <Display size="md" as="h3">
           {session.title}
         </Display>
-        <span className={styles.right}>
-          {session.tag ? <Chip tone="mint">{session.tag}</Chip> : null}
-          <Text as="span" variant="bodySM" tone="secondary" numeric>
-            {session.duration}
-          </Text>
-          <span className={styles.arrow} aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M7 17L17 7" />
-              <path d="M8 7h9v9" />
-            </svg>
-          </span>
-        </span>
       </div>
 
-      <StatSet className={styles.stats} stats={shown.map((s) => ({ label: s.label, value: s.value }))} />
+      <StatSet stats={shown.map((s) => ({ label: s.label, value: s.value }))} />
 
-      <Text variant="bodySM" tone="tertiary" className={styles.note}>
+      <Text variant="bodySM" className={styles.note}>
         {session.note}
       </Text>
 
@@ -71,6 +61,18 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
           </Text>
         </div>
       ) : null}
+
+      <div className={styles.foot}>
+        <Text as="span" variant="bodySM" tone="secondary" numeric>
+          {session.duration}
+        </Text>
+        <span className={styles.arrow} aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M7 17L17 7" />
+            <path d="M8 7h9v9" />
+          </svg>
+        </span>
+      </div>
     </Card>
   );
 }

@@ -2,8 +2,8 @@
   display: inline-block;
   white-space: nowrap;
   border-radius: var(--aera-radius-pill);
-  font-family: var(--aera-text-label-family);
-  font-size: var(--aera-text-label-size);
+  font-family: var(--aera-text-mono-family);
+  font-size: var(--aera-text-mono-size);
   font-weight: var(--aera-weight-medium);
   text-transform: uppercase;
   letter-spacing: 0.09em;
@@ -20,8 +20,8 @@
   padding: var(--aera-space-3) var(--aera-space-6);
   background: var(--aera-color-surface-level1);
   color: var(--aera-color-ink-secondary);
-  font-family: var(--aera-text-label-family);
-  font-size: var(--aera-text-label-size);
+  font-family: var(--aera-text-mono-family);
+  font-size: var(--aera-text-mono-size);
   font-weight: var(--aera-weight-medium);
   text-transform: uppercase;
   letter-spacing: 0.12em;

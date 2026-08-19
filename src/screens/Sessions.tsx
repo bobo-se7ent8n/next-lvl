@@ -1,22 +1,39 @@
-import { ScreenHeader } from '../components/chrome/ScreenHeader';
-import { SplitLayout } from '../components/chrome/SplitLayout';
+import { useNavigate } from 'react-router-dom';
+import { PageHeader } from '../components/chrome/PageHeader';
 import { SessionCard } from '../components/composed/SessionCard';
-import { ActivityPanel } from '../features/sessions/ActivityPanel';
+import { ActivityCalendar } from '../features/sessions/ActivityCalendar';
 import { SESSIONS } from '../data';
+import { sessionPath } from '../app/routes';
+import styles from './Sessions.module.css';
 
-/** every recorded session, read against the activity calendar */
+/** every recorded session, read against the month it happened in.
+ *  The calendar holds the left column the way Focus holds it on Home;
+ *  the log on the right is what scrolls. */
 export function Sessions() {
+  const navigate = useNavigate();
+
   return (
-    <section>
-      <ScreenHeader
+    <section className={styles.screen}>
+      <PageHeader
         title="Sessions"
-        description="Every game you recorded, kept on the device. The calendar on the left is the frame; the log on the right is what happened."
+        subhead="Every game you recorded, kept on the device. The month is the frame; the log is what happened."
       />
-      <SplitLayout aside={<ActivityPanel />} columns="minmax(340px, 0.85fr) minmax(0, 1.6fr)">
-        {SESSIONS.map((session) => (
-          <SessionCard key={session.id} session={session} />
-        ))}
-      </SplitLayout>
+
+      <div className={styles.split}>
+        <div className={styles.aside}>
+          <ActivityCalendar />
+        </div>
+
+        <div className={styles.log}>
+          {SESSIONS.map((session) => (
+            <SessionCard
+              key={session.id}
+              session={session}
+              onClick={() => navigate(sessionPath(session.id))}
+            />
+          ))}
+        </div>
+      </div>
     </section>
   );
 }

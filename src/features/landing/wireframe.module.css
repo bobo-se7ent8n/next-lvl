@@ -1,0 +1,157 @@
+/* ============================================================
+   WIREFRAME SCAFFOLDING
+
+   This page is a wireframe and it says so — but only once per
+   section. The previous pass drew a dashed outline around the
+   section, another around every region inside it, another around
+   every slot, and a pair of column guides down the whole page, all
+   at the same weight. Everything was annotated, so nothing was.
+
+   The rule now: ONLY the section container is dashed. Everything
+   inside it is a flat level1 tint with no border at all, and the
+   column guides are gone. Annotation is small uppercase mono, and
+   it describes what a section is FOR rather than how many lines
+   of type it holds.
+
+   Weight is the other half of the fix. A section declares itself
+   primary, secondary or tertiary, and that decides its padding,
+   its heading size and how much room it gets — so the spine of
+   the argument is visible at a glance.
+   ============================================================ */
+
+.section {
+  position: relative;
+  width: 100%;
+}
+
+/* ---- weight ---- */
+.primary {
+  padding-block: calc(var(--aera-space-16) * 1.5);
+}
+
+.secondary {
+  padding-block: var(--aera-space-14);
+}
+
+.tertiary {
+  padding-block: var(--aera-space-13);
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  max-width: var(--aera-layout-max-content-width);
+  margin: 0 auto;
+  border: 1px dashed var(--aera-color-utility-wireframe);
+  border-radius: var(--aera-radius-card);
+}
+
+.primary .container {
+  padding: var(--aera-space-15) var(--aera-space-13) var(--aera-space-14);
+}
+
+.secondary .container {
+  padding: var(--aera-space-13) var(--aera-space-12) var(--aera-space-12);
+}
+
+.tertiary .container {
+  padding: var(--aera-space-12) var(--aera-space-11);
+}
+
+/* the one annotation a section carries: its number, its name, and a
+   line saying what the section is for */
+.tag {
+  position: absolute;
+  top: var(--aera-space-7);
+  left: var(--aera-space-11);
+  right: var(--aera-space-11);
+  display: flex;
+  align-items: baseline;
+  gap: var(--aera-space-7);
+  flex-wrap: wrap;
+}
+
+.tagIntent {
+  color: var(--aera-color-ink-tertiary);
+  opacity: 0.78;
+}
+
+/* ---- regions: flat tint, no border, ever ---- */
+.box {
+  padding: var(--aera-space-10);
+  border-radius: var(--aera-radius-lg);
+  background: var(--aera-color-surface-level1);
+}
+
+.boxBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-7);
+}
+
+/* a region that is only type gets no fill at all — a tint behind
+   every single thing is the same noise problem in another colour */
+.plain {
+  padding: 0;
+  background: transparent;
+}
+
+/* ---- media slot: a flat muted block, never an image ---- */
+.slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--aera-space-5);
+  width: 100%;
+  aspect-ratio: var(--slot-ratio);
+  padding: var(--aera-space-11);
+  border-radius: var(--aera-radius-card);
+  background: var(--aera-color-surface-level2);
+  text-align: center;
+}
+
+.slotBleed {
+  width: 100vw;
+  max-width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  border-radius: var(--aera-radius-card);
+}
+
+/* ---- the fixed left ruler ---- */
+.ruler {
+  position: fixed;
+  left: var(--aera-space-6);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-6);
+  padding: var(--aera-space-8) var(--aera-space-5);
+  border-radius: var(--aera-radius-lg);
+  background: var(--aera-color-surface-background);
+}
+
+.rung {
+  color: var(--aera-color-ink-tertiary);
+  opacity: 0.34;
+  transition: opacity var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.rungOn {
+  opacity: 1;
+  color: var(--aera-color-ink-primary);
+}
+
+@media (max-width: 900px) {
+  .ruler {
+    display: none;
+  }
+  .primary .container,
+  .secondary .container,
+  .tertiary .container {
+    padding: var(--aera-space-13) var(--aera-space-9) var(--aera-space-11);
+  }
+}

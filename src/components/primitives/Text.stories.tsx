@@ -19,7 +19,7 @@ const meta = {
     variant: { control: 'select', options: Object.keys(tokens.textStyle) },
     tone: {
       control: 'inline-radio',
-      options: ['primary', 'secondary', 'tertiary', 'numeral', 'onInverse', 'inherit'],
+      options: ['primary', 'secondary', 'tertiary', 'primary', 'onInverse', 'inherit'],
     },
     align: { control: 'inline-radio', options: [undefined, 'start', 'center', 'end'] },
     numeric: { control: 'boolean' },
@@ -43,7 +43,7 @@ export const Playground: Story = {};
 export const Tones: Story = {
   render: (args) => (
     <StoryFrame name="Text" note="tone">
-      {(['primary', 'secondary', 'tertiary', 'numeral'] as const).map((tone) => (
+      {(['primary', 'secondary', 'tertiary', 'primary'] as const).map((tone) => (
         <Variant key={tone} name={tone}>
           <Text {...args} tone={tone} />
         </Variant>

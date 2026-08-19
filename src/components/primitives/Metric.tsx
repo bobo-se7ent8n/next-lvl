@@ -3,20 +3,19 @@ import { cx } from '../../lib/css';
 import { Label } from './Text';
 import styles from './Metric.module.css';
 
-export type MetricSize = 'sm' | 'md' | 'lg' | 'xl';
+/* There are two metric tokens and therefore two metric sizes. The
+   `sm` and `xl` steps this type used to carry pointed at token names
+   that no longer exist, so they rendered with no size at all. */
+export type MetricSize = 'md' | 'lg';
 
 const VARIANT: Record<MetricSize, string> = {
-  sm: 'metric-sm',
   md: 'metric-md',
   lg: 'metric-lg',
-  xl: 'metric-xl',
 };
 
 const UNIT_SIZE: Record<MetricSize, string> = {
-  sm: 'var(--aera-text-body-xs-size)',
   md: 'var(--aera-text-body-sm-size)',
   lg: 'var(--aera-text-body-size)',
-  xl: 'var(--aera-text-body-size)',
 };
 
 export interface MetricProps {
@@ -55,7 +54,7 @@ export function Metric({
           '--v-leading': `var(${key}-leading)`,
           '--v-tracking': `var(${key}-tracking)`,
           '--v-weight': `var(${key}-weight)`,
-          '--v-tone': inherit ? 'currentColor' : 'var(--aera-color-ink-numeral)',
+          '--v-tone': inherit ? 'currentColor' : 'var(--aera-color-ink-primary)',
           '--u-size': UNIT_SIZE[size],
           '--u-tone': inherit ? 'currentColor' : 'var(--aera-color-ink-tertiary)',
         } as CSSProperties

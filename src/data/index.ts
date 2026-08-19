@@ -3,5 +3,6 @@ export * from './patterns';
 export * from './sessions';
 export * from './insights';
 export * from './vitals';
-export * from './activity';
+export * from './calendar';
+export * from './moments';
 export * from './scoreboard';

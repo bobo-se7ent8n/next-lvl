@@ -1,10 +1,16 @@
 import type { Insight } from './types';
 
 /* The library is pulled from, never pushed. Nothing here is
-   recommended, ranked, or marked as urgent. */
+   recommended, ranked, or marked as urgent.
+
+   Every card carries a dot-matrix pattern rather than artwork of
+   its own: breath is a held gap, closeout reps compress, the
+   rushing lesson stalls and resumes, film is a steady field. One
+   system, never a per-type illustration style. */
 export const INSIGHTS: Insight[] = [
   {
     id: 'breath',
+    graphic: 'hold',
     title: 'Breath before the gather',
     kind: 'DRILL',
     duration: '8 min',
@@ -15,6 +21,7 @@ export const INSIGHTS: Insight[] = [
   },
   {
     id: 'closeout',
+    graphic: 'compress',
     title: 'Closeout release reps',
     kind: 'DRILL',
     duration: '12 min',
@@ -25,6 +32,7 @@ export const INSIGHTS: Insight[] = [
   },
   {
     id: 'rushing-lesson',
+    graphic: 'stall',
     title: 'What rushing feels like',
     kind: 'LESSON',
     duration: '6 min',
@@ -35,6 +43,7 @@ export const INSIGHTS: Insight[] = [
   },
   {
     id: 'film-pressure',
+    graphic: 'steady',
     title: 'Film · pressure possessions',
     kind: 'VIDEO',
     duration: '9 min',
@@ -44,6 +53,7 @@ export const INSIGHTS: Insight[] = [
   },
   {
     id: 'handle-fatigue',
+    graphic: 'disperse',
     title: 'Handle under fatigue',
     kind: 'DRILL',
     duration: '10 min',
@@ -54,6 +64,7 @@ export const INSIGHTS: Insight[] = [
   },
   {
     id: 'reset',
+    graphic: 'hold',
     title: 'Pre-game reset routine',
     kind: 'LESSON',
     duration: '5 min',
@@ -63,6 +74,7 @@ export const INSIGHTS: Insight[] = [
   },
   {
     id: 'sleep',
+    graphic: 'steady',
     title: 'Sleep & decision speed',
     kind: 'VIDEO',
     duration: '11 min',
@@ -72,6 +84,7 @@ export const INSIGHTS: Insight[] = [
   },
   {
     id: 'ladder',
+    graphic: 'compress',
     title: 'Two-ball dribble ladder',
     kind: 'DRILL',
     duration: '9 min',

@@ -1,0 +1,26 @@
+.line {
+  text-align: center;
+}
+
+/* the footer link — quiet, mono, and the only thing after the closing
+   line on the whole page */
+.footer {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--aera-space-15);
+}
+
+.link {
+  color: var(--aera-color-ink-tertiary);
+  text-decoration: none;
+  padding: var(--aera-space-5) var(--aera-space-8);
+  border-radius: var(--aera-radius-md);
+  transition:
+    color var(--aera-duration-fast) var(--aera-ease-out),
+    background var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.link:hover {
+  color: var(--aera-color-ink-primary);
+  background: var(--aera-color-surface-level1);
+}

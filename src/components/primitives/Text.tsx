@@ -1,21 +1,15 @@
+import { Fragment } from 'react';
 import type { CSSProperties, ElementType, ReactNode } from 'react';
-import { inkLetters } from '../../lib/inkVariation';
+import { inkWords } from '../../lib/inkVariation';
 import type { TextStyleName } from '../../tokens';
 import styles from './Text.module.css';
 
-export type TextTone =
-  | 'primary'
-  | 'secondary'
-  | 'tertiary'
-  | 'numeral'
-  | 'onInverse'
-  | 'inherit';
+export type TextTone = 'primary' | 'secondary' | 'tertiary' | 'onInverse' | 'inherit';
 
 const TONE_VAR: Record<TextTone, string> = {
   primary: 'var(--aera-color-ink-primary)',
   secondary: 'var(--aera-color-ink-secondary)',
   tertiary: 'var(--aera-color-ink-tertiary)',
-  numeral: 'var(--aera-color-ink-numeral)',
   onInverse: 'var(--aera-color-ink-on-inverse)',
   inherit: 'inherit',
 };
@@ -97,7 +91,7 @@ export function Text({
 
 export interface DisplayProps extends Omit<TextProps, 'variant' | 'children'> {
   children: string;
-  size?: 'xl' | 'lg' | 'md' | 'sm';
+  size?: 'xl' | 'lg' | 'md';
   /** per-letter weight variation. On by default for xl and lg. */
   inked?: boolean;
 }
@@ -106,7 +100,6 @@ const DISPLAY_VARIANT = {
   xl: 'displayXL',
   lg: 'displayLG',
   md: 'displayMD',
-  sm: 'displaySM',
 } as const;
 
 /** a display headline — Oswald, uppercase, optionally hand-set */
@@ -131,36 +124,49 @@ export function Display({
 
   return (
     <Text {...rest} as={Tag} variant={variant} aria-label={children}>
+      {/* Letters are grouped into WORDS before they are drawn.
+          Every letter is its own inline-block (it carries its own
+          weight and its own rotation), and an inline-block is a
+          break opportunity — so a headline of loose letters wrapped
+          mid-word while the spaces, drawn as &nbsp;, refused to
+          break at all. Wrapping each word in a nowrap box moves the
+          break opportunities back to where the spaces are. */}
       <span aria-hidden="true">
-        {inkLetters(children).map((letter, i) =>
-          letter.char === ' ' ? (
-            <span key={i} className={styles.letter}>
-              &nbsp;
+        {inkWords(children).map((word, w) => (
+          <Fragment key={w}>
+            {/* the space lives BETWEEN the word boxes, never inside
+                one — a space inside a nowrap box is not a break
+                opportunity, which is the whole point of the box */}
+            {w > 0 ? ' ' : null}
+            <span className={styles.word}>
+              {word.map((letter, i) => (
+                <span
+                  key={i}
+                  className={styles.letter}
+                  style={{
+                    fontVariationSettings: `'wght' ${letter.weight}`,
+                    fontWeight: letter.weight,
+                    transform: `translateY(${letter.shift}px) rotate(${letter.rotate}deg)`,
+                  }}
+                >
+                  {letter.char}
+                </span>
+              ))}
             </span>
-          ) : (
-            <span
-              key={i}
-              className={styles.letter}
-              style={{
-                fontVariationSettings: `'wght' ${letter.weight}`,
-                fontWeight: letter.weight,
-                transform: `translateY(${letter.shift}px) rotate(${letter.rotate}deg)`,
-              }}
-            >
-              {letter.char}
-            </span>
-          ),
-        )}
+          </Fragment>
+        ))}
       </span>
     </Text>
   );
 }
 
-export type LabelProps = Omit<TextProps, 'variant'> & { size?: 'sm' | 'lg' };
+export type LabelProps = Omit<TextProps, 'variant'>;
 
-/** the mono micro-label — the caption voice of the whole product */
-export function Label({ size = 'sm', tone = 'tertiary', ...rest }: LabelProps) {
-  return <Text {...rest} tone={tone} variant={size === 'lg' ? 'labelLG' : 'label'} as={rest.as ?? 'span'} />;
+/** the mono micro-label — the annotation voice of the whole product.
+ *  There is one mono size now; the two label sizes it replaces were a
+ *  distinction nobody could see. */
+export function Label({ tone = 'tertiary', ...rest }: LabelProps) {
+  return <Text {...rest} tone={tone} variant="mono" as={rest.as ?? 'span'} />;
 }
 
 /** mono running text — timecodes, counts, machine readings */

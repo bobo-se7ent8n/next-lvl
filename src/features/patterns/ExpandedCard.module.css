@@ -1,0 +1,176 @@
+/* ============================================================
+   THE OPENED CARD
+
+   A detail view, not a modal. The panel carries its own face
+   colour at full saturation and sits above the dim; there is no
+   backdrop panel behind it, no blur on it, and no chrome.
+
+   AND IT DOES NOT SCROLL. There is no scroll container in here at
+   any size — the popup is given a height and its contents adapt to
+   it: the rhythm tightens first, then the chart shortens, then the
+   history sheds its oldest rows and says so. Type never shrinks to
+   make room. See fitPlan.ts, which owns those decisions; the three
+   density steps below are the spacing half of that plan.
+   ============================================================ */
+.panel {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  cursor: default;
+  text-align: left;
+}
+
+.inner {
+  /* the FINAL box, not the animating one — see ExpandedCard.tsx */
+  height: var(--fit-h, 100%);
+  width: var(--fit-w, 100%);
+  /* deliberately NOT auto: a popup that scrolls inside itself is the
+     bug this file exists to prevent */
+  overflow: hidden;
+  padding: var(--pad-y) var(--pad-x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-gap);
+  text-align: left;
+}
+
+/* ---- the three density steps ---- */
+.inner {
+  --pad-y: var(--aera-space-11);
+  --pad-x: var(--aera-space-12);
+  --stack-gap: var(--aera-space-9);
+  --column-gap: var(--aera-space-11);
+  --row-gap: var(--aera-space-7);
+  --history-gap: var(--aera-space-6);
+  --measured-pad: var(--aera-space-7) var(--aera-space-8);
+}
+
+.inner[data-density='tight'] {
+  --pad-y: var(--aera-space-9);
+  --pad-x: var(--aera-space-11);
+  --stack-gap: var(--aera-space-7);
+  --column-gap: var(--aera-space-9);
+  --row-gap: var(--aera-space-6);
+  --history-gap: var(--aera-space-4);
+  --measured-pad: var(--aera-space-5) var(--aera-space-7);
+}
+
+.inner[data-density='compact'] {
+  --pad-y: var(--aera-space-7);
+  --pad-x: var(--aera-space-9);
+  --stack-gap: var(--aera-space-5);
+  --column-gap: var(--aera-space-8);
+  --row-gap: var(--aera-space-4);
+  --history-gap: var(--aera-space-2);
+  --measured-pad: var(--aera-space-4) var(--aera-space-6);
+}
+
+.top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-4);
+}
+
+.context {
+  opacity: 0.66;
+}
+
+.quiet {
+  opacity: 0.7;
+}
+
+.body {
+  opacity: 0.82;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: var(--column-gap);
+  align-items: start;
+  min-height: 0;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--row-gap);
+  min-width: 0;
+  min-height: 0;
+}
+
+.measured {
+  padding: var(--measured-pad);
+  border-radius: var(--aera-radius-md);
+  background: var(--aera-color-on-face-wash);
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-3);
+}
+
+.viz {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--aera-space-6);
+  border-radius: var(--aera-radius-md);
+  background: var(--viz-well);
+}
+
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--history-gap);
+  margin-top: var(--row-gap);
+}
+
+.historyRow {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-6);
+}
+
+.historyName {
+  width: 88px;
+  flex: 0 0 auto;
+  opacity: 0.72;
+}
+
+.historyBar {
+  flex: 1 1 auto;
+  min-width: 40px;
+  height: 7px;
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-on-face-track);
+  overflow: hidden;
+}
+
+.historyFill {
+  display: block;
+  height: 100%;
+  border-radius: var(--aera-radius-pill);
+  background: var(--fill);
+  width: var(--w);
+  transition: width var(--aera-duration-slow) var(--aera-ease-out);
+}
+
+.historyValue {
+  width: 52px;
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.note {
+  opacity: 0.5;
+  margin-top: auto;
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--column-gap);
+  }
+  .inner {
+    padding: var(--pad-y) var(--pad-x);
+  }
+}

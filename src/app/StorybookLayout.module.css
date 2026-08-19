@@ -1,0 +1,30 @@
+/* ============================================================
+   THE PUBLIC BROWSER SHELL
+
+   Structured like a component browser and rendered entirely in
+   AERA: paper-cream ground, the AERA palette, the existing type.
+   There is no dark shell anywhere in this product and there is
+   not going to be one here either.
+   ============================================================ */
+.shell {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--aera-layout-sidebar-width) minmax(0, 1fr);
+  align-items: start;
+  min-height: 100svh;
+  background: var(--aera-color-surface-background);
+}
+
+.main {
+  min-width: 0;
+  padding: var(--aera-space-14) var(--aera-space-13) var(--aera-space-16);
+}
+
+@media (max-width: 900px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .main {
+    padding: var(--aera-space-11) var(--aera-layout-gutter) var(--aera-space-14);
+  }
+}

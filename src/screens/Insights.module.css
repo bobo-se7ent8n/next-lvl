@@ -1,12 +1,84 @@
-.grid {
+/* ============================================================
+   INSIGHTS — full bleed. The Ask panel holds the left column and
+   the library scrolls on the right. The grid runs to the gutter;
+   it used to stop several hundred pixels short of it.
+   ============================================================ */
+.screen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.split {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--aera-space-8);
+  grid-template-columns: var(--aera-layout-left-column) minmax(0, 1fr);
+  gap: var(--aera-space-11);
   align-items: start;
+  width: 100%;
+}
+
+/* The Ask panel is pinned, and it is exactly one shared column tall —
+   the same width and height as Focus on Home and Activity on
+   Sessions. It used to stretch to the full scroll height of the
+   library beside it, which pushed the input and the suggestion chips
+   about fourteen hundred pixels off the bottom of the screen. */
+.aside {
+  position: sticky;
+  top: var(--aera-layout-column-top);
+  align-self: start;
+  min-width: 0;
+  height: var(--aera-layout-column-height);
+  display: flex;
+}
+
+.aside > * {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Columns, not a grid. A grid put every card in a ROW on the row's
+   baseline, so a short card left the one under it stranded and the
+   three columns drifted apart — gaps of 130px, 60px and 110px on the
+   same screen. In a column flow every card sits exactly one gap
+   token below the card above it in its own column, and that gap is
+   the same token as the horizontal one. */
+.grid {
+  columns: 2;
+  column-gap: var(--aera-space-8);
+  min-width: 0;
+}
+
+.grid > * {
+  /* block, so the card's box IS the column item: as an inline-block
+     it sat on a line box and inherited that line's leading, which is
+     what made one gap 25px, the next 30px and the next 43px when all
+     three were asking for the same token. */
+  display: block;
+  width: 100%;
+  break-inside: avoid;
+  /* the one vertical gap in the library */
+  margin-bottom: var(--aera-space-8);
+}
+
+@media (min-width: 1440px) {
+  .grid {
+    columns: 3;
+  }
+}
+
+@media (max-width: 1080px) {
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--aera-space-10);
+  }
+  .aside {
+    position: static;
+    height: auto;
+  }
 }
 
 @media (max-width: 780px) {
   .grid {
-    grid-template-columns: 1fr;
+    columns: 1;
   }
 }

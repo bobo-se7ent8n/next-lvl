@@ -14,3 +14,11 @@
 .fill {
   height: 100%;
 }
+
+/* A well holds a graphic, and the graphic sits on the floor of it.
+   Top-aligning left a gap under every chart in the product. */
+.well {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}

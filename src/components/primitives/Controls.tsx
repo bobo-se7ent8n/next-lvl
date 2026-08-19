@@ -173,8 +173,8 @@ export function ProgressRow({ label, value, color, className }: ProgressRowProps
       <ProgressBar value={value} color={color} ariaLabel={`${label}: ${value} of 100`} />
       <Text
         as="span"
-        variant="metricSM"
-        tone="numeral"
+        variant="metricMD"
+        tone="primary"
         numeric
         className={styles.progressRowValue}
       >

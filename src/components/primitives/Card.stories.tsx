@@ -3,6 +3,7 @@ import { Card } from './Card';
 import { Display, Text } from './Text';
 import { StoryFrame, Variant } from '../../stories/kit';
 import { tokens } from '../../tokens';
+import { colorData } from '../../tokens';
 
 const meta = {
   title: 'Primitives/Card',
@@ -28,7 +29,7 @@ const meta = {
     fill: { control: 'boolean' },
     onClick: { action: 'clicked' },
   },
-  args: { radius: 'panel', elevation: 'medium', padding: '10' },
+  args: { radius: 'card', elevation: 'medium', padding: '10' },
   render: (args) => (
     <Card {...args} style={{ width: 260, gap: 'var(--aera-space-5)' }}>
       <Display size="md" as="h3" tone="inherit">
@@ -70,7 +71,7 @@ export const States: Story = {
         </Card>
       </Variant>
       <Variant name="face colour">
-        <Card face="#93EAC3" padding="8" style={{ width: 220 }}>
+        <Card face={colorData.mint} padding="8" style={{ width: 220 }}>
           <Text variant="bodySM" tone="inherit">
             ink flips with the face
           </Text>

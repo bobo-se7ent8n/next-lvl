@@ -5,7 +5,8 @@ import {
   colorDataInk,
   colorOnFace,
   colorSemantic,
-  shotZoneRamp,
+  colorSurface,
+  accuracyRamp,
   type DataTone,
 } from '../tokens';
 
@@ -46,16 +47,18 @@ export function luminance(hex: string): number {
   return (r * 0.299 + g * 0.587 + b * 0.114) / 255;
 }
 
-/** legible ink for text sitting on an arbitrary fill */
+/** legible ink for text sitting on an arbitrary fill. The two ends are
+ *  the surface tokens themselves — there is no third black and no third
+ *  white anywhere in the product. */
 export function inkOn(hex: string): string {
-  return luminance(hex) > 0.5 ? '#141310' : '#FFFFFC';
+  return luminance(hex) > 0.5 ? colorSurface.inverse : colorSurface.background;
 }
 
 /** a tint of a colour, pushed toward paper or toward ink */
 export function tintOf(hex: string): string {
   return luminance(hex) > 0.55
-    ? mix(hex, '#141310', 0.3)
-    : mix(hex, '#FFFFFC', 0.42);
+    ? mix(hex, colorSurface.inverse, 0.3)
+    : mix(hex, colorSurface.background, 0.42);
 }
 
 export function dataColor(tone: DataTone): string {
@@ -83,14 +86,13 @@ export function semanticColor(k: number): string {
 }
 
 /* ------------------------------------------------------------
-   SHOT ZONES — the one exemption. `pct` is raw FG% as 0..1.
+   ACCURACY — three ordered stops. `pct` is raw FG% as 0..1, and
+   the thresholds are real FG% rather than a normalised scale, so
+   the legend can print the numbers a reader would recognise.
    ------------------------------------------------------------ */
-export function shotZoneColor(pct: number): string {
-  /* the useful band of basketball FG% sits between .26 and .44,
-     so the ramp is stretched across that window rather than 0..1 */
-  const k = Math.max(0, Math.min(1, (pct - 0.26) / 0.18));
-  for (const stop of shotZoneRamp) {
-    if (k < stop.max) return stop.color;
+export function accuracyColor(pct: number): string {
+  for (const stop of accuracyRamp) {
+    if (pct >= stop.min) return stop.color;
   }
-  return shotZoneRamp[shotZoneRamp.length - 1].color;
+  return accuracyRamp[accuracyRamp.length - 1].color;
 }

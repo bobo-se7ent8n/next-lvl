@@ -25,9 +25,9 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--aera-radius-lg);
-  background: var(--aera-color-surface-panel);
+  background: var(--aera-color-surface-background);
   color: var(--aera-color-ink-secondary);
-  box-shadow: var(--aera-elevation-floating);
+  box-shadow: var(--aera-elevation-high);
   transition: color var(--aera-duration-fast) var(--aera-ease-out);
 }
 
@@ -59,7 +59,7 @@
   gap: var(--aera-space-4);
   padding: var(--aera-space-6) var(--aera-space-7);
   border-radius: var(--aera-radius-md);
-  background: var(--aera-color-surface-well);
+  background: var(--aera-color-surface-level1);
 }
 
 .fieldsOff {

@@ -1,0 +1,66 @@
+/* ============================================================
+   SHOT MECHANICS
+
+   The card fills its column so its bottom edge lands level with
+   Skill ratings and Shot zones — the three columns of the bento
+   end on one line. The arc is the elastic part: it takes whatever
+   the heading, the three rows and the footnote leave, exactly the
+   way the court does on the zones card.
+   ============================================================ */
+.card {
+  gap: var(--aera-space-6);
+  text-align: left;
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--aera-space-5);
+}
+
+.arc {
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: var(--aera-space-6);
+  border-radius: var(--aera-radius-lg);
+  background: var(--aera-color-surface-level1);
+}
+
+/* the ball travels the path once per loop. Subtle by design: the
+   trail is always there and only the brightening moves. */
+.ball {
+  opacity: 0.28;
+  animation: ballTravel calc(var(--aera-duration-settle) * 4) var(--aera-ease-in-out) infinite;
+  animation-delay: var(--dot-delay);
+}
+
+@keyframes ballTravel {
+  0%,
+  16%,
+  100% {
+    opacity: 0.28;
+  }
+  6% {
+    opacity: 1;
+  }
+}
+
+/* three rows, label left and reading right, and nothing underneath
+   either of them */
+.rows {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+}
+
+.source {
+  padding-top: var(--aera-space-2);
+  opacity: 0.75;
+}

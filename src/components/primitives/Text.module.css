@@ -31,7 +31,14 @@
   overflow: hidden;
 }
 
-/* ---- display, with per-letter weight variation ---- */
+/* ---- display, with per-letter weight variation ----
+   The word is the unbreakable unit; the letter inside it is free to
+   carry its own weight and its own tilt. */
+.word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
 .letter {
   display: inline-block;
   will-change: transform;

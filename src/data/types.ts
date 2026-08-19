@@ -1,4 +1,5 @@
 import type { DataTone } from '../tokens';
+import type { DotPattern } from '../lib/dotField';
 
 export type PatternState = 'improving' | 'steady' | 'new' | 'declining';
 
@@ -80,17 +81,8 @@ export interface Insight {
   pattern?: string;
   desc: string;
   ratio: string;
-}
-
-export interface ActivityDay {
-  index: number;
-  week: number;
-  day: number;
-  level: 0 | 1 | 2 | 3;
-  date: string;
-  count: number;
-  name: string;
-  duration: string;
+  /** which dot-matrix metaphor stands in for this item's subject */
+  graphic: DotPattern;
 }
 
 export interface FocusStep {

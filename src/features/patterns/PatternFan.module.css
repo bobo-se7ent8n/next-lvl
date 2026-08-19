@@ -1,36 +1,53 @@
 /* ============================================================
    THE FAN
 
-   Five cards visible at rest, the hand centred on the screen. The
-   set cycles: as the position moves, cards leave one edge and are
-   replaced from the other. Each slot has its own Y offset, its own
-   rotation and its own scale, so the hand is asymmetric — laid down
-   by a person rather than plotted on an even arc.
+   Every pattern is in the set; eight of them are in the window.
+   Each card carries its own tilt and its own vertical stagger —
+   both pure functions of the card index, so the hand is identical
+   on every render — and the slot it sits in supplies the spread
+   and the scale falloff.
 
-   There is no drag. Hovering a card shows a Figma-style outline and
-   its name tag; clicking opens it.
+   THE ACTIVE CARD IS ALWAYS CENTRED. The hand flows leftward
+   through the middle of the stage as the page scrolls; the ends
+   of the set look asymmetric because the first and last cards
+   have no neighbour on one side, not because the hand has been
+   pushed against an edge.
+
+   Nothing inside the window fades. Every card in the hand is at
+   full fill: an opacity ramp toward the edges made the outer
+   cards look broken rather than distant. A card LEAVING the
+   window fades and shrinks over the same transition every other
+   slot property uses, so it goes rather than pops.
+
+   The hint line does not travel with the hand: it is pinned to
+   the middle of the viewport and stays there. Scroll is vertical
+   only.
    ============================================================ */
 .wrap {
   position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--aera-space-8);
+  gap: var(--aera-space-9);
 }
 
 .stage {
-  --card-w: clamp(158px, 15.5vw, 226px);
-  --card-h: clamp(228px, 22vw, 316px);
+  /* five cards, so each one can be bigger without the hand widening */
+  --card-w: clamp(196px, 19vw, 292px);
+  --card-h: clamp(282px, 27vw, 406px);
   position: relative;
   width: 100%;
-  height: clamp(340px, 46vh, 440px);
+  height: clamp(420px, 56vh, 560px);
   /* the ends of the hand sit outside the viewport by design */
   overflow: clip;
-}
-
-/* a card is open — the hand needs room for the panel and the peek */
-.stageOpen {
-  height: clamp(560px, 68vh, 680px);
+  /* the whole hand shrinks together when the viewport cannot hold
+     it, so the composition never changes — only its size does. This
+     sits on the STAGE rather than on each slot: the individual
+     `scale` property is applied before `transform`, so scaling a slot
+     would shrink the card without shrinking the offset that places
+     it, and the hand would come apart instead of getting smaller. */
+  transform: scale(var(--fit, 1));
+  transform-origin: 50% 50%;
 }
 
 @supports not (overflow: clip) {
@@ -49,45 +66,71 @@
   margin-top: calc(var(--card-h) / -2);
   transform: translate3d(var(--x), var(--y), 0) rotate(var(--rot)) scale(var(--sc));
   opacity: var(--op);
-  visibility: var(--vis);
   will-change: transform;
   transition:
     transform var(--aera-duration-slow) var(--aera-ease-out),
     opacity var(--aera-duration-slow) var(--aera-ease-out);
 }
 
-/* while a card is open the rest of the hand tucks behind it */
-.slotTucked {
-  pointer-events: none;
-}
-
 .slot > * {
   height: 100%;
 }
 
+.hintRow {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* the middle of the row is the middle of the viewport: the page runs
+   edge to edge with an equal gutter either side, so this stays put
+   however far the hand has travelled */
 .hint {
   text-align: center;
 }
 
-.expanded {
-  animation: openCard var(--aera-duration-expand) var(--aera-ease-out) both;
-  position: absolute;
-  left: 50%;
-  top: var(--aera-space-9);
-  z-index: 40;
-  width: min(900px, 94vw);
-  height: clamp(420px, 58vh, 560px);
-  transform: translateX(-50%);
-  transform-origin: center top;
+/* ---- the opened state ----------------------------------------
+   A flat dim over the whole page, and the focused card above it
+   at full saturation. No blur, no backdrop panel, no chrome.
+
+   The panel is the card, grown. It is planted on the source
+   card's own bounding rect and then given the expanded one, and
+   the five values between those two states — left, top, width,
+   height and the corner — are what animate. Nothing is scaled and
+   nothing cross-fades: a transform would stretch the type on the
+   way, and a fade would be two objects rather than one. */
+.dim {
+  position: fixed;
+  inset: 0;
+  /* above the nav: an opened pattern is a detail view, and a detail
+     view has no nav links in it */
+  z-index: 960;
+  background: var(--aera-color-utility-dim);
+  animation: dimIn var(--aera-duration-base) var(--aera-ease-out) both;
 }
 
-@keyframes openCard {
+.flight {
+  position: fixed;
+  z-index: 970;
+  overflow: hidden;
+  box-shadow: var(--aera-elevation-overlay);
+  transition:
+    left var(--aera-duration-expand) var(--aera-ease-expand),
+    top var(--aera-duration-expand) var(--aera-ease-expand),
+    width var(--aera-duration-expand) var(--aera-ease-expand),
+    height var(--aera-duration-expand) var(--aera-ease-expand),
+    border-radius var(--aera-duration-expand) var(--aera-ease-out);
+}
+
+
+@keyframes dimIn {
   from {
-    transform: translateX(-50%) scale(0.62);
     opacity: 0;
   }
   to {
-    transform: translateX(-50%) scale(1);
     opacity: 1;
   }
 }
+
+

@@ -1,4 +1,4 @@
-import { colorData } from '../tokens';
+import { colorData, colorSurface } from '../tokens';
 import type { Pattern, PatternState } from './types';
 
 export const STATE_LABEL: Record<PatternState, string> = {
@@ -8,16 +8,18 @@ export const STATE_LABEL: Record<PatternState, string> = {
   declining: 'Declining',
 };
 
-/* the card faces cycle through the muted palette plus paper and ink,
-   so a fanned hand never shows the same colour twice side by side */
+/* The card faces cycle through the AERA palette plus two surface
+   tokens, so a fanned hand never shows the same colour twice side by
+   side. Both ends are tokens: the warm cream that used to sit in this
+   list was a seventh colour that existed nowhere else in the system. */
 export const FAN_FILLS = [
   colorData.mint,
   colorData.yellow,
   colorData.orange,
   colorData.lilac,
   colorData.blue,
-  '#F0E9D8',
-  '#141310',
+  colorSurface.level2,
+  colorSurface.inverse,
 ] as const;
 
 /* Trend copy is deliberately flat: it states the direction and the

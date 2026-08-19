@@ -7,7 +7,7 @@ import { tokens } from '../../tokens';
 
 const Box = ({ label }: { label: string }) => (
   <Surface level="level1" radius="md" elevation="none" padding="6">
-    <Text variant="bodyXS" tone="secondary">
+    <Text variant="bodySM" tone="secondary">
       {label}
     </Text>
   </Surface>

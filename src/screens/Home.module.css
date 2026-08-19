@@ -1,44 +1,68 @@
 /* ============================================================
    HOME — two stages. Stage one is patterns and nothing else and
-   owns the first viewport; stage two is focus + vitals.
+   owns the first viewport; stage two is focus + vitals and fits
+   inside one viewport with nothing to scroll: the header takes
+   what it needs and the grid takes the rest, so the focus column
+   and the 3 × 2 vitals grid are on screen together.
+
+   Both run edge to edge and neither leaves a band of padding
+   under its last row.
    ============================================================ */
 .stageOne {
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding-bottom: var(--aera-space-14);
+  align-items: stretch;
+  padding-bottom: var(--aera-space-13);
 }
 
 .stageTwo {
-  min-height: 100svh;
+  /* an exact viewport, not a minimum — the whole point is that this
+     stage does not scroll */
+  height: 100svh;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  padding-bottom: var(--aera-space-16);
+  padding-bottom: var(--aera-space-9);
 }
 
 .fan {
   width: 100%;
-  margin-top: var(--aera-space-9);
 }
 
+/* the grid fills the page: the focus column and the six vitals run
+   from gutter to gutter with nothing capping them, and stand exactly
+   one shared column height tall — the same height Activity and Ask
+   AERA stand at on the other two screens */
 .grid {
+  flex: 0 0 auto;
+  height: var(--aera-layout-column-height);
+  min-height: 0;
   display: grid;
-  grid-template-columns: minmax(250px, 1fr) minmax(0, 2.05fr);
-  gap: var(--aera-space-12);
+  grid-template-columns: var(--aera-layout-left-column) minmax(0, 1fr);
+  gap: var(--aera-space-11);
   align-items: stretch;
+  width: 100%;
 }
 
 .vitals {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: var(--aera-space-8);
+  gap: var(--aera-space-7);
+  min-height: 0;
 }
 
+/* below the split the two halves stack, and one screen is no longer
+   possible or desirable — the stage goes back to scrolling */
 @media (max-width: 1080px) {
+  .stageTwo {
+    height: auto;
+    min-height: 100svh;
+  }
   .grid {
     grid-template-columns: 1fr;
+    height: auto;
     gap: var(--aera-space-10);
   }
   .vitals {

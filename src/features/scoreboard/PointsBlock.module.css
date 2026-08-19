@@ -1,5 +1,8 @@
+/* Three type tokens and nothing between them: displayMD, metricLG,
+   and one mono line. The season low and high used to be a separate
+   row in the same voice as the caption above it. */
 .card {
-  gap: var(--aera-space-7);
+  gap: var(--aera-space-6);
   text-align: left;
 }
 
@@ -8,35 +11,4 @@
   align-items: baseline;
   justify-content: space-between;
   gap: var(--aera-space-5);
-}
-
-.readout {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--aera-space-9);
-}
-
-.spark {
-  flex: 1 1 140px;
-  max-width: 200px;
-}
-
-.tendency {
-  display: flex;
-  align-items: center;
-  gap: var(--aera-space-5);
-}
-
-.tendencyMark {
-  display: block;
-  width: 28px;
-  height: 4px;
-  flex: 0 0 auto;
-  border-radius: var(--aera-radius-pill);
-}
-
-.note {
-  padding-top: var(--aera-space-2);
-  opacity: 0.75;
 }

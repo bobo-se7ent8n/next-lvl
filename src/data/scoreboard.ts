@@ -12,27 +12,34 @@ export interface CourtZone {
   short: string;
   makes: number;
   attempts: number;
-  /** rect in the half-court viewBox, basket at the bottom */
-  x: number;
-  y: number;
-  w: number;
-  h: number;
 }
 
-export const COURT_VIEWBOX = { w: 360, h: 266 } as const;
+/* The zone list is readings only. Where each zone SITS is court
+   geometry and lives in lib/court.ts, so the polygons follow the
+   real lines rather than being placed by hand. */
+/* TEN ZONES. The paint used to be one region at 38%, which put the
+   whole interior in the middle of the ramp and meant the mint end of
+   the scale never appeared anywhere on the card — a legend showing a
+   colour the graphic never draws is a legend that lies.
 
+   Splitting the rim off from the rest of the paint is also just true:
+   a shot at the rim and a shot from the low block are not the same
+   shot. The distribution now reads the way a real shot chart reads —
+   efficient at the rim, average from mid-range, cold from three. */
 export const ZONES: CourtZone[] = [
-  /* laid out the way the court reads: the top-of-key three is the
-     furthest shot, the corners sit nearest the baseline, the mid-range
-     pair is inside the line and the paint is at the rim */
-  { id: 'lw3', label: 'left wing 3', short: 'L wing', makes: 11, attempts: 34, x: 8, y: 8, w: 84, h: 52 },
-  { id: 'tk3', label: 'top of key 3', short: 'Top key', makes: 14, attempts: 47, x: 134, y: 8, w: 92, h: 52 },
-  { id: 'rw3', label: 'right wing 3', short: 'R wing', makes: 9, attempts: 31, x: 268, y: 8, w: 84, h: 52 },
-  { id: 'lc3', label: 'left corner 3', short: 'L corner', makes: 6, attempts: 19, x: 8, y: 70, w: 84, h: 52 },
-  { id: 'rc3', label: 'right corner 3', short: 'R corner', makes: 8, attempts: 22, x: 268, y: 70, w: 84, h: 52 },
-  { id: 'midL', label: 'mid-range left', short: 'Mid L', makes: 12, attempts: 30, x: 62, y: 134, w: 92, h: 48 },
-  { id: 'midR', label: 'mid-range right', short: 'Mid R', makes: 15, attempts: 38, x: 206, y: 134, w: 92, h: 48 },
-  { id: 'paint', label: 'paint', short: 'Paint', makes: 19, attempts: 50, x: 128, y: 192, w: 104, h: 46 },
+  /* the interior — the only place the mint end of the ramp appears */
+  { id: 'ra', label: 'restricted area', short: 'Rim', makes: 28, attempts: 40 },
+  { id: 'paint', label: 'paint', short: 'Paint', makes: 14, attempts: 32 },
+  { id: 'ft', label: 'free-throw area', short: 'FT area', makes: 9, attempts: 23 },
+  /* mid-range — the middle of the ramp */
+  { id: 'midL', label: 'mid-range left', short: 'Mid L', makes: 11, attempts: 28 },
+  { id: 'midR', label: 'mid-range right', short: 'Mid R', makes: 14, attempts: 36 },
+  /* the perimeter — the cold end */
+  { id: 'lc3', label: 'left corner 3', short: 'L corner', makes: 6, attempts: 19 },
+  { id: 'rc3', label: 'right corner 3', short: 'R corner', makes: 7, attempts: 22 },
+  { id: 'lw3', label: 'left wing 3', short: 'L wing', makes: 10, attempts: 34 },
+  { id: 'tk3', label: 'top of key 3', short: 'Top key', makes: 13, attempts: 47 },
+  { id: 'rw3', label: 'right wing 3', short: 'R wing', makes: 9, attempts: 31 },
 ];
 
 export const ZONE_TOTALS = {
@@ -44,130 +51,80 @@ export const ZONE_TOTALS = {
    SHOT MECHANICS — the arc diagram plus the three readings
    ------------------------------------------------------------ */
 export const MECHANICS = {
-  /** launch angle at release, in degrees */
+  /* the inputs. Everything drawn — the curve, the apex marker, the
+     entry angle — is solved from these four numbers rather than
+     placed by eye. See lib/arc.ts. */
   arcAngle: 46,
-  /** apex height above the floor, in metres */
-  apexHeight: 3.4,
-  /** distance from release to apex, in metres */
-  apexDistance: 4.1,
-  /** shooting distance, in metres */
-  shotDistance: 6.75,
   releaseHeight: 2.3,
+  shotDistance: 6.75,
+  rimHeight: 3.05,
+  /* label and value only. The explanatory line under each row said
+     what the number already said, the footnote ran to two, and the
+     quality tick beside each reading was a fourth encoding of the
+     same three numbers. */
   rows: [
-    {
-      id: 'arc',
-      label: 'Arc angle',
-      value: '46',
-      unit: '°',
-      note: '43–48° holds the softest landing on the rim',
-      quality: 0.86,
-    },
-    {
-      id: 'release',
-      label: 'Release time',
-      value: '0.58',
-      unit: 's',
-      note: 'catch to ball leaving the hand, unpressured reps',
-      quality: 0.72,
-    },
-    {
-      id: 'consistency',
-      label: 'Motion consistency',
-      value: '81',
-      unit: '/ 100',
-      note: 'frame-to-frame agreement across the shooting motion',
-      quality: 0.81,
-    },
+    { id: 'arc', label: 'Arc angle', value: '46', unit: '°' },
+    { id: 'release', label: 'Release time', value: '0.58', unit: 's' },
+    { id: 'consistency', label: 'Motion consistency', value: '81', unit: '/ 100' },
   ],
-  source:
-    'measured on 328 tracked shots across sessions 9–14 · on-device pose and ball tracking',
+  source: '328 tracked shots · sessions 9–14 · on-device',
 };
 
 /* ------------------------------------------------------------
-   POINTS — three windows. The two wider windows carry a tendency;
-   a single scrimmage has nothing to trend against.
+   POINTS — one reading with its context. There is no window
+   toggle any more: a control on this tile invited comparison,
+   and comparison is not what this screen is for. The register is
+   flat — notable, never praised, never ranked.
    ------------------------------------------------------------ */
-export type PointsRange = 'last' | 'last5' | 'all';
-
-export interface PointsWindow {
-  id: PointsRange;
-  label: string;
-  value: string;
-  unit: string;
-  caption: string;
-  /** neutral sentence about direction — never praise, never warning */
-  tendency?: string;
-  /** 0..1 quality, drives the semantic colour of the tendency mark */
-  tendencyQuality?: number;
-  splits: Array<{ label: string; made: number; attempts: number }>;
-  series: number[];
-}
-
-export const POINTS: Record<PointsRange, PointsWindow> = {
-  last: {
-    id: 'last',
-    label: 'Last scrimmage',
-    value: '18',
-    unit: 'pts',
-    caption: 'Apr 12 · Tuesday scrimmage · 62 min',
-    splits: [
-      { label: '2PT', made: 5, attempts: 11 },
-      { label: '3PT', made: 2, attempts: 8 },
-      { label: 'FT', made: 2, attempts: 2 },
-    ],
-    series: [18],
-  },
-  last5: {
-    id: 'last5',
-    label: 'Last 5 scrimmages',
-    value: '17.4',
-    unit: 'pts avg',
-    caption: 'five most recent full-court runs',
-    tendency: 'Up 1.2 on the five before it.',
-    tendencyQuality: 0.78,
-    splits: [
-      { label: '2PT', made: 24, attempts: 52 },
-      { label: '3PT', made: 11, attempts: 34 },
-      { label: 'FT', made: 12, attempts: 14 },
-    ],
-    series: [14, 21, 16, 18, 18],
-  },
-  all: {
-    id: 'all',
-    label: 'All time',
-    value: '15.8',
-    unit: 'pts avg',
-    caption: '14 recorded scrimmages since December',
-    tendency: 'Up 2.0 across the recorded set.',
-    tendencyQuality: 0.74,
-    splits: [
-      { label: '2PT', made: 61, attempts: 138 },
-      { label: '3PT', made: 27, attempts: 84 },
-      { label: 'FT', made: 33, attempts: 41 },
-    ],
-    series: [12, 14, 11, 15, 13, 17, 14, 16, 15, 19, 14, 21, 16, 18],
-  },
+export const POINTS = {
+  value: '18',
+  unit: 'pts',
+  /* ONE mono line. The session meta and the season range used to be
+     two rows in the same voice saying two halves of one sentence, and
+     the prose paragraph above them said it a third time. */
+  caption: 'Apr 12 · Tuesday scrimmage · 62 min · low 11 · high 21',
 };
 
-export const POINTS_ORDER: PointsRange[] = ['last', 'last5', 'all'];
-
 /* ------------------------------------------------------------
-   SKILLS
+   SKILL RATINGS — two groups, every rating derived from sensor
+   data rather than entered by anybody. The scale is the player's
+   own: there is nobody else in it.
    ------------------------------------------------------------ */
 export const SKILLS = {
   shooting: [
-    { label: 'Catch & shoot', value: 78 },
-    { label: 'Off the dribble', value: 64 },
     { label: 'Free throw', value: 85 },
-    { label: 'Contested 3', value: 52 },
-    { label: 'Corner 3', value: 71 },
+    { label: 'Mid-range', value: 73 },
+    { label: 'Three-point', value: 61 },
+    { label: 'Finishing', value: 66 },
+    { label: 'Catch-and-shoot', value: 78 },
+    { label: 'Off-dribble', value: 64 },
   ],
   handling: [
-    { label: 'Ball security', value: 69 },
-    { label: 'Change of pace', value: 58 },
+    { label: 'Ball handling', value: 69 },
+    { label: 'Agility', value: 76 },
     { label: 'First step', value: 74 },
-    { label: 'Finishing at rim', value: 66 },
+    { label: 'Balance', value: 58 },
   ],
 };
 
 export const SKILL_AVERAGE = 70;
+
+/* one line at column width — the two-line version cost the card the
+   room its last rating row needed */
+export const SKILL_SOURCE = 'on-device pose, ball and inertial data · sessions 9–14';
+
+/* ------------------------------------------------------------
+   WHERE TO WORK NEXT — one item. Three was a list, and a list on
+   this screen reads as a ranking. There is no intro line and no
+   share note either: at tile size there is no room for prose, and
+   the tile is not the place that claim belongs.
+   ------------------------------------------------------------ */
+/* The one thing worth working on. It is a rating like any other —
+   same label, same 0–100 bar, same right-aligned reading — because
+   it IS one of the ratings above, singled out. Styling it as a
+   display number made it read as a separate kind of measurement. */
+export const WHERE_NEXT = {
+  label: 'Balance',
+  value: 58,
+  text: 'The lowest movement rating. It moves with late-session fatigue, not with anything technical.',
+};

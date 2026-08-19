@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Scoreboard } from './Scoreboard';
 import { ScreenFrame } from './ScreenFrame';
 
-const meta = {
+const meta: Meta<typeof Scoreboard> = {
   title: 'Screens/Scoreboard',
   component: Scoreboard,
   parameters: {
@@ -19,7 +19,7 @@ const meta = {
       <Scoreboard />
     </ScreenFrame>
   ),
-} satisfies Meta<typeof Scoreboard>;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;

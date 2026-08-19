@@ -1,0 +1,10 @@
+/* The landing shell carries the paper itself rather than inheriting the
+   app's background layers — nothing from the app chrome reaches it. */
+.page {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  background: var(--aera-color-surface-background);
+  /* full-bleed placeholder blocks are measured against the viewport */
+  overflow-x: hidden;
+}

@@ -1,0 +1,39 @@
+/* ============================================================
+   The detail screen: the heading block, the stage, the timeline,
+   and then the insight block for wherever the playhead is.
+   Full bleed, no page header, no side panels.
+   ============================================================ */
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-11);
+  width: 100%;
+}
+
+/* Title, one body line, stat row — three type tokens, stacked, in
+   that order. The description used to sit inline beside the title,
+   there was a fourth mono row repeating the date and the duration,
+   and the stats were at the bottom of the page. */
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--aera-space-5);
+}
+
+.note {
+  max-width: var(--aera-layout-max-prose-width);
+}
+
+.stats {
+  margin-top: var(--aera-space-5);
+}
+
+/* the stage, the transport and the timeline, as one surface */
+.timeBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-9);
+  width: 100%;
+  min-width: 0;
+}

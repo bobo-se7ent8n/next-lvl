@@ -1,43 +1,28 @@
 /* ============================================================
    ELEVATION
 
-   Four card levels plus one inset. Shadows are warm-grey, never
-   pure black, and always long and soft — the object should look
-   like it is resting on paper.
+   Cards and the page share a fill now, so elevation is the only
+   thing separating an object from the paper it rests on. The
+   shadows below are correspondingly a little more present than
+   they were when a card was also a different colour — still warm
+   grey, never pure black, still long and soft.
 
    Every shadow here is a plain box-shadow so it follows the
    element's own border-radius. Nothing in the system paints a
    shadow on a different element from the one carrying the radius —
-   that is what produced the sharp-corner artefact on the fan cards.
+   that is what produced the dark wedge at the card corners.
    ============================================================ */
 
 export const elevation = {
   none: 'none',
-  /** a record strip resting on the page */
-  low: '0 12px 30px -22px rgba(40,36,28,0.45)',
+  /** a record resting on the page */
+  low: '0 10px 26px -18px rgba(40,36,28,0.42), 0 2px 5px -3px rgba(40,36,28,0.10)',
   /** the default card */
-  medium: '0 16px 40px -26px rgba(40,36,28,0.45)',
-  /** hover / lifted */
-  high: '0 30px 62px -28px rgba(40,36,28,0.50)',
-  /** the opened pattern, the modal */
-  overlay: '0 50px 96px -34px rgba(40,36,28,0.55)',
-  /** the recessed well inside a card */
-  inset: [
-    'inset 0 0 18px 3px rgba(255,255,255,0.92)',
-    'inset 0 0 0 1px rgba(255,255,255,0.85)',
-    'inset 0 0 0 2px rgba(255,255,255,0.40)',
-    'inset 0 0 0 1px rgba(120,110,92,0.05)',
-  ].join(', '),
-  /** floating chrome — the nav track, the settings button */
-  floating: [
-    '0 18px 44px -22px rgba(40,36,28,0.55)',
-    '0 2px 6px -3px rgba(40,36,28,0.18)',
-  ].join(', '),
-  /** the white pill riding inside a track */
-  pill: [
-    '0 6px 16px -6px rgba(40,36,28,0.34)',
-    '0 1px 2px rgba(40,36,28,0.08)',
-  ].join(', '),
+  medium: '0 18px 42px -24px rgba(40,36,28,0.50), 0 3px 8px -4px rgba(40,36,28,0.12)',
+  /** hovered, or otherwise lifted */
+  high: '0 30px 62px -26px rgba(40,36,28,0.54), 0 4px 10px -5px rgba(40,36,28,0.14)',
+  /** the opened pattern, above the dim */
+  overlay: '0 50px 96px -34px rgba(40,36,28,0.58), 0 6px 14px -6px rgba(40,36,28,0.16)',
   /** the figma-style hover ring — a spread shadow, so it follows the radius */
   selectRing: '0 0 0 1.5px #0D99FF',
 } as const;

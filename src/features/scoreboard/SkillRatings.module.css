@@ -1,0 +1,66 @@
+/* ============================================================
+   SKILL RATINGS
+
+   One tall card holding the whole centre column: two rating
+   groups and then, under them, the single thing worth working on
+   next. Where-to-work-next used to be its own tile, which made it
+   look like a second, competing reading rather than the
+   conclusion of the first one.
+   ============================================================ */
+.card {
+  gap: var(--aera-space-4);
+  text-align: left;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--aera-space-5);
+}
+
+.top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--aera-space-9);
+  flex-wrap: wrap;
+}
+
+.source {
+  max-width: var(--aera-layout-max-read-width);
+}
+
+/* the centre column is narrow, so the two groups stack rather than
+   sitting side by side the way the old full-width panel did */
+/* Ten rows, two group labels and a focus section share one screen
+   with everything else, so the rows are tight by design — and the
+   block does not shrink. Letting it shrink made its rows spill out
+   the bottom and collide with the focus section underneath. */
+.groups {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  gap: var(--aera-space-5);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-2);
+}
+
+/* ---- where to work next: a section of this card, at the bottom ---- */
+.next {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  gap: var(--aera-space-3);
+  margin-top: auto;
+  padding-top: var(--aera-space-5);
+  border-top: 1px solid var(--aera-color-utility-hairline);
+}
+

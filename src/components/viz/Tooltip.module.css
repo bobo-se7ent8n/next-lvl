@@ -1,6 +1,13 @@
+/* ============================================================
+   TOOLTIP
+
+   Painted at the document root, never inside the card it describes.
+   Cards clip to their own radius, so an anchored tip was being cut
+   off the moment it crossed an edge.
+   ============================================================ */
 .tip {
   position: absolute;
-  z-index: 40;
+  z-index: 980;
   pointer-events: none;
   opacity: 0;
   transform: translate(-50%, -118%);
@@ -10,9 +17,13 @@
   padding: var(--aera-space-4) var(--aera-space-6);
   white-space: nowrap;
   font-family: var(--aera-text-body-family);
-  font-size: var(--aera-text-body-xs-size);
+  font-size: var(--aera-text-body-sm-size);
   line-height: 1.45;
   transition: opacity var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.fixed {
+  position: fixed;
 }
 
 .on {

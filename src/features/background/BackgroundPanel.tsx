@@ -25,7 +25,7 @@ export function BackgroundPanel({ settings, onChange, inline, className }: Backg
   ) => onChange({ ...settings, [key]: { ...settings[key], ...value } });
 
   const body = (
-    <Card radius="shell" padding="10" elevation="overlay" className={styles.body}>
+    <Card radius="card" padding="10" elevation="overlay" className={styles.body}>
       <div className={styles.group}>
         <div className={styles.groupHead}>
           <Label>Vertical lines</Label>

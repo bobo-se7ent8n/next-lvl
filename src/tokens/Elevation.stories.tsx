@@ -34,11 +34,11 @@ export const Levels: Story = {
               style={{
                 width: '100%',
                 height: 72,
-                borderRadius: 'var(--aera-radius-panel)',
+                borderRadius: 'var(--aera-radius-card)',
                 background:
                   name === 'inset'
-                    ? 'var(--aera-color-surface-well)'
-                    : 'var(--aera-color-surface-panel)',
+                    ? 'var(--aera-color-surface-level1)'
+                    : 'var(--aera-color-surface-background)',
                 boxShadow: value,
               }}
             />

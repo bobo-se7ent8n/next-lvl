@@ -20,8 +20,8 @@ export function StatRow({ label, value, inline, inherit, className }: StatRowPro
       <span className={cx(styles.row, styles.inline, className)}>
         <Text
           as="b"
-          variant="metricSM"
-          tone={inherit ? 'inherit' : 'numeral'}
+          variant="metricMD"
+          tone={inherit ? 'inherit' : 'primary'}
           numeric
         >
           {value}
@@ -38,8 +38,8 @@ export function StatRow({ label, value, inline, inherit, className }: StatRowPro
       </Text>
       <Text
         as="b"
-        variant="metricSM"
-        tone={inherit ? 'inherit' : 'numeral'}
+        variant="metricMD"
+        tone={inherit ? 'inherit' : 'primary'}
         numeric
         className={styles.value}
       >
