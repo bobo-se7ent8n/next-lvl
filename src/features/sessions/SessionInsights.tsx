@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { cx } from '../../lib/css';
 import { Chip } from '../../components/primitives/Chip';
@@ -16,6 +17,12 @@ export interface SessionInsightsProps {
   className?: string;
 }
 
+/** where the block's notch has to point. The track area starts one
+ *  label column plus one gap in from the card edge, so the chip's
+ *  position along the lane has to be mapped back onto the block's
+ *  own width to line the notch up with it. */
+const TRACK_INSET = 'calc(var(--aera-space-16) + var(--aera-space-8))';
+
 /** The block under the timeline. Exactly one is on screen at a time —
  *  the one the playhead is standing on — rather than all of them at
  *  once with the unreached ones greyed out. Clicking the description
@@ -31,7 +38,15 @@ export function SessionInsights({ insights, playhead, className }: SessionInsigh
             key={insight.id}
             to={`${ROUTES.insights}#${insight.insightId}`}
             className={styles.block}
+            /* the notch points at the chip this block belongs to,
+               which is at the insight's own position along the lane */
+            style={
+              {
+                '--notch': `calc(${TRACK_INSET} + (100% - ${TRACK_INSET}) * ${insight.at.toFixed(4)})`,
+              } as CSSProperties
+            }
           >
+            <span className={styles.notch} aria-hidden="true" />
             {/* the chips sit in their own row above the title. They
                 used to share a grid column with it, which is what put
                 PATTERN CANDIDATE straight through the heading. */}
@@ -56,11 +71,7 @@ export function SessionInsights({ insights, playhead, className }: SessionInsigh
             </span>
           </Link>
         ))
-      ) : (
-        <Label tone="tertiary" className={styles.empty}>
-          move the playhead onto a marker to read what was noticed there
-        </Label>
-      )}
+      ) : null}
     </div>
   );
 }

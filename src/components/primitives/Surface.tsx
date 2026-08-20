@@ -75,22 +75,29 @@ export function Surface({
   );
 }
 
-export interface WellProps extends Omit<SurfaceProps, 'level' | 'elevation'> {
+export interface WellProps extends Omit<SurfaceProps, 'level' | 'elevation' | 'padding'> {
   /** the aspect the well holds, e.g. '5 / 3' */
   ratio?: string;
 }
 
-/** The recessed frame inside a card. Its padding is one step for the
- *  whole product and its content is bottom-aligned, so a chart sits on
- *  the floor of the well instead of floating at the top of it. */
-export function Well({ ratio, radius = 'lg', padding = '6', style, ...rest }: WellProps) {
+/** THE INNER CONTAINER — the one recessed frame in the product.
+ *
+ *  Every region inside a card that holds a chart, a dot field or a
+ *  pattern candidate is one of these: level1 fill, the lg corner, one
+ *  padding step, and the white light around all four inside edges that
+ *  makes it read as pressed INTO the card rather than sitting on it.
+ *  The padding and the inset light are tokens, defined once, so there
+ *  is no second version of this treatment anywhere.
+ *
+ *  Content is bottom-aligned: top-aligning left a gap under every
+ *  chart in the product. */
+export function Well({ ratio, radius = 'lg', style, ...rest }: WellProps) {
   return (
     <Surface
       {...rest}
       level="level1"
       elevation="none"
       radius={radius}
-      padding={padding}
       className={cx(styles.well, rest.className)}
       style={{ ...(ratio ? { aspectRatio: ratio } : null), ...style }}
     />

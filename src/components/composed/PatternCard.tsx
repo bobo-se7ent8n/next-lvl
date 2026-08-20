@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
 import { inkOn, tintOf, vizWell } from '../../lib/color';
 import { Card } from '../primitives/Card';
-import { Display, Label, Text } from '../primitives/Text';
+import { Display, Text } from '../primitives/Text';
 import { Metric } from '../primitives/Metric';
 import { Sparkline } from '../viz/Sparkline';
 import { BarSet } from '../viz/BarSet';
@@ -21,10 +21,15 @@ export interface PatternCardProps {
   style?: CSSProperties;
 }
 
-/** the compact viz on a card front, chosen by the pattern's own shape */
+/* The graphic fills its slot rather than sitting at a fixed strip
+   height. A number rather than a token because it is an SVG box
+   height in px, the same way the chart primitives take one. */
+const GRAPHIC_H = 200;
+
+/** the graphic on a card front, chosen by the pattern's own shape */
 function CardViz({ pattern, tint }: { pattern: Pattern; tint: string }) {
   if (pattern.viz === 'bars') {
-    return <BarSet items={pattern.bars} height={62} showValues={false} radius="md" inherit />;
+    return <BarSet items={pattern.bars} height={GRAPHIC_H} showValues={false} radius="md" inherit />;
   }
   if (pattern.viz === 'dots') {
     const filled = Math.round((pattern.series[pattern.series.length - 1] / 100) * 24);
@@ -38,7 +43,7 @@ function CardViz({ pattern, tint }: { pattern: Pattern; tint: string }) {
       />
     );
   }
-  return <Sparkline values={pattern.series} color={tint} height={58} weight={2.5} />;
+  return <Sparkline values={pattern.series} color={tint} height={GRAPHIC_H} weight={2.5} />;
 }
 
 /** the fan card front — label, headline reading, a neutral trend line,
@@ -59,39 +64,42 @@ export function PatternCard({
     <Card
       face={pattern.fill}
       radius="card"
-      padding="8"
-      /* hover changes the outline and the fill, never the height —
-         a card that lifts under the pointer is playfulness, and the
-         register here is resistance */
-      elevation="medium"
       outlined={hovered}
       interactive
       onClick={onClick}
       ariaLabel={`${pattern.name}: ${pattern.hero}${pattern.unit}`}
-      clip={false}
       className={cx(styles.card, className)}
       style={{ color: ink, ...style }}
     >
+      {/* 1 — TITLE AND TAG. The title leads the card now; it used to
+          sit at the very bottom, under the graphic, which made the
+          card read from the number upward. The pill is on a light
+          fill so it holds against a saturated face. */}
       <div className={styles.head}>
-        <Label tone="inherit">{pattern.kind}</Label>
+        <Display size="md" as="h3" tone="inherit" className={styles.title}>
+          {pattern.name}
+        </Display>
+        <span className={styles.tag}>{pattern.kind}</span>
       </div>
 
-      <Metric value={pattern.hero} unit={pattern.unit} size="md" inherit />
+      {/* 2 — the reading */}
+      <Metric value={pattern.hero} unit={pattern.unit} size="lg" inherit />
 
+      {/* 3 — the line under it */}
       <Text variant="bodySM" tone="inherit" className={styles.trend}>
         {pattern.trend}
       </Text>
 
+      {/* 4 — THE GRAPHIC, and it takes everything left. A swappable
+          slot: whatever renders inside is free to change without the
+          card's layout knowing, which is the point — these will be
+          generated artwork later, not dot fields. */}
       <div
         className={styles.viz}
         style={{ '--viz-well': vizWell(pattern.fill) } as CSSProperties}
       >
         <CardViz pattern={pattern} tint={tint} />
       </div>
-
-      <Display size="md" as="h3" tone="inherit" className={styles.title}>
-        {pattern.name}
-      </Display>
 
       {showTag ? (
         <span className={cx(styles.nameTag, hovered && styles.tagOn)}>

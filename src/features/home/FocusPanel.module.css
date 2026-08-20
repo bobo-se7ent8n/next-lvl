@@ -7,16 +7,23 @@
    whatever height is left after the reading and the three beats.
    ============================================================ */
 .card {
-  gap: var(--aera-space-7);
+  /* gap is a no-op on a block box — this must stay flex */
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-card-gap);
   text-align: left;
   min-height: 0;
 }
 
+/* the header row: label left, pill hard right — the same
+   space-between header every other card uses. The pill used to sit
+   immediately after the label, which made this the one card in the
+   product whose header did not line up with the rest. */
 .top {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--aera-space-5);
-  flex-wrap: wrap;
 }
 
 /* the graphic well — bottom-aligned like every other well, and the
@@ -27,9 +34,10 @@
   flex-direction: column;
   justify-content: flex-end;
   min-height: var(--aera-space-15);
-  padding: var(--aera-space-6);
+  padding: var(--aera-inner-padding);
   border-radius: var(--aera-radius-lg);
   background: var(--aera-color-surface-level1);
+  box-shadow: var(--aera-surface-inner-glow);
 }
 
 .graphicAxis {

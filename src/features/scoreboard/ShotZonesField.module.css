@@ -13,10 +13,11 @@
    edges to clip a label against.
    ============================================================ */
 .card {
-  gap: var(--aera-space-6);
+  /* gap is a no-op on a block box — this must stay flex */
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-card-gap);
   text-align: left;
-  height: 100%;
-  min-height: 0;
 }
 
 .head {
@@ -34,15 +35,12 @@
   flex-wrap: wrap;
 }
 
-/* the graphic is the elastic part of the card: it takes whatever the
-   readings and the legends leave, which is what keeps the whole
-   scoreboard on one screen */
+/* the court carries its own aspect now that the card hugs rather than
+   stretches — it used to take whatever a fixed-height card had left */
 .court {
   display: block;
-  flex: 1 1 auto;
-  min-height: 0;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 50 / 47;
   border-radius: var(--aera-radius-lg);
   background: var(--aera-color-surface-level1);
 }
@@ -73,39 +71,49 @@
 }
 
 /* ---- interaction ----
-   A zone lifts by having every other zone drop, so the active
-   neighbourhood is the only thing at full strength. The dots never
-   move and nothing is outlined: the reading changes, the map does
-   not. */
-.zone {
-  opacity: 1;
+   THE HOVERED ZONE STAYS; THE REST FADE. NOTHING RESIZES.
+
+   The fade is an opacity on each DOT, set in the component, not on
+   a wrapper `<g>`. A group opacity composites the whole zone as a
+   single layer — the wrong unit for a field whose meaning is
+   carried by the relative weight of individual dots. It is also
+   why this never appeared to work: the stylesheet was still
+   matching `[data-muted]` while the component had moved on to a
+   different attribute, so the selector simply never fired.
+
+   Size is untouched at every state. A dot that shrank under the
+   pointer would be lying about how often that shot gets taken. */
+.field {
   /* drawing only — the hit layer above takes every pointer event */
   pointer-events: none;
-  transition: opacity var(--aera-duration-base) var(--aera-ease-out);
+}
+
+.dot {
+  transition: opacity var(--aera-duration-fast) var(--aera-ease-out);
 }
 
 .hit {
   cursor: pointer;
 }
 
-.zone[data-muted] {
-  opacity: 0.22;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .zone {
+  .dot {
     transition: none;
   }
 }
 
-/* the zone reading, in the header where the session line was */
+/* THE ZONE READING — one line, never two.
+
+   Zone, split and comparison are one fact about one place on the
+   floor, so they are one row. Wrapping is off: a reading that
+   reflows to two lines as you move the pointer makes the header
+   jump, and the header is the one thing on this card that must not
+   move while you are reading the map. */
 .readout {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--aera-space-1);
-  text-align: right;
   min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ramp {

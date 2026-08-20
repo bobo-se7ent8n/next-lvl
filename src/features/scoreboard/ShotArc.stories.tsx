@@ -10,7 +10,7 @@ const meta: Meta<typeof ShotArc> = {
     docs: {
       description: {
         component:
-          'The trajectory is solved rather than drawn: given a release angle, a release height and a distance to the ring there is exactly one parabola that arrives at rim height. The apex marker sits on the mathematical peak, the angle wedge is anchored at the release point, the ground line spans the frame, and the ball travels the path as a looped dot trail in the same dot language as every other graphic.',
+          'The trajectory: a true parabola solved from the release height, the distance and the arc angle. Every label inside the diagram is one size and ONE COLOUR — they were three sizes and two weights in three different inks, so the diagram looked annotated by three different people. The caption sits directly under the header row rather than at the foot, where it read as a footnote to the stat rows. The chart container is a Well.',
       },
     },
   },

@@ -22,6 +22,9 @@ const LINE = colorInk.tertiary;
 const MARK = { keep: 0.3, faint: 0.12 } as const;
 
 /* the ends of the FG% ramp the legend draws, as fractions */
+/** how far a dot outside the hovered zone recedes */
+const DOT_FADE = 0.18;
+
 const RAMP_FLOOR = 0.25;
 const RAMP_CEIL = 0.5;
 
@@ -134,7 +137,7 @@ export function ShotZonesField({ className }: ShotZonesFieldProps) {
     : 0;
 
   return (
-    <Card radius="card" padding="10" className={[styles.card, className].filter(Boolean).join(' ')}>
+    <Card radius="card" className={[styles.card, className].filter(Boolean).join(' ')}>
       <div className={styles.head}>
         <Display size="md" as="h3">
           Shot zones
@@ -147,13 +150,10 @@ export function ShotZonesField({ className }: ShotZonesFieldProps) {
       <div className={styles.top}>
         {reading ? (
           <>
-            <Metric value={reading.pct} unit="% FG" size="md" />
-            <div className={styles.readout}>
-              <Label>{reading.label}</Label>
-              <Text variant="bodySM" tone="tertiary" numeric>
-                {reading.makes} / {reading.attempts} · {reading.comparison}
-              </Text>
-            </div>
+            <Metric value={reading.pct} unit="% FG" size="md" static />
+            <Label tone="secondary" className={styles.readout}>
+              {reading.label} · {reading.makes}/{reading.attempts} · {reading.comparison}
+            </Label>
           </>
         ) : (
           <>
@@ -177,30 +177,37 @@ export function ShotZonesField({ className }: ShotZonesFieldProps) {
       >
         {/* the field first, the court over it. Dots are grouped per
             zone so one opacity carries the whole neighbourhood. */}
-        {ZONES.map((zone) => (
-          <g
-            key={zone.id}
-            className={styles.zone}
-            data-muted={active !== null && active !== zone.id ? '' : undefined}
-          >
-            {FIELD.dots
-              .filter((dot) => dot.zone === zone.id)
-              .map((dot) => {
-                const size = dotSizeFor(dot.frequency);
-                return (
-                  <rect
-                    key={dot.key}
-                    x={(dot.x - size / 2).toFixed(2)}
-                    y={(dot.y - size / 2).toFixed(2)}
-                    width={size.toFixed(2)}
-                    height={size.toFixed(2)}
-                    rx={dotMatrix.corner}
-                    fill={accuracyColor(dot.accuracy)}
-                  />
-                );
-              })}
-          </g>
-        ))}
+        {/* THE FADE IS PER-DOT, and it is an OPACITY on the rect
+            itself — not on a wrapper `<g>`. A group opacity composites
+            the whole group as one layer, which is both why the fade
+            never appeared to land and why it would have flattened the
+            density encoding if it had: every dot in a faded group
+            would have lost its own relative weight. Multiplying each
+            dot's own opacity keeps the field's internal contrast
+            intact while the zone recedes.
+
+            Size is untouched at every state. A dot that shrank under
+            the pointer would be lying about how often that shot gets
+            taken. */}
+        <g className={styles.field}>
+          {FIELD.dots.map((dot) => {
+            const size = dotSizeFor(dot.frequency);
+            const faded = active !== null && active !== dot.zone;
+            return (
+              <rect
+                key={dot.key}
+                className={styles.dot}
+                x={(dot.x - size / 2).toFixed(2)}
+                y={(dot.y - size / 2).toFixed(2)}
+                width={size.toFixed(2)}
+                height={size.toFixed(2)}
+                rx={dotMatrix.corner}
+                fill={accuracyColor(dot.accuracy)}
+                opacity={faded ? DOT_FADE : 1}
+              />
+            );
+          })}
+        </g>
 
         <CourtLines />
 

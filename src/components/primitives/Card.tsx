@@ -9,10 +9,12 @@ export interface CardProps {
   /** a face colour from the data palette; defaults to the panel surface */
   face?: string;
   radius?: RadiusStep;
+  /** Only set this on a card that genuinely floats — the opened
+   *  pattern above its dim. A card resting on the page carries the
+   *  2px stroke instead, and that is the default. */
   elevation?: ElevationLevel;
+  /** overrides the standard 20px card padding; leave unset normally */
   padding?: SpaceStep;
-  /** clip the contents to the radius */
-  clip?: boolean;
   fill?: boolean;
   /** renders as a button and lifts on hover */
   interactive?: boolean;
@@ -32,9 +34,8 @@ export function Card({
   children,
   face,
   radius = 'card',
-  elevation = 'medium',
-  padding = '10',
-  clip = true,
+  elevation,
+  padding,
   fill,
   interactive,
   outlined,
@@ -55,9 +56,15 @@ export function Card({
       disabled={interactive && disabled ? true : undefined}
       className={cx(
         styles.card,
-        clip && styles.clip,
         fill && styles.fill,
-        interactive && styles.interactive,
+        /* TWO TREATMENTS, AND THEY ARE MUTUALLY EXCLUSIVE.
+           A clickable card floats: it has a shadow and no stroke,
+           because it is an object you can pick up. A non-clickable
+           one is flat: it has the 2px stroke and no shadow, because
+           it is a region of the page. Deciding this here — from the
+           one prop that already says which it is — is what stops the
+           two treatments getting mixed on individual cards. */
+        interactive ? styles.interactive : styles.stroked,
         outlined && styles.outlined,
         disabled && styles.disabled,
         className,
@@ -67,8 +74,12 @@ export function Card({
           '--card-bg': face ?? 'var(--aera-color-surface-background)',
           '--card-ink': face ? inkOn(face) : 'var(--aera-color-ink-primary)',
           '--card-radius': tokenVar('radius', radius),
-          '--card-shadow': tokenVar('elevation', elevation),
-          '--card-pad': tokenVar('space', padding),
+          '--card-shadow': elevation
+            ? tokenVar('elevation', elevation)
+            : interactive
+              ? tokenVar('elevation', 'low')
+              : undefined,
+          '--card-pad': padding ? tokenVar('space', padding) : undefined,
           ...style,
         } as CSSProperties
       }

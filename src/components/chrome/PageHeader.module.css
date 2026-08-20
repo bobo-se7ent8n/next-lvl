@@ -41,3 +41,64 @@
     padding-bottom: var(--aera-space-12);
   }
 }
+
+/* ---- the switchable headings -----------------------------------
+   The heading IS the control. Both sit on one line at the display
+   size; the active one is full ink and the inactive one drops to
+   the tertiary ink token — a real colour, not an opacity, so it
+   stays a token value rather than a computed ghost of one.
+
+   The affordance has to be unmistakable, because a headline does
+   not normally do anything: pointer cursor, and the inactive one
+   travels toward the active colour under the pointer.
+   ---------------------------------------------------------------- */
+.views {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--aera-space-11);
+}
+
+.view {
+  color: var(--aera-color-ink-tertiary);
+  cursor: pointer;
+  transition:
+    color var(--aera-duration-fast) var(--aera-ease-out),
+    transform var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.view:hover {
+  color: var(--aera-color-ink-primary);
+}
+
+.view:active {
+  transform: scale(0.985);
+  transition-duration: var(--aera-duration-press);
+}
+
+.view:focus-visible {
+  outline: 2px solid var(--aera-color-utility-focus);
+  outline-offset: 4px;
+  border-radius: var(--aera-radius-sm);
+}
+
+.viewOn {
+  color: var(--aera-color-ink-primary);
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view {
+    transition: none;
+  }
+  .view:active {
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .views {
+    gap: var(--aera-space-8);
+  }
+}

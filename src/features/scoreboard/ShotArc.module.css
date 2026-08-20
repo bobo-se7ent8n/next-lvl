@@ -8,11 +8,11 @@
    way the court does on the zones card.
    ============================================================ */
 .card {
-  gap: var(--aera-space-6);
+  /* gap is a no-op on a block box — this must stay flex */
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-card-gap);
   text-align: left;
-  flex: 1 1 auto;
-  height: 100%;
-  min-height: 0;
 }
 
 .head {
@@ -22,15 +22,35 @@
   gap: var(--aera-space-5);
 }
 
+/* the chart's own container is a Well — the one inner treatment.
+   It carries the diagram's own aspect rather than taking whatever a
+   stretched card had left, which is what collapsed it to a sliver. */
+.arcWell {
+  width: 100%;
+  aspect-ratio: 5 / 3;
+}
+
 .arc {
   display: block;
-  flex: 1 1 auto;
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: var(--aera-space-6);
-  border-radius: var(--aera-radius-lg);
-  background: var(--aera-color-surface-level1);
+}
+
+/* EVERY LABEL IN THE DIAGRAM IS THE SAME LABEL.
+
+   One size and ONE COLOUR. They were three sizes and two weights of
+   Inter in three different inks — `46°` was near-black while the
+   rest were grey, so the diagram looked annotated by three different
+   people. The colour is set here rather than per-element, which is
+   what let them drift apart in the first place. */
+.mark {
+  font-family: var(--aera-text-mono-sm-family);
+  font-size: var(--aera-text-mono-sm-size);
+  font-weight: var(--aera-text-mono-sm-weight);
+  letter-spacing: var(--aera-text-mono-sm-tracking);
+  text-transform: uppercase;
+  fill: var(--aera-color-ink-tertiary);
 }
 
 /* the ball travels the path once per loop. Subtle by design: the
@@ -61,6 +81,14 @@
 }
 
 .source {
-  padding-top: var(--aera-space-2);
-  opacity: 0.75;
+  flex: 0 0 auto;
+}
+
+/* a degree tight to its number, raised — never a baseline glyph
+   sitting behind the unit slot's gap */
+.degree {
+  font-size: 0.55em;
+  line-height: 1;
+  vertical-align: super;
+  letter-spacing: 0;
 }

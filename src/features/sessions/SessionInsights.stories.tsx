@@ -30,7 +30,7 @@ const meta: Meta<typeof SessionInsights> = {
     docs: {
       description: {
         component:
-          'The block under the timeline. Exactly one is on screen — the one the playhead is standing on — rather than every block at once with the unreached ones greyed out. Everything in it stacks, so the pattern-candidate chip can no longer run through the title. Clicking the description goes through to the full insight: this is the join between a session and a pattern candidate, and it is the same chip the session card carries in the list.',
+          'The block under the timeline. Exactly one is on screen — the one the playhead is standing on — and it hangs off that chip rather than sitting centred in the card, with a small upward notch positioned from the insight’s own place along the lane so it points at its own chip. The empty "move the playhead onto a marker" placeholder is gone.',
       },
     },
   },

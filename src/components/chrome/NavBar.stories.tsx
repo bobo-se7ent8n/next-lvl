@@ -18,7 +18,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'The main nav: one capsule track, centred at the top of the page, with the active item as a white pill riding inside it. Stories render it inline; the app renders it fixed.',
+          'The main nav — fixed to the bottom of the viewport and centred on it, never on the content column. The active item changes exactly one thing, its fill: no border, no padding change and no weight change, because a semibold label is wider than a medium one and re-measured the whole track every time you switched tabs. Every item also reserves the same width, so which one is current can never reflow its neighbours. The bar sits at identical coordinates on all four tabs.',
       },
     },
   },

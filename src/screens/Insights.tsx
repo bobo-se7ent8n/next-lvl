@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PageHeader } from '../components/chrome/PageHeader';
 import { ChatPanel, type ChatMessage } from '../components/composed/ChatPanel';
 import { InsightCard } from '../components/composed/InsightCard';
+import { columnize, columnCountFor } from '../lib/columns';
 import { askAera } from '../features/insights/askAera';
 import { ASK_SEEDS, INSIGHTS } from '../data';
 import styles from './Insights.module.css';
@@ -15,6 +16,16 @@ const OPENING: ChatMessage = {
 /** the library, unfiltered, beside the assistant. Everything here is
  *  pulled: nothing is pushed, ranked or marked urgent. */
 export function Insights() {
+  /* real flex columns, not CSS multi-column — see lib/columns.ts */
+  const [columns, setColumns] = useState(() =>
+    columnCountFor(typeof window === 'undefined' ? 1440 : window.innerWidth),
+  );
+  useEffect(() => {
+    const measure = () => setColumns(columnCountFor(window.innerWidth));
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
+
   const [messages, setMessages] = useState<ChatMessage[]>([OPENING]);
 
   const send = (text: string) => {
@@ -39,8 +50,12 @@ export function Insights() {
         </div>
 
         <div className={styles.grid}>
-          {INSIGHTS.map((insight) => (
-            <InsightCard key={insight.id} insight={insight} id={insight.id} />
+          {columnize(INSIGHTS, columns).map((column, i) => (
+            <div key={i} className={styles.column}>
+              {column.map((insight) => (
+                <InsightCard key={insight.id} insight={insight} id={insight.id} />
+              ))}
+            </div>
           ))}
         </div>
       </div>

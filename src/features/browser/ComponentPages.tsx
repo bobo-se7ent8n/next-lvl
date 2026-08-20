@@ -28,13 +28,13 @@ import { ChatPanel } from '../../components/composed/ChatPanel';
 import { PatternFan } from '../../features/patterns/PatternFan';
 import { MotionStage } from '../../features/sessions/MotionStage';
 import { SessionInsights } from '../../features/sessions/SessionInsights';
-import { PointsBlock } from '../../features/scoreboard/PointsBlock';
+import { ShotTrend } from '../../features/scoreboard/ShotTrend';
 import { SplitLayout } from '../../components/chrome/SplitLayout';
 import { ExpandedCard } from '../../features/patterns/ExpandedCard';
 import { ActivityCalendar } from '../../features/sessions/ActivityCalendar';
 import { SessionTimeline } from '../../features/sessions/SessionTimeline';
 import { ShotZonesField } from '../../features/scoreboard/ShotZonesField';
-import { SkillRatings } from '../../features/scoreboard/SkillRatings';
+import { SkillRatings, WhereToWorkNext } from '../../features/scoreboard/SkillRatings';
 import { ShotArc } from '../../features/scoreboard/ShotArc';
 import { FocusPanel } from '../../features/home/FocusPanel';
 import { VitalCard } from '../../features/home/VitalCard';
@@ -241,7 +241,7 @@ export function TooltipPage() {
           on the card, or on anything above it, cut them off. This one is portalled to the body and
           positioned in viewport coordinates instead.
         </Note>
-        <Card radius="card" padding="11" clip>
+        <Card radius="card" padding="11">
           <div
             onPointerEnter={(e) => {
               const r = e.currentTarget.getBoundingClientRect();
@@ -521,7 +521,7 @@ export function SessionInsightsPage() {
   );
 }
 
-export function PointsBlockPage() {
+export function ShotTrendPage() {
   return (
     <BrowserSection title="The number, the session it came from, and the band it sits inside">
       <Note>
@@ -530,7 +530,7 @@ export function PointsBlockPage() {
         scoreboard is for.
       </Note>
       <div style={{ maxWidth: 'var(--aera-layout-max-prose-width)' }}>
-        <PointsBlock />
+        <ShotTrend />
       </div>
     </BrowserSection>
   );
@@ -582,14 +582,22 @@ export function ShotZonesPage() {
 
 export function SkillRatingsPage() {
   return (
-    <BrowserSection title="Two groups, and then the one thing worth working on">
+    <BrowserSection title="Two cards: the ratings, and the conclusion drawn from them">
       <Note>
-        Where-to-work-next is a section at the bottom of this card rather than a tile beside it —
-        the same relationship Focus has to the vitals on Home: the stats first, then the single
-        thing they point at.
+        Where-to-work-next is its own card rather than a section under the ratings. Behind a
+        divider inside one card it read as a footnote to the numbers above it, when it is the
+        thing those numbers are for. Each entry is a rating row and one line saying what that
+        number actually does — never what to do about it.
       </Note>
-      <div style={{ maxWidth: 'var(--aera-layout-max-prose-width)' }}>
+      <div
+        style={{
+          maxWidth: 'var(--aera-layout-max-prose-width)',
+          display: 'grid',
+          gap: 'var(--aera-space-8)',
+        }}
+      >
         <SkillRatings />
+        <WhereToWorkNext />
       </div>
     </BrowserSection>
   );

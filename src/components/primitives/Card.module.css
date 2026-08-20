@@ -6,15 +6,32 @@
    one holding the radius — that is exactly what produced the dark
    wedge at the card corners.
 
-   TACTILITY. The register is resistance, not playfulness. A card
-   answers the pointer by shifting its own fill, never by lifting
-   or growing; a press compresses it a fraction and releases
-   cleanly. There is no overshoot anywhere in here, because a
-   product that pulls rather than pushes has no business bouncing.
+   NO DROP SHADOW. A card resting on the page is separated from
+   it by a 2px stroke sitting OUTSIDE its edge, painted as a
+   spread box-shadow so it costs no layout. A shadow says the
+   object could be picked up, and most of these cannot. Only a
+   card that genuinely floats — the opened pattern, above its dim
+   — asks for an elevation.
 
-   Non-clickable cards get the same fill shift and keep the default
-   cursor, so a surface reads as responsive without reading as a
-   target.
+   TACTILITY. The register is resistance, not playfulness. A
+   clickable card lifts a little and compresses under the press;
+   there is no overshoot anywhere in here, because a product that
+   pulls rather than pushes has no business bouncing.
+
+   THE CARD IS A FLEX COLUMN, ALWAYS. `gap` is a no-op on a
+   `display: block` box — Chrome says so out loud in devtools —
+   and that one fact is why card spacing kept failing to land no
+   matter which token it was given. Every composed card layers its
+   own class on top of this one; none of them may set `display`
+   back to block.
+
+   AND IT DOES NOT CLIP. The `clip` class is gone: a card that
+   clips cuts off the very thing the spacing was meant to reveal.
+
+   A NON-CLICKABLE CARD IS INERT. It has no hover state at all —
+   not a fill shift, not a cursor. Anything that answers the
+   pointer is claiming to be a target, and a card that is not one
+   must not make that claim.
    ============================================================ */
 .card {
   position: relative;
@@ -24,16 +41,31 @@
   background: var(--card-bg);
   color: var(--card-ink);
   border-radius: var(--card-radius);
-  padding: var(--card-pad);
-  box-shadow: var(--card-shadow);
+  padding: var(--card-pad, var(--aera-card-padding));
+  gap: var(--aera-card-gap);
+  box-shadow: var(--card-shadow, none);
   transition:
     box-shadow var(--aera-duration-fast) var(--aera-ease-out),
-    transform var(--aera-duration-press) var(--aera-ease-firm);
+    transform var(--aera-duration-base) var(--aera-ease-out);
+}
+
+/* A NON-CLICKABLE CARD: the stroke, and nothing else. No shadow,
+   no hover, no cursor — it is a region of the page, not a target. */
+.stroked {
+  box-shadow: var(--aera-surface-stroke);
+}
+
+/* A CLICKABLE CARD: the shadow, and NO stroke. The two were being
+   applied together, which made every card look the same whether it
+   did anything or not. */
+.interactive {
+  box-shadow: var(--card-shadow);
 }
 
 /* the fill shift — a flat wash over the card's own face, never a
-   gradient and never a second colour */
-.card::after {
+   gradient and never a second colour. Only an INTERACTIVE card has
+   one; see the header note. */
+.interactive::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -43,12 +75,8 @@
   transition: background var(--aera-duration-fast) var(--aera-ease-out);
 }
 
-.card:hover::after {
+.interactive:hover::after {
   background: var(--aera-color-utility-hover);
-}
-
-.clip {
-  overflow: hidden;
 }
 
 .fill {
@@ -61,9 +89,30 @@
   width: 100%;
 }
 
-/* pressed: compress a little, and let go without a rebound */
+/* hover: a small, flat lift — no growth, no colour change */
+.interactive:hover {
+  transform: translateY(-2px);
+}
+
+/* pressed: compress, immediately, and let go without a rebound */
 .interactive:active {
-  transform: scale(0.993);
+  transform: scale(0.985);
+  transition-duration: var(--aera-duration-press);
+}
+
+/* the keyboard route through the product is visible */
+.card:focus-visible {
+  outline: 2px solid var(--aera-color-utility-focus);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .interactive:hover,
+  .interactive:active {
+    transition: none;
+    transform: none;
+  }
 }
 
 .interactive:active::after {

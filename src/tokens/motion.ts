@@ -20,6 +20,10 @@ export const duration = {
   fast: '160ms',
   base: '220ms',
   slow: '340ms',
+  /** one tab giving way to the next */
+  page: '260ms',
+  /** a number counting up to its value on page enter */
+  count: '600ms',
   /** the fan card opening into the expanded state */
   expand: '440ms',
   /** a long, quiet loop — the dot fields and the shot arc */

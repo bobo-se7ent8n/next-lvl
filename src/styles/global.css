@@ -81,8 +81,14 @@ ul {
   border: 3px solid var(--aera-color-surface-background);
 }
 
+/* THE KEYBOARD ROUTE THROUGH THE PRODUCT IS VISIBLE.
+
+   One ring, on a token colour, on everything focusable — a button, a
+   card, a nav item, a heading that switches a view. It is deliberately
+   global rather than per-component: a focus style that has to be
+   remembered is a focus style that gets forgotten. */
 :focus-visible {
-  outline: 2px solid var(--aera-color-ink-primary);
+  outline: 2px solid var(--aera-color-utility-focus);
   outline-offset: 3px;
   border-radius: var(--aera-radius-md);
 }
@@ -94,5 +100,28 @@ ul {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---- RESISTANCE, GLOBALLY --------------------------------------
+   Every button in the product compresses under the press and lets
+   go cleanly. Components that need more than this — a lift, a fill
+   shift — add it themselves; this is the floor, so nothing ends up
+   feeling dead just because nobody remembered it.
+   ---------------------------------------------------------------- */
+button:not(:disabled) {
+  transition: transform var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+button:not(:disabled):active {
+  transform: scale(0.985);
+  transition-duration: var(--aera-duration-press);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled),
+  button:not(:disabled):active {
+    transition: none;
+    transform: none;
   }
 }

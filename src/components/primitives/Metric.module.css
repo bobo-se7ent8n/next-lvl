@@ -33,3 +33,17 @@
   justify-content: center;
   align-items: center;
 }
+
+/* THE DEGREE IS A SUPERSCRIPT, AND IT TOUCHES THE NUMBER.
+
+   It used to be the first character of the unit string, which put
+   it on the baseline with the unit slot's gap in front of it:
+   `+3 °`. Here it is part of the value, raised, with no space
+   before it at all. */
+.degree {
+  font-size: 0.55em;
+  line-height: 1;
+  vertical-align: super;
+  margin-left: 0;
+  letter-spacing: 0;
+}

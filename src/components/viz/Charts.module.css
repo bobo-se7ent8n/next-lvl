@@ -137,3 +137,19 @@
   background: var(--aera-color-ink-primary);
   transform: translateX(-50%);
 }
+
+/* the sparkline's end marker — a true circle, outside the stretched
+   SVG so no non-uniform scale can flatten it into an ellipse */
+.endDot {
+  position: absolute;
+  left: var(--dot-x);
+  top: var(--dot-y);
+  width: var(--dot-size);
+  height: var(--dot-size);
+  margin-left: calc(var(--dot-size) / -2);
+  margin-top: calc(var(--dot-size) / -2);
+  border-radius: var(--aera-radius-pill);
+  background: var(--dot-color);
+  pointer-events: none;
+  transition: opacity var(--aera-duration-fast) var(--aera-ease-out);
+}

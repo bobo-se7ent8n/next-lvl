@@ -92,6 +92,14 @@ export const textStyle = {
     letterSpacing: '-0.02em',
     fontWeight: fontWeight.bold,
   },
+  /** the stat number on a session card — a reading, not a headline */
+  metricSM: {
+    fontFamily: fontFamily.display,
+    fontSize: '16px',
+    lineHeight: '1',
+    letterSpacing: '-0.01em',
+    fontWeight: fontWeight.bold,
+  },
 
   /* ---- body · Inter ---- */
   body: {
@@ -108,8 +116,27 @@ export const textStyle = {
     letterSpacing: '0',
     fontWeight: fontWeight.regular,
   },
+  /** a group heading inside a card — sentence case, bold, never mono */
+  bodyStrong: {
+    fontFamily: fontFamily.body,
+    fontSize: '14.5px',
+    lineHeight: '1.4',
+    letterSpacing: '0',
+    fontWeight: fontWeight.semibold,
+  },
 
   /* ---- mono · the annotation voice of the whole product ---- */
+  /** the smallest annotation in the product — labels sitting INSIDE a
+   *  diagram, where the drawing is the content and the label is only
+   *  there to name what you are already looking at */
+  monoSM: {
+    fontFamily: fontFamily.mono,
+    fontSize: '8px',
+    lineHeight: '1.3',
+    letterSpacing: '0.1em',
+    textTransform: 'uppercase',
+    fontWeight: fontWeight.regular,
+  },
   mono: {
     fontFamily: fontFamily.mono,
     fontSize: '10px',

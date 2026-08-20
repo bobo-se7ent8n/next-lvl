@@ -1,5 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { cx } from '../../lib/css';
+import { useCountUpText } from '../../lib/enter';
+import { useEnterKey } from '../../lib/enterContext';
 import { Label } from './Text';
 import styles from './Metric.module.css';
 
@@ -28,8 +30,25 @@ export interface MetricProps {
   /** inherit the card's ink instead of the numeral colour */
   inherit?: boolean;
   align?: 'start' | 'center';
+  /** opt out of the count-up — a value that is not a reading */
+  static?: boolean;
+  /** append a true superscript degree, tight to the number. Written
+   *  as a separate flag rather than as part of the value because a
+   *  degree glyph in the unit slot sat on the baseline with the
+   *  unit's own leading space in front of it — `+3 °` rather than
+   *  `+3°`. */
+  degree?: boolean;
   className?: string;
   style?: CSSProperties;
+}
+
+/** A reading counts up to itself on entry. Only a plain numeric string
+ *  is animated: anything else is passed straight through, so a value
+ *  that is a node or a word never flickers through nonsense. */
+function CountedValue({ value }: { value: ReactNode }) {
+  const enterKey = useEnterKey();
+  const text = useCountUpText(typeof value === 'string' ? value : '', enterKey);
+  return <>{typeof value === 'string' ? text : value}</>;
 }
 
 /** big number + unit — the headline reading of any card */
@@ -40,6 +59,8 @@ export function Metric({
   caption,
   inherit,
   align = 'start',
+  static: isStatic,
+  degree,
   className,
   style,
 }: MetricProps) {
@@ -60,7 +81,10 @@ export function Metric({
         } as CSSProperties
       }
     >
-      <span className={styles.value}>{value}</span>
+      <span className={styles.value}>
+        {isStatic ? value : <CountedValue value={value} />}
+        {degree ? <sup className={styles.degree}>°</sup> : null}
+      </span>
       {unit ? <span className={styles.unit}>{unit}</span> : null}
     </div>
   );

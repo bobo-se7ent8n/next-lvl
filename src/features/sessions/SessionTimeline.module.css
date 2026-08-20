@@ -21,19 +21,105 @@
   text-align: left;
 }
 
-.head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+/* THE RULER ROW. There is no card header above it — the card starts
+   here. The play button occupies the SAME column as the track labels
+   below it, so the ruler's left edge and every lane's left edge are
+   one line. */
+.rulerRow {
+  display: grid;
+  grid-template-columns: var(--aera-space-16) minmax(0, 1fr);
   gap: var(--aera-space-8);
-  flex-wrap: wrap;
+  align-items: end;
+}
+
+.play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--aera-space-13);
+  height: var(--aera-space-13);
+  border-radius: var(--aera-radius-md);
+  background: var(--aera-color-surface-inverse);
+  color: var(--aera-color-ink-on-inverse);
+  cursor: pointer;
+  transition:
+    transform var(--aera-duration-fast) var(--aera-ease-out),
+    background var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.play svg {
+  width: 16px;
+  height: 16px;
+}
+
+.play:hover {
+  transform: translateY(-2px);
+}
+
+.play:active {
+  transform: scale(0.985);
+  transition-duration: var(--aera-duration-press);
+}
+
+.play:focus-visible {
+  outline: 2px solid var(--aera-color-utility-focus);
+  outline-offset: 3px;
+}
+
+.ruler {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-3);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.rulerLabels {
+  display: flex;
+  justify-content: space-between;
+}
+
+.rulerTicks {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: var(--aera-space-6);
+}
+
+.tick {
+  width: 1px;
+  height: 40%;
+  background: var(--aera-color-ink-tertiary);
+  opacity: 0.45;
+}
+
+.tickMajor {
+  height: 100%;
+  opacity: 0.7;
+}
+
+/* THE PLAYHEAD'S HANDLE — a triangle sitting on the tick row, with
+   the line running down from it through every track below. */
+.handle {
+  position: absolute;
+  left: var(--x);
+  bottom: 0;
+  width: 0;
+  height: 0;
+  margin-left: -5px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid var(--aera-color-ink-primary);
+  pointer-events: none;
 }
 
 .tracks {
   position: relative;
   display: grid;
   grid-template-columns: var(--aera-space-16) minmax(0, 1fr);
-  gap: var(--aera-space-5) var(--aera-space-8);
+  /* more air between tracks — they were cramped */
+  gap: var(--aera-space-9) var(--aera-space-8);
   align-items: center;
 }
 
@@ -88,8 +174,8 @@
   transform: translate(-50%, -50%);
   border-radius: var(--aera-radius-sm);
   padding: var(--aera-space-3) var(--aera-space-6);
-  background: var(--aera-color-data-lilac);
-  color: var(--aera-color-data-ink-lilac);
+  background: var(--aera-color-surface-inverse);
+  color: var(--aera-color-ink-on-inverse);
   white-space: nowrap;
   transition:
     background var(--aera-duration-fast) var(--aera-ease-out),
@@ -115,12 +201,15 @@
   pointer-events: none;
 }
 
+/* the line runs from the handle above, down through all four tracks
+   and into the active insight chip at the bottom */
 .playhead {
   position: absolute;
   top: 0;
   bottom: 0;
   left: var(--x);
   width: 2px;
+  margin-left: -1px;
   border-radius: var(--aera-radius-pill);
   background: var(--aera-color-ink-primary);
 }

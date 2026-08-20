@@ -16,7 +16,8 @@ export const radius = {
   xs: '4px',
   sm: '10px',
   md: '16px',
-  lg: '22px',
+  /** the recessed inner container — chart wells, candidate blocks */
+  lg: '24px',
   /** every card, panel and object shell in the product */
   card: '28px',
   pill: '999px',

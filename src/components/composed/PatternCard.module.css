@@ -1,36 +1,70 @@
 .card {
-  height: 100%;
-  gap: var(--aera-space-4);
-  text-align: left;
-  align-items: stretch;
-}
-
-.head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--aera-space-4);
-  opacity: 0.62;
-}
-
-/* a well holds its graphic on the floor, not floating at the top */
-.viz {
+  /* gap is a no-op on a block box — this must stay flex */
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  margin-top: auto;
-  margin-bottom: var(--aera-space-4);
-  padding: var(--aera-space-6);
-  border-radius: var(--aera-radius-md);
-  background: var(--viz-well);
+  height: 100%;
+  gap: var(--aera-card-gap);
+  text-align: left;
+  align-items: stretch;
+  /* nothing on a fan card is clipped, at any index */
+  overflow: visible;
 }
 
-.trend {
-  opacity: 0.66;
+/* 1 — title left, tag hard right */
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--aera-space-6);
 }
 
 .title {
-  margin-top: var(--aera-space-2);
+  min-width: 0;
+}
+
+/* the kind pill. On a saturated card face a surface token would
+   either vanish or fight the face, so it rides on a white wash —
+   the same on-face treatment every chip uses over colour. */
+.tag {
+  flex: 0 0 auto;
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-on-face-wash);
+  padding: var(--aera-space-2) var(--aera-space-5);
+  font-family: var(--aera-text-mono-family);
+  font-size: var(--aera-text-mono-size);
+  font-weight: var(--aera-weight-medium);
+  letter-spacing: var(--aera-text-mono-tracking);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.trend {
+  opacity: 0.72;
+}
+
+/* 4 — THE GRAPHIC SLOT.
+
+   The dominant element on the card: it takes every pixel the three
+   text rows above it leave. It used to be a strip pinned to the
+   bottom with a fixed height, which is why the card read as text
+   with a decoration under it rather than as a graphic with a
+   caption. Whatever renders inside is swappable — the layout here
+   makes no assumption about it beyond that it fills its box. */
+.viz {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  padding: var(--aera-inner-padding);
+  border-radius: var(--aera-radius-lg);
+  background: var(--viz-well);
+  box-shadow: var(--aera-surface-inner-glow);
+}
+
+.viz > * {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 /* the figma-style name tag, pinned under the card's own corner */

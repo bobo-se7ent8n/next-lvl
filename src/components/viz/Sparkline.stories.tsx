@@ -11,7 +11,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'A single series as a line: direction only, no axis and no grid. It answers "which way" and refuses to answer "by how much" — that is the metric next to it.',
+          'A single series as a line — direction only, no axis, no grid. The line draws itself in on entry and then the dash pattern is REMOVED: `getTotalLength()` reports user units while a non-scaling stroke lays dashes out in screen units, so a leftover dasharray repeated across the path and every trend line in the product rendered as disconnected fragments. The end marker is positioned outside the SVG, in percentages with a fixed pixel size, because the chart box is drawn with `preserveAspectRatio="none"` and any circle inside it comes out an ellipse.',
       },
     },
   },

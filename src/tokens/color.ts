@@ -125,6 +125,8 @@ export const colorUtility = {
   hover: 'rgba(20,19,16,0.045)',
   /** the same, pressed */
   press: 'rgba(20,19,16,0.085)',
+  /** the keyboard focus ring — never used for hover, only for tab */
+  focus: '#111111',
 } as const;
 
 export const color = {

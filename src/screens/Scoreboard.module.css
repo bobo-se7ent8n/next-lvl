@@ -1,11 +1,14 @@
 /* ============================================================
-   BENTO — three columns, no bottom row, and ONE SCREEN.
+   BENTO — three columns, and every card HUGS ITS CONTENT.
 
-   The grid stands exactly one shared column tall, the same height
-   the left column takes on Home, Sessions and Insights, so the
-   page is a header and a bento and nothing below them. Every card
-   fills its cell and hands the slack to its graphic; nothing
-   scrolls and nothing is clipped.
+   The grid used to stand exactly one shared column tall so the
+   whole screen fit one viewport. That cap is gone: it was doing
+   the clipping. Skill ratings lost its entire second group and
+   the shot arc collapsed to a sliver, because both were being
+   squeezed into a height chosen before anyone knew what was in
+   them. Cards size to what they hold and the page scrolls if the
+   sum of them is taller than the screen — a card that hides half
+   its rows is worse than a page that scrolls.
    ============================================================ */
 .screen {
   display: flex;
@@ -16,14 +19,17 @@
 .bento {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--aera-space-8);
-  align-items: stretch;
+  gap: var(--aera-layout-split-gap);
+  align-items: start;
   width: 100%;
-  height: var(--aera-layout-column-height);
-  min-height: 0;
 }
 
+/* the centre column: the ratings, and the conclusion drawn from them
+   as its own card underneath */
 .ratings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-8);
   min-width: 0;
   min-height: 0;
 }
@@ -40,13 +46,9 @@
   min-height: 0;
 }
 
-/* below the three-column split one screen is neither possible nor
-   desirable, so the bento goes back to scrolling */
 @media (max-width: 1180px) {
   .bento {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    height: auto;
-    align-items: start;
   }
   .zones {
     grid-column: 1 / -1;

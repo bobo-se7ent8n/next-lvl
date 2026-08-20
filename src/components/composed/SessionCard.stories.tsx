@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'One recorded session. Date leads, the stat run sits inline, duration closes it. A solo shooting hour has no assists, so only what was actually recorded is shown. When the session produced a candidate, the block underneath says so without claiming it yet.',
+          'One recorded session. The top block runs at 12px; the stat row carries 16px between groups and 2px between a number and its unit. A session that is not a game carries its OWN stats — a solo shooting hour has no points, rebounds or assists, so filtering the game run left one number and the card read as broken. The description and the pattern-candidate block are alternatives, never both.',
       },
     },
   },

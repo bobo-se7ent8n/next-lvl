@@ -10,7 +10,7 @@ const meta: Meta<typeof Insights> = {
     docs: {
       description: {
         component:
-          'The assistant sticks on the left, the library scrolls on the right, and there is no filter — the cards keep their own ON COURT / OFF COURT tags.',
+          'The library. Same column model as Sessions: real flex columns with real gaps, not CSS multi-column with margins on the cards.',
       },
     },
   },

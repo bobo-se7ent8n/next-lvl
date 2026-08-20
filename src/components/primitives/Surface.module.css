@@ -15,10 +15,20 @@
   height: 100%;
 }
 
-/* A well holds a graphic, and the graphic sits on the floor of it.
+/* THE INNER CONTAINER.
+
+   A recess cut into a card, not an object placed on one: the white
+   light runs around all four inside edges so it reads as pressed in
+   from every direction rather than lit from above. Both the padding
+   and the light are single tokens — this treatment is defined here
+   and nowhere else.
+
+   A well holds a graphic, and the graphic sits on the floor of it.
    Top-aligning left a gap under every chart in the product. */
 .well {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  padding: var(--aera-inner-padding);
+  box-shadow: var(--aera-surface-inner-glow);
 }

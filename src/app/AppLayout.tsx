@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { BackgroundPanel } from '../features/background/BackgroundPanel';
 import { BACKGROUND_DEFAULTS, type BackgroundSettings } from '../features/background/settings';
 import { ScreenFrame } from '../screens/ScreenFrame';
+import { EnterContext } from '../lib/enterContext';
 import { SCREEN_PATH, screenFromPath, type ScreenName } from './routes';
 import styles from './App.module.css';
 
@@ -29,9 +30,12 @@ export function AppLayout() {
         onNavigate={(next) => navigate(SCREEN_PATH[next as ScreenName])}
       >
         {/* keyed on the path so each tab settles in rather than
-            appearing already in place */}
+            appearing already in place, and scoped on it so every
+            number and graph inside recalculates on each entry */}
         <div key={location.pathname} className={styles.settle}>
-          <Outlet />
+          <EnterContext.Provider value={location.pathname}>
+            <Outlet />
+          </EnterContext.Provider>
         </div>
       </ScreenFrame>
 

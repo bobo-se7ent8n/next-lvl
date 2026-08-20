@@ -6,7 +6,6 @@ import { PatternCard } from '../../components/composed/PatternCard';
 import { ExpandedCard } from './ExpandedCard';
 import {
   cardHand,
-  fanFit,
   fanStep,
   slotDelta,
   slotHidden,
@@ -16,9 +15,6 @@ import {
 import { duration } from '../../tokens';
 import type { Pattern } from '../../data/types';
 import styles from './PatternFan.module.css';
-
-/* the breathing room the hand keeps at the stage edge */
-const FAN_GUTTER = 24;
 
 /* below this the opened card's two columns stack — it must match the
    breakpoint in ExpandedCard.module.css, because the fit plan has to
@@ -104,7 +100,6 @@ export function PatternFan({
 }: PatternFanProps) {
   const [hover, setHover] = useState<number | null>(null);
   const [cardWidth, setCardWidth] = useState(240);
-  const [fit, setFit] = useState(1);
   /* the box the opened popup has to stand inside. It is state rather
      than a read at render time so the fit plan re-runs on resize. */
   const [openBox, setOpenBox] = useState(() =>
@@ -125,9 +120,6 @@ export function PatternFan({
       if (!slot) return;
       const w = slot.offsetWidth;
       setCardWidth(w);
-      /* and how much the widened hand has to shrink to stand inside
-         the stage at this viewport */
-      setFit(fanFit(el.clientWidth, w, FAN_GUTTER));
       const r = expandedRect();
       setOpenBox({ width: r.width, height: r.height });
     };
@@ -208,7 +200,10 @@ export function PatternFan({
       <div
         ref={stage}
         className={styles.stage}
-        style={{ '--fit': fit.toFixed(4) } as CSSProperties}
+        /* the step, published as one property. Everything the fan does
+           horizontally is this number times a card's slot index —
+           there is no other spacing input. */
+        style={{ '--fan-gap': `${step.toFixed(1)}px` } as CSSProperties}
       >
         {patterns.map((pattern, i) => {
           const d = slotDelta(i, position);
@@ -225,20 +220,27 @@ export function PatternFan({
                 if (el) slots.current.set(i, el);
                 else slots.current.delete(i);
               }}
-              className={styles.slot}
+              className={cx(styles.slot, !open && hover === i && styles.slotHover)}
               style={
                 {
-                  '--x': `${(d * step).toFixed(1)}px`,
+                  '--x': `calc(var(--fan-gap) * ${d.toFixed(3)})`,
                   '--y': `${(shape.y + hand.dy).toFixed(1)}px`,
                   '--rot': `${(shape.rot + hand.rot).toFixed(2)}deg`,
                   '--sc': shape.scale.toFixed(4),
                   '--op': flying ? 0 : slotOpacity(d),
-                  /* nothing outside the window is painted at all, and
-                     nothing inside it is anything but fully saturated */
-                  visibility: hidden ? 'hidden' : 'visible',
-                  /* not strictly centre-forward: each card carries a
-                     small, stable lift so the stack looks dropped */
-                  zIndex: hover === i ? 700 : 600 - Math.round(Math.abs(d) * 12) + hand.lift,
+                  /* Cards outside the window are taken OUT OF LAYOUT,
+                     not just hidden. Now that the stage no longer
+                     clips, an absolutely-positioned slot sitting off
+                     to one side still counted toward the document's
+                     scroll width — so the twelve-card set gave the
+                     page a horizontal scrollbar even though only five
+                     of them were visible. */
+                  display: hidden ? 'none' : undefined,
+                  /* DEPTH RUNS LEFT TO RIGHT: every card sits above
+                     the one to its left, so the rightmost is
+                     front-most and active. The old model stacked
+                     toward a centre, which is the opposite shape. */
+                  zIndex: hover === i ? 700 : 600 + d,
                 } as CSSProperties
               }
               onPointerEnter={() => !open && setHover(i)}

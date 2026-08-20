@@ -13,7 +13,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'The card. One element carries the face colour, the radius, the clip and the shadow, so a shadow can never fall outside the corner it belongs to. The hover ring is a spread box-shadow rather than an outline, for the same reason.',
+          'The card, and it is a FLEX COLUMN — `gap` is a no-op on a `display: block` box, which is why card spacing failed to land for two rounds no matter which token it was given. It also no longer clips. Two mutually exclusive treatments, decided from the `interactive` prop rather than per-card: a clickable card floats (drop shadow, no stroke, hover lift and press compression), a non-clickable one is flat (2px #F3F2EE stroke, no shadow, and no hover at all — it is a region of the page, not a target).',
       },
     },
   },
@@ -25,7 +25,6 @@ const meta = {
     interactive: { control: 'boolean' },
     outlined: { control: 'boolean' },
     disabled: { control: 'boolean' },
-    clip: { control: 'boolean' },
     fill: { control: 'boolean' },
     onClick: { action: 'clicked' },
   },

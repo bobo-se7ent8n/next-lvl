@@ -1,0 +1,33 @@
+/* ============================================================
+   WHERE THE SHOT IS GOING
+
+   Deliberately sparse, and deliberately SHORT. The heading carries
+   the reading, two numbers carry the evidence and one line places
+   it. It was three numbers and a two-sentence paragraph, which made
+   the right column taller than the centre one it is supposed to
+   match.
+
+   The meta line and the heading are one block at the tight step;
+   everything else is the 16px block gap.
+   ============================================================ */
+.card {
+  /* gap is a no-op on a block box — this must stay flex */
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-card-gap);
+  text-align: left;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-card-tight-gap);
+}
+
+/* the numbers run across, 16px between groups. A group's own number
+   and unit sit 2px apart — that pairing is handled by Metric. */
+.readings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--aera-card-group-gap);
+}

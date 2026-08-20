@@ -41,7 +41,7 @@ export function FocusPanel({ className }: FocusPanelProps) {
   }, []);
 
   return (
-    <Card radius="card" padding="10" fill className={[styles.card, className].filter(Boolean).join(' ')}>
+    <Card radius="card" fill className={[styles.card, className].filter(Boolean).join(' ')}>
       <div className={styles.top}>
         <Display size="md" as="h2" tone="tertiary">
           Focus

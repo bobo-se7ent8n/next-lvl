@@ -45,7 +45,7 @@ export const CATALOG: BrowserEntry[] = [
   { slug: 'session-card', name: 'SessionCard', group: 'Components', chip: 'composed', description: 'a vertical card of uniform width — heights are allowed to be ragged' },
   { slug: 'insight-card', name: 'InsightCard', group: 'Components', chip: 'composed', description: 'a library item, carrying a dot field rather than artwork' },
   { slug: 'chat-panel', name: 'ChatPanel', group: 'Components', chip: 'composed', description: 'ask aera — four levels, loudest first, never taller than the viewport' },
-  { slug: 'points-block', name: 'PointsBlock', group: 'Components', chip: 'feature', description: 'the number, the session it came from, and the band it sits inside' },
+  { slug: 'shot-trend', name: 'ShotTrend', group: 'Components', chip: 'feature', description: 'where the shot is going — a direction, its numbers, and one line placing it' },
   { slug: 'split-layout', name: 'SplitLayout', group: 'Components', chip: 'chrome', description: 'a sticky column beside the one that scrolls' },
   { slug: 'activity-calendar', name: 'ActivityCalendar', group: 'Components', chip: 'feature', description: 'a month, read as a month, with wide landscape cells' },
   { slug: 'motion-stage', name: 'SessionStage', group: 'Components', chip: 'feature', description: 'point clouds, a ground plane and a camera you can orbit' },

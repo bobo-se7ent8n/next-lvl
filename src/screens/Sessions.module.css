@@ -12,7 +12,7 @@
 .split {
   display: grid;
   grid-template-columns: var(--aera-layout-left-column) minmax(0, 1fr);
-  gap: var(--aera-space-12);
+  gap: var(--aera-layout-split-gap);
   align-items: stretch;
   width: 100%;
 }
@@ -38,24 +38,28 @@
    short card is followed immediately by the next card in that column
    and no column waits on its neighbours. `break-inside: avoid` keeps
    a card whole, and the bottom margin is the single vertical gap. */
+/* REAL COLUMNS, REAL GAPS.
+
+   `column-count` packed the cards correctly and spaced them
+   wrongly: a multi-column box has no flex gap, so the only way to
+   separate two stacked cards was a margin on the card — which is
+   the margin-based stacking that kept swallowing every spacing
+   token aimed at this list. Each column is now its own flex column
+   with its own `gap`, and the packing is unchanged. */
 .log {
-  column-count: 3;
-  column-gap: var(--aera-space-8);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--aera-card-gap);
   min-width: 0;
-}
-
-.log > * {
-  display: block;
   width: 100%;
-  break-inside: avoid;
-  /* the one vertical gap between stacked cards */
-  margin-bottom: var(--aera-space-8);
 }
 
-@media (max-width: 1280px) {
-  .log {
-    column-count: 2;
-  }
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-card-gap);
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 @media (max-width: 1080px) {
@@ -69,8 +73,4 @@
   }
 }
 
-@media (max-width: 720px) {
-  .log {
-    column-count: 1;
-  }
-}
+

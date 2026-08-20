@@ -1,6 +1,25 @@
+/* THE GAPS ARE GAPS.
+
+   The card is one flex column at the 16px block step, and the one
+   place that needs a different number — the heading row to the line
+   under it — gets it by nesting a second flex column at 12px rather
+   than by putting a margin on anything. Nothing here collapses and
+   nothing depends on a child's own spacing.
+
+     .card    16px  — subheading → dot matrix → footer
+     .intro   12px  — heading + pill row → subheading */
 .card {
-  gap: var(--aera-space-6);
+  /* gap is a no-op on a block box — this must stay flex */
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-card-gap);
   text-align: left;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-inner-head-gap);
 }
 
 .head {
@@ -10,30 +29,40 @@
   gap: var(--aera-space-6);
 }
 
+
+
+/* ONE ROW: the two tags and the duration.
+
+   It used to wrap, which put the duration on a line of its own on
+   any card whose pattern name was long — so the same three things
+   sat on one row on some cards and two on others. The tags shrink
+   and ellipsize instead; the duration never does, because a time is
+   unreadable the moment it is truncated. */
 .meta {
   display: flex;
   align-items: center;
   gap: var(--aera-space-4);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   margin-top: auto;
   padding-top: var(--aera-space-4);
+  min-width: 0;
+}
+
+.meta > * {
+  min-width: 0;
 }
 
 .duration {
   margin-left: auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
-/* the graphic well. The radius and the shadow are on this one
-   element, so the inset light follows the corner exactly. */
+/* the graphic well — a Well, so its padding, corner and inset light
+   are the one inner-container treatment rather than a copy of it */
 .graphic {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
   align-items: center;
   width: 100%;
   aspect-ratio: var(--ratio);
-  padding: var(--aera-space-6);
-  border-radius: var(--aera-radius-lg);
-  background: var(--aera-color-surface-level1);
 }

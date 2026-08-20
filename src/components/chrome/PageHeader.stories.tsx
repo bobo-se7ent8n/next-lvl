@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { PageHeader } from './PageHeader';
 import { colorData } from '../../tokens';
@@ -11,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'The one header every tab uses. The title sits at the same offset on all four, and the header reserves a spacing token beneath itself which no content region may enter — that reserve is the structural fix for the subhead being overlapped and clipped on every tab. The subhead measure is wide enough to hold one line at desktop width and uses `text-wrap: pretty`, so it never leaves an orphan word.',
+          'Every screen header. Centre aligned, one reserved band beneath it. It also carries the switched-view form used on Home, where two headings sit side by side and the heading itself is the control — no tab strip and no pill, because a tab strip above a headline would be a second navigation bar on a screen that already has one. The inactive heading uses the tertiary ink token rather than an opacity, and travels toward full ink under the pointer.',
       },
     },
   },
@@ -49,5 +50,30 @@ export const LongSubhead: Story = {
     title: 'Insights',
     subhead:
       'Built from your own sessions, on-device. Pull what you want — nothing here is pushed at you, ranked, or marked urgent.',
+  },
+};
+
+/** the two-view form, as Home uses it */
+export const SwitchedViews: Story = {
+  render: function Switched() {
+    const [view, setView] = useState('patterns');
+    return (
+      <PageHeader
+        views={[
+          {
+            id: 'patterns',
+            title: 'Patterns',
+            subhead: 'A pattern is a behaviour your sessions keep repeating.',
+          },
+          {
+            id: 'vitals',
+            title: 'Focus & vitals',
+            subhead: 'One thing worth attention this week, and the readings underneath it.',
+          },
+        ]}
+        activeView={view}
+        onView={setView}
+      />
+    );
   },
 };

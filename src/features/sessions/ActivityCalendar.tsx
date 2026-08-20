@@ -49,7 +49,7 @@ export function ActivityCalendar({ className }: ActivityCalendarProps) {
   const atFirst = !isBefore(CALENDAR_FIRST, view);
 
   return (
-    <Card radius="card" padding="10" className={[styles.card, className].filter(Boolean).join(' ')}>
+    <Card radius="card" className={[styles.card, className].filter(Boolean).join(' ')}>
       <div className={styles.head}>
         <div className={styles.title}>
           <Display size="md" as="h2">

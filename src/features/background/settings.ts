@@ -41,8 +41,11 @@ export interface BackgroundSettings {
   ascii: AsciiSettings;
 }
 
+/* The state the panel opens in. ASCII keeps its values while being
+   switched off, so turning it on lands on a considered setting
+   rather than on whatever zero happens to look like. */
 export const BACKGROUND_DEFAULTS: BackgroundSettings = {
-  lines: { on: true, opacity: 0.11, width: 2, count: 16 },
+  lines: { on: true, opacity: 0.08, width: 2, count: 18 },
   grain: { on: true, opacity: 0.2, amount: 0.7, scale: 1.4 },
   ascii: { on: false, opacity: 0.1, cell: 26, fontSize: 10, seed: 20260805 },
 };

@@ -8,11 +8,11 @@
    conclusion of the first one.
    ============================================================ */
 .card {
-  gap: var(--aera-space-4);
+  /* gap is a no-op on a block box — this must stay flex */
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-card-gap);
   text-align: left;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
 }
 
 .head {
@@ -36,31 +36,33 @@
 
 /* the centre column is narrow, so the two groups stack rather than
    sitting side by side the way the old full-width panel did */
-/* Ten rows, two group labels and a focus section share one screen
-   with everything else, so the rows are tight by design — and the
-   block does not shrink. Letting it shrink made its rows spill out
-   the bottom and collide with the focus section underneath. */
+/* both groups, in full. Nothing here shrinks and nothing is cut. */
 .groups {
   display: flex;
   flex-direction: column;
-  flex: 0 0 auto;
-  gap: var(--aera-space-5);
+  gap: var(--aera-card-gap);
 }
 
 .group {
   display: flex;
   flex-direction: column;
-  gap: var(--aera-space-2);
 }
 
-/* ---- where to work next: a section of this card, at the bottom ---- */
-.next {
+/* ---- where to work next: its OWN card now ---- */
+.entries {
   display: flex;
   flex-direction: column;
-  flex: 0 0 auto;
-  gap: var(--aera-space-3);
-  margin-top: auto;
-  padding-top: var(--aera-space-5);
-  border-top: 1px solid var(--aera-color-utility-hairline);
+  gap: var(--aera-card-gap);
+}
+
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-card-tight-gap);
+}
+
+/* every rating row breathes the same amount, in both cards */
+.ratingRow {
+  padding-block: var(--aera-card-row-padding);
 }
 

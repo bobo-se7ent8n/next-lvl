@@ -13,6 +13,7 @@ export * from './typography';
 export * from './elevation';
 export * from './motion';
 export * from './graphic';
+export * from './surface';
 
 import { color } from './color';
 import { space, layout } from './space';
@@ -21,6 +22,7 @@ import { fontFamily, fontWeight, textStyle, inkVariation } from './typography';
 import { elevation } from './elevation';
 import { duration, easing, transition } from './motion';
 import { dotMatrix, dotDensity } from './graphic';
+import { cardSpec, innerSpec, surfaceEffect } from './surface';
 
 export const tokens = {
   color,
@@ -37,6 +39,9 @@ export const tokens = {
   transition,
   dotMatrix,
   dotDensity,
+  cardSpec,
+  innerSpec,
+  surfaceEffect,
 } as const;
 
 export type Tokens = typeof tokens;

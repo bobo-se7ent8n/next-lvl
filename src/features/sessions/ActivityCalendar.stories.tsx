@@ -10,7 +10,7 @@ const meta: Meta<typeof ActivityCalendar> = {
     docs: {
       description: {
         component:
-          'A month, read as a month — seven columns, weekday labels across the top, and wide landscape cells with real gutters between them rather than the eighteen-week square heatmap this replaces. The day number sits in the cell corner, the session load is the fill, and the stats row underneath is scoped to the month on screen and to nothing else. Paging back and forth does not shift the data: every day is a pure function of its date.',
+          'A month, sized to the shared left column. The day cells are portrait — noticeably taller than wide, with a generous corner — because the squat landscape version read as a heat strip rather than as a calendar. Non-clickable: 2px stroke, no shadow, no hover.',
       },
     },
   },

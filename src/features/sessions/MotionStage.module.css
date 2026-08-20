@@ -75,16 +75,24 @@
   pointer-events: none;
 }
 
-/* ---- the transport: a row of the block, not an overlay ---- */
+/* THE TRANSPORT — a compact light pill INSIDE the canvas frame,
+   bottom-centred. It was a full-width black bar sitting under the
+   canvas, which read as a second widget rather than as the picture's
+   own controls. */
 .transport {
-  position: relative;
+  position: absolute;
+  left: 50%;
+  bottom: var(--aera-space-8);
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: var(--aera-space-7);
-  padding: var(--aera-space-4) var(--aera-space-6);
-  border-radius: var(--aera-radius-lg);
-  background: var(--aera-color-surface-inverse);
-  color: var(--aera-color-ink-on-inverse);
+  gap: var(--aera-space-4);
+  padding: var(--aera-space-3) var(--aera-space-5);
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-surface-background);
+  color: var(--aera-color-ink-primary);
+  box-shadow: var(--aera-elevation-low);
+  white-space: nowrap;
 }
 
 .button {

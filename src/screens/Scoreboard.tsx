@@ -1,8 +1,8 @@
 import { PageHeader } from '../components/chrome/PageHeader';
-import { PointsBlock } from '../features/scoreboard/PointsBlock';
+import { ShotTrend } from '../features/scoreboard/ShotTrend';
 import { ShotArc } from '../features/scoreboard/ShotArc';
 import { ShotZonesField } from '../features/scoreboard/ShotZonesField';
-import { SkillRatings } from '../features/scoreboard/SkillRatings';
+import { SkillRatings, WhereToWorkNext } from '../features/scoreboard/SkillRatings';
 import styles from './Scoreboard.module.css';
 
 /** The bento — three columns, no bottom row, and the whole thing on
@@ -21,10 +21,13 @@ export function Scoreboard() {
       <div className={styles.bento}>
         <ShotZonesField className={styles.zones} />
 
-        <SkillRatings className={styles.ratings} />
+        <div className={styles.ratings}>
+          <SkillRatings />
+          <WhereToWorkNext />
+        </div>
 
         <div className={styles.stack}>
-          <PointsBlock />
+          <ShotTrend />
           <ShotArc />
         </div>
       </div>

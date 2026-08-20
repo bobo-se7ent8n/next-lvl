@@ -8,19 +8,21 @@ export interface StatRowProps {
   value: ReactNode;
   /** the compact form — value above, mono label below, used in a StatSet */
   inline?: boolean;
+  /** the smaller stat number — a reading on a card, not a headline */
+  compact?: boolean;
   /** inherit the surrounding ink rather than the numeral colour */
   inherit?: boolean;
   className?: string;
 }
 
 /** a labelled reading — the row form of a metric */
-export function StatRow({ label, value, inline, inherit, className }: StatRowProps) {
+export function StatRow({ label, value, inline, compact, inherit, className }: StatRowProps) {
   if (inline) {
     return (
       <span className={cx(styles.row, styles.inline, className)}>
         <Text
           as="b"
-          variant="metricMD"
+          variant={compact ? 'metricSM' : 'metricMD'}
           tone={inherit ? 'inherit' : 'primary'}
           numeric
         >
@@ -52,15 +54,24 @@ export function StatRow({ label, value, inline, inherit, className }: StatRowPro
 export interface StatSetProps {
   stats: Array<{ label: string; value: ReactNode }>;
   inherit?: boolean;
+  /** the smaller stat number — a reading on a card, not a headline */
+  compact?: boolean;
   className?: string;
 }
 
 /** a run of inline stats — the stat row of a session card */
-export function StatSet({ stats, inherit, className }: StatSetProps) {
+export function StatSet({ stats, inherit, compact, className }: StatSetProps) {
   return (
     <div className={cx(styles.set, className)}>
       {stats.map((s) => (
-        <StatRow key={s.label} label={s.label} value={s.value} inline inherit={inherit} />
+        <StatRow
+          key={s.label}
+          label={s.label}
+          value={s.value}
+          inline
+          compact={compact}
+          inherit={inherit}
+        />
       ))}
     </div>
   );

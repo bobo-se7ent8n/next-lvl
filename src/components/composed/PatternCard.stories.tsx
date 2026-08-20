@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'The face of a card in the fan: the MEASURED / SCORE label, the headline reading, one flat sentence of trend, a compact viz driven by that pattern’s own data, and the name at the bottom. No links live here — those exist only in the expanded state.',
+          'The fan card front, read top to bottom: title and kind pill, the reading, the line under it, then the graphic taking every pixel the three text rows leave. The title used to sit at the very bottom under a small graphic strip, which made the card read from the number upward. The graphic slot is deliberately swappable — the layout makes no assumption about what renders inside beyond that it fills its box, because these become generated artwork later.',
       },
     },
   },

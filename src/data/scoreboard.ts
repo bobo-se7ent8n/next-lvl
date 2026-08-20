@@ -63,9 +63,11 @@ export const MECHANICS = {
      quality tick beside each reading was a fourth encoding of the
      same three numbers. */
   rows: [
-    { id: 'arc', label: 'Arc angle', value: '46', unit: '°' },
-    { id: 'release', label: 'Release time', value: '0.58', unit: 's' },
-    { id: 'consistency', label: 'Motion consistency', value: '81', unit: '/ 100' },
+    /* the degree is a flag, not a unit string: in the unit slot it
+       rendered on the baseline behind the slot's own gap — `46 °` */
+    { id: 'arc', label: 'Arc angle', value: '46', unit: '', degree: true },
+    { id: 'release', label: 'Release time', value: '0.58', unit: 's', degree: false },
+    { id: 'consistency', label: 'Motion consistency', value: '81', unit: '/ 100', degree: false },
   ],
   source: '328 tracked shots · sessions 9–14 · on-device',
 };
@@ -114,17 +116,52 @@ export const SKILL_AVERAGE = 70;
 export const SKILL_SOURCE = 'on-device pose, ball and inertial data · sessions 9–14';
 
 /* ------------------------------------------------------------
-   WHERE TO WORK NEXT — one item. Three was a list, and a list on
-   this screen reads as a ranking. There is no intro line and no
-   share note either: at tile size there is no room for prose, and
-   the tile is not the place that claim belongs.
+   WHERE TO WORK NEXT
+
+   Its own card now, and a repeatable list rather than a single
+   item. Every entry is a rating from the card above, singled out
+   and given a sentence — the sentence says what the number does,
+   never what to do about it. Nothing here is an instruction and
+   nothing is ranked against anybody.
    ------------------------------------------------------------ */
-/* The one thing worth working on. It is a rating like any other —
-   same label, same 0–100 bar, same right-aligned reading — because
-   it IS one of the ratings above, singled out. Styling it as a
-   display number made it read as a separate kind of measurement. */
-export const WHERE_NEXT = {
-  label: 'Balance',
-  value: 58,
-  text: 'The lowest movement rating. It moves with late-session fatigue, not with anything technical.',
+export interface WorkNextEntry {
+  label: string;
+  value: number;
+  note: string;
+}
+
+export const WHERE_NEXT: WorkNextEntry[] = [
+  {
+    label: 'Balance',
+    value: 58,
+    note: 'The lowest movement rating. It moves with late-session fatigue, not with anything technical.',
+  },
+  {
+    label: 'Three-point',
+    value: 61,
+    note: 'The lowest shooting rating. It sits lower on right-wing attempts than anywhere else on the floor.',
+  },
+];
+
+/* ------------------------------------------------------------
+   WHERE THE SHOT IS GOING
+
+   The advice block that replaced the points tile. Points was a
+   score, and a score is the one thing this product does not keep.
+   What is here instead is a trend in the mechanics, stated as an
+   observation with its numbers beside it — an experiment to sit
+   with, never a directive.
+   ------------------------------------------------------------ */
+export const SHOT_TREND = {
+  meta: 'Apr 12 · Tuesday scrimmage · 62 min',
+  heading: 'Arc is tightening',
+  /* TWO readings, not three. Consistency was the third, and it is
+     already the last row of Shot Mechanics directly underneath —
+     printing it twice made this block taller than its column. */
+  readings: [
+    { value: '+3', unit: 'arc', degree: true, label: 'arc angle' },
+    { value: '-0.06', unit: 's', label: 'release time' },
+  ],
+  note: 'Earlier and steeper across the last six sessions.',
 };
+

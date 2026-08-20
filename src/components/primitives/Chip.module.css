@@ -13,7 +13,11 @@
   color: var(--chip-ink);
 }
 
+/* a tag shrinks and ellipsizes rather than pushing its row apart */
 .tag {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   display: inline-block;
   white-space: nowrap;
   border-radius: var(--aera-radius-pill);

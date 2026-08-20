@@ -16,7 +16,7 @@ export interface NavBarProps<T extends string = string> {
   className?: string;
 }
 
-/** the main nav — top of the page, horizontally centred */
+/** the main nav — fixed to the bottom of the viewport, centred */
 export function NavBar<T extends string>({
   items,
   value,
@@ -36,7 +36,10 @@ export function NavBar<T extends string>({
             onClick={() => onChange(item.value)}
             className={cx(styles.item, item.value === value && styles.itemOn)}
           >
-            {item.label}
+            {/* the active item no longer changes weight, so the label
+                is measured once and the track's width is the same on
+                every tab by construction */}
+            <span className={styles.label}>{item.label}</span>
           </button>
         ))}
       </div>

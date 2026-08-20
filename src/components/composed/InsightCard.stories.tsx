@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'A library item. Nothing here is recommended, ranked or marked urgent — the library is pulled from. The ON COURT / OFF COURT tag stays on the card now that the filter is gone.',
+          'A library item, pulled from rather than pushed. One flex column at the 16px block step, with the heading row and its line nested in a second column at 12px. Footer runs filled tag, stroked tag, then the duration right-aligned. Clickable treatment: shadow, no stroke.',
       },
     },
   },

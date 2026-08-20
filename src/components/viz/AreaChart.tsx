@@ -53,6 +53,8 @@ export function AreaChart({
           strokeWidth={3}
           strokeLinecap="round"
           strokeLinejoin="round"
+          /* no dash pattern here, ever — see Sparkline for why a dash
+             measured in user units fragments a non-scaling stroke */
           vectorEffect="non-scaling-stroke"
         />
       </svg>

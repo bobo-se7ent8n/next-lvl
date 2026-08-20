@@ -14,10 +14,9 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: var(--aera-space-8);
+  gap: var(--aera-card-gap);
   text-align: left;
   width: 100%;
-  height: 100%;
 }
 
 .head {
@@ -81,8 +80,9 @@
   padding-bottom: var(--aera-space-2);
 }
 
-/* six equal rows filling whatever height the column has left, with
-   every cell stretched to its row rather than parked at the top */
+/* six equal rows, and PORTRAIT cells: noticeably taller than they
+   are wide, with a generous corner. The squat landscape version
+   read as a heat strip rather than as a month. */
 .grid {
   flex: 1 1 auto;
   min-height: 0;
@@ -91,17 +91,20 @@
   grid-auto-rows: minmax(0, 1fr);
   align-content: stretch;
   align-items: stretch;
-  gap: var(--aera-space-3);
+  gap: var(--aera-space-4);
 }
 
 .cell {
   position: relative;
   display: block;
   width: 100%;
-  /* the row owns the height; the cell takes all of it */
+  /* taller than wide, always — the row gives it the height and the
+     aspect ratio guarantees the proportion even in a short column */
   height: 100%;
-  min-height: var(--aera-space-11);
-  border-radius: var(--aera-radius-sm);
+  min-height: var(--aera-space-13);
+  aspect-ratio: 3 / 4;
+  justify-self: stretch;
+  border-radius: var(--aera-radius-md);
   background: var(--cell-bg);
   transition:
     background var(--aera-duration-fast) var(--aera-ease-out),
@@ -127,7 +130,7 @@
 .foot {
   display: flex;
   flex-direction: column;
-  gap: var(--aera-space-6);
+  gap: var(--aera-card-gap);
   /* anchored to the bottom edge of the column, deliberately */
   flex: 0 0 auto;
   padding-top: var(--aera-space-2);

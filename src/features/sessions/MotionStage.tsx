@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { cx } from '../../lib/css';
 import { Label, Mono } from '../../components/primitives/Text';
 import { Legend } from '../../components/viz/Legend';
@@ -250,14 +250,6 @@ export function MotionStage({
     }
   }, [playhead, size, floor, view]);
 
-  const scrubTo = useCallback(
-    (clientX: number, el: HTMLElement) => {
-      const rect = el.getBoundingClientRect();
-      onPlayhead(clamp((clientX - rect.left) / rect.width, 0, 1));
-    },
-    [onPlayhead],
-  );
-
   /* ---- drag to orbit ---- */
   const onOrbitStart = (e: React.PointerEvent<HTMLCanvasElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -280,7 +272,6 @@ export function MotionStage({
   const phase = phaseAt(playhead);
   const start = parseClock(moment.timestamp);
   const clock = formatClock(start + playhead * seconds);
-  const end = formatClock(start + seconds);
 
   return (
     <div className={cx(styles.stage, className)}>
@@ -313,111 +304,75 @@ export function MotionStage({
           { label: 'ball', color: GROUP_COLOR.ball },
         ]}
       />
-      </div>
 
-      {/* ---- the transport: a row of this block, directly under the
-              picture and directly above the timeline ---- */}
+      {/* THE TRANSPORT LIVES INSIDE THE FRAME.
+
+          A compact light pill, bottom-centred over the canvas: prev,
+          the timecode, the moment it belongs to, the dropdown, next.
+          The full-width black bar that used to sit under the canvas
+          is gone — its scrub slider and its clock are both here now,
+          and its play button moved to the timeline's ruler row where
+          it lines up with the tracks it drives. */}
       <div className={styles.transport}>
         <button
           type="button"
-          className={cx(styles.button, styles.play)}
-          aria-label={playing ? 'Pause' : 'Play'}
-          onClick={() => {
-            if (!playing && playhead >= 1) onPlayhead(0);
-            setPlaying((p) => !p);
-          }}
+          className={cx(styles.button, styles.small)}
+          disabled={index === 0}
+          aria-label="Previous moment"
+          onClick={() => onMoment(index - 1)}
         >
-          <Glyph d={playing ? Icon.pause : Icon.play} filled />
+          <Glyph d={Icon.back} />
         </button>
 
         <Mono className={styles.clock} tone="inherit">
-          {clock} / {end}
+          {clock}
         </Mono>
 
-        {/* the same 0..1 axis the timeline below draws — scrubbing
-            either one moves both, because there is only one value */}
-        <div
-          className={styles.scrubber}
-          role="slider"
-          tabIndex={0}
-          aria-label="Playhead"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.round(playhead * 100)}
-          onPointerDown={(e) => {
-            e.currentTarget.setPointerCapture(e.pointerId);
-            scrubTo(e.clientX, e.currentTarget);
-          }}
-          onPointerMove={(e) => e.buttons === 1 && scrubTo(e.clientX, e.currentTarget)}
-          onKeyDown={(e) => {
-            if (e.key === 'ArrowRight') onPlayhead(clamp(playhead + 0.02, 0, 1));
-            if (e.key === 'ArrowLeft') onPlayhead(clamp(playhead - 0.02, 0, 1));
-          }}
+        <div className={styles.menu} ref={menu}>
+          <button
+            type="button"
+            className={styles.select}
+            aria-haspopup="listbox"
+            aria-expanded={open}
+            onClick={() => setOpen((o) => !o)}
+          >
+            <span className={styles.selectName}>{moment.title}</span>
+            <Glyph d={Icon.down} />
+          </button>
+
+          {open ? (
+            <ul className={styles.list} role="listbox" aria-label="Tracked moments">
+              {moments.map((m, i) => (
+                <li key={m.id}>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={i === index}
+                    className={cx(styles.option, i === index && styles.optionOn)}
+                    onClick={() => {
+                      onMoment(i);
+                      setOpen(false);
+                    }}
+                  >
+                    <Mono tone="inherit">{m.timestamp}</Mono>
+                    <span className={styles.optionName}>{m.title}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+
+        <button
+          type="button"
+          className={cx(styles.button, styles.small)}
+          disabled={index === moments.length - 1}
+          aria-label="Next moment"
+          onClick={() => onMoment(index + 1)}
         >
-          <span className={styles.track} />
-          <span className={styles.fill} style={{ width: `${(playhead * 100).toFixed(2)}%` }} />
-          <span className={styles.thumb} style={{ left: `${(playhead * 100).toFixed(2)}%` }} />
-        </div>
-
-        <div className={styles.pager}>
-          <button
-            type="button"
-            className={cx(styles.button, styles.small)}
-            disabled={index === 0}
-            aria-label="Previous moment"
-            onClick={() => onMoment(index - 1)}
-          >
-            <Glyph d={Icon.back} />
-          </button>
-
-          {/* every tracked moment, with its timecode, and the one the
-              playhead is on marked */}
-          <div className={styles.menu} ref={menu}>
-            <button
-              type="button"
-              className={styles.select}
-              aria-haspopup="listbox"
-              aria-expanded={open}
-              onClick={() => setOpen((o) => !o)}
-            >
-              <Mono tone="inherit">{moment.timestamp}</Mono>
-              <span className={styles.selectName}>{moment.title}</span>
-              <Glyph d={Icon.down} />
-            </button>
-
-            {open ? (
-              <ul className={styles.list} role="listbox" aria-label="Tracked moments">
-                {moments.map((m, i) => (
-                  <li key={m.id}>
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={i === index}
-                      className={cx(styles.option, i === index && styles.optionOn)}
-                      onClick={() => {
-                        onMoment(i);
-                        setOpen(false);
-                      }}
-                    >
-                      <Mono tone="inherit">{m.timestamp}</Mono>
-                      <span className={styles.optionName}>{m.title}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-
-          <button
-            type="button"
-            className={cx(styles.button, styles.small)}
-            disabled={index === moments.length - 1}
-            aria-label="Next moment"
-            onClick={() => onMoment(index + 1)}
-          >
-            <Glyph d={Icon.next} />
-          </button>
-        </div>
+          <Glyph d={Icon.next} />
+        </button>
+      </div>
       </div>
     </div>
   );

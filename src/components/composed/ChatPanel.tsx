@@ -50,7 +50,7 @@ export function ChatPanel({
   };
 
   return (
-    <Card radius="card" padding="9" elevation="medium" className={cx(styles.panel, className)}>
+    <Card radius="card" className={cx(styles.panel, className)}>
       <div className={styles.head}>
         <Display size="md" as="h2">
           {title}

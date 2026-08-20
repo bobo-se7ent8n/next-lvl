@@ -2,7 +2,8 @@ import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
 import { Card } from '../primitives/Card';
 import { Chip, Tag } from '../primitives/Chip';
-import { Display, Text } from '../primitives/Text';
+import { Display, Label, Text } from '../primitives/Text';
+import { Well } from '../primitives/Surface';
 import { DotMatrix } from '../graphics/DotMatrix';
 import type { DataTone } from '../../tokens';
 import type { Insight } from '../../data/types';
@@ -41,29 +42,31 @@ export function InsightCard({ insight, onClick, id, className }: InsightCardProp
   return (
     <Card
       radius="card"
-      elevation="low"
-      padding="9"
       id={id}
       interactive={Boolean(onClick)}
       onClick={onClick}
       className={cx(styles.card, className)}
     >
-      <div className={styles.head}>
-        <Display size="md" as="h3">
-          {insight.title}
-        </Display>
-        <Chip tone={KIND_TONE[insight.kind]}>{insight.kind.toLowerCase()}</Chip>
-      </div>
+      {/* heading row and the line under it: one nested column at the
+          12px step, so the 16px block gap below is undisturbed */}
+      <div className={styles.intro}>
+        <div className={styles.head}>
+          <Display size="md" as="h3">
+            {insight.title}
+          </Display>
+          <Chip tone={KIND_TONE[insight.kind]}>{insight.kind.toLowerCase()}</Chip>
+        </div>
 
-      {insight.desc ? (
-        <Text variant="bodySM" tone="secondary">
-          {insight.desc}
-        </Text>
-      ) : null}
+        {insight.desc ? (
+          <Text variant="bodySM" tone="secondary">
+            {insight.desc}
+          </Text>
+        ) : null}
+      </div>
 
       {/* the one illustration language, never a per-card style: the
           pattern is chosen to match what the item is about */}
-      <div className={styles.graphic} style={{ '--ratio': insight.ratio } as CSSProperties}>
+      <Well radius="lg" className={styles.graphic} style={{ '--ratio': insight.ratio } as CSSProperties}>
         <DotMatrix
           pattern={insight.graphic}
           rows={rowsFor(insight.ratio)}
@@ -72,14 +75,17 @@ export function InsightCard({ insight, onClick, id, className }: InsightCardProp
           fill
           ariaLabel={`${insight.title}: ${insight.graphic} field`}
         />
-      </div>
+      </Well>
 
+      {/* FILLED TAG FIRST. The filled one says where this is done and
+          the stroked one says which pattern it belongs to — the
+          stronger mark is the more specific fact, so it leads. */}
       <div className={styles.meta}>
-        {insight.pattern ? <Tag quiet>{insight.pattern}</Tag> : <Tag quiet>library</Tag>}
         <Tag>{insight.side === 'on' ? 'on court' : 'off court'}</Tag>
-        <Text as="span" variant="bodySM" tone="secondary" numeric className={styles.duration}>
+        {insight.pattern ? <Tag quiet>{insight.pattern}</Tag> : <Tag quiet>library</Tag>}
+        <Label tone="secondary" className={styles.duration}>
           {insight.duration}
-        </Text>
+        </Label>
       </div>
     </Card>
   );

@@ -25,7 +25,7 @@ const FILL = { '--chart-h': '100%' } as CSSProperties;
 /** a body reading. Private to the device — never shareable. */
 export function VitalCard({ vital, className }: VitalCardProps) {
   return (
-    <Card radius="card" padding="10" fill className={[styles.card, className].filter(Boolean).join(' ')}>
+    <Card radius="card" fill className={[styles.card, className].filter(Boolean).join(' ')}>
       <div className={styles.head}>
         <Display size="md" as="h3">
           {vital.label}

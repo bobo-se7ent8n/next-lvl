@@ -10,7 +10,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'One thing worth attention this week. It reads top to bottom: the number carries the weight, and the three beats are a plain stacked sequence — what we saw, why it happens, what to do.',
+          'The one thing worth attention this week. The header is space-between — label left, session pill hard right — matching every other card header in the product; the pill used to sit immediately after the label, which made this the one card whose header did not line up with the rest. The graphic carries the standard inner-container treatment.',
       },
     },
   },

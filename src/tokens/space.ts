@@ -28,14 +28,20 @@ export const space = {
 export type SpaceStep = keyof typeof space;
 
 const NAV_HEIGHT = '58px';
-const HEADER_BLOCK = '252px';
+/* the nav sits at the BOTTOM now, so the header band no longer has to
+   clear it and the column that used to start under it starts higher */
+const HEADER_BLOCK = '196px';
 
 /** layout constants that are structural rather than spacing steps */
 export const layout = {
-  /** where the headline sits under the fixed nav. One number, four screens. */
-  headerTitleOffset: '92px',
-  /** top nav height, used to offset sticky columns */
+  /** where the headline sits. One number, four screens. */
+  headerTitleOffset: '40px',
+  /** the nav capsule's height */
   navHeight: NAV_HEIGHT,
+  /** The band the fixed bottom nav stands in. Every page reserves it
+   *  below its last row, so the nav never covers content — the nav is
+   *  out of the flow entirely and cannot push anything out of its way. */
+  navReserve: `calc(${NAV_HEIGHT} + 44px)`,
   /** gutter on the page edge — the only horizontal inset a page has */
   gutter: '26px',
   /** the space reserved beneath every page header. No content enters it. */
@@ -49,6 +55,14 @@ export const layout = {
   maxContentWidth: '1680px',
   /** the narrower cap for a region that is mostly reading */
   maxProseWidth: '860px',
+  /** THE COLUMN GAP, everywhere. Home, Sessions, Insights and the
+   *  scoreboard bento all split into columns, and they used to do it
+   *  at two different sizes — 32 on two screens and 40 on a third —
+   *  which made the same layout read as three layouts. */
+  splitGap: '32px',
+  /** the width every nav item reserves, so the current one cannot
+   *  reflow its neighbours */
+  navItem: '104px',
   /** the storybook browser's fixed sidebar */
   sidebarWidth: '248px',
 
@@ -64,10 +78,10 @@ export const layout = {
    *  reserve beneath it. PageHeader is given this as a min-height, so
    *  the number is true rather than an estimate of itself. */
   headerBlock: HEADER_BLOCK,
-  /** where a pinned column parks under the fixed nav */
-  columnTop: `calc(${NAV_HEIGHT} + ${space['9']})`,
+  /** where a pinned column parks */
+  columnTop: space['9'],
   /** and how tall it stands once parked: the header band and one page
    *  gutter subtracted from the viewport, so a screen is a header and
    *  a column and nothing below them */
-  columnHeight: `calc(100svh - ${HEADER_BLOCK} - ${space['11']})`,
+  columnHeight: `calc(100svh - ${HEADER_BLOCK} - ${NAV_HEIGHT} - ${space['12']})`,
 } as const;

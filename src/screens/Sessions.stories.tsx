@@ -10,7 +10,7 @@ const meta: Meta<typeof Sessions> = {
     docs: {
       description: {
         component:
-          'The month calendar runs full width above the log, and every session card opens its own detail view — the replay stage, the moment pager, and the multi-track timeline.',
+          'The session log. The bento is real flex columns rather than CSS multi-column: a multi-column box has no flex gap, so the space between stacked cards could only ever be a margin on the card itself — which is what kept swallowing every spacing token aimed at this list. Each column is its own flex column with its own gap, and the independent packing is unchanged.',
       },
     },
   },

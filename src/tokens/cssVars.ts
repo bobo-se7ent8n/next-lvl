@@ -61,6 +61,17 @@ export function buildCssVars(): Record<string, string> {
     vars[`${key}-transform`] = String(s.textTransform ?? 'none');
   }
 
+  // surface — the card system -----------------------------------
+  for (const [name, value] of Object.entries(tokens.cardSpec)) {
+    vars[`${PREFIX}-card-${kebab(name)}`] = value;
+  }
+  for (const [name, value] of Object.entries(tokens.innerSpec)) {
+    vars[`${PREFIX}-inner-${kebab(name)}`] = value;
+  }
+  for (const [name, value] of Object.entries(tokens.surfaceEffect)) {
+    vars[`${PREFIX}-surface-${kebab(name)}`] = value;
+  }
+
   // elevation ---------------------------------------------------
   for (const [name, value] of Object.entries(tokens.elevation)) {
     vars[`${PREFIX}-elevation-${kebab(name)}`] = value;

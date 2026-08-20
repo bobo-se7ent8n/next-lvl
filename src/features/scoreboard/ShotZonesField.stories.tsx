@@ -9,7 +9,7 @@ const meta: Meta<typeof ShotZonesField> = {
     docs: {
       description: {
         component:
-          'Shots as a continuous field rather than eight named regions. Every recorded zone becomes a kernel centred where those shots were actually taken, and every dot on the grid reads every kernel: dot SIZE is the attempts near that spot, dot COLOUR is the attempt-weighted FG% on the three-step accuracy ramp. The court is drawn over the field in one neutral ink. A zone was a polygon with a hard edge and a tag hanging off it, and neither is a thing that exists — a shooter does not stop being accurate at a painted line, and the three-foot corner strips could never hold a label inside them.',
+          'Shots as a continuous dot field on a real half court. Dot SIZE is attempt frequency, dot COLOUR is accuracy. On hover every dot outside the hovered zone drops in opacity and the hovered zone stays at full — applied PER DOT, not on a wrapper group: a group opacity composites the zone as one layer, which both hid the effect and would have flattened the density encoding. Size never changes, because a dot that shrank would be lying about how often that shot gets taken.',
       },
     },
   },

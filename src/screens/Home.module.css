@@ -1,29 +1,27 @@
 /* ============================================================
-   HOME — two stages. Stage one is patterns and nothing else and
-   owns the first viewport; stage two is focus + vitals and fits
-   inside one viewport with nothing to scroll: the header takes
-   what it needs and the grid takes the rest, so the focus column
-   and the 3 × 2 vitals grid are on screen together.
+   HOME — two VIEWS, not two stages.
+
+   Both fit the viewport with nothing to scroll: the header band
+   takes what it needs and the view under it takes the rest. They
+   used to be stacked stages of one very long scroll, which made
+   the vitals reachable only by exhausting the pattern fan.
 
    Both run edge to edge and neither leaves a band of padding
    under its last row.
    ============================================================ */
-.stageOne {
-  min-height: 100svh;
+.screen {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  padding-bottom: var(--aera-space-13);
+  width: 100%;
 }
 
-.stageTwo {
-  /* an exact viewport, not a minimum — the whole point is that this
-     stage does not scroll */
-  height: 100svh;
+/* the arriving view — one row, taking whatever the header leaves */
+.view {
+  flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding-bottom: var(--aera-space-9);
+  width: 100%;
 }
 
 .fan {
@@ -35,12 +33,11 @@
    one shared column height tall — the same height Activity and Ask
    AERA stand at on the other two screens */
 .grid {
-  flex: 0 0 auto;
-  height: var(--aera-layout-column-height);
-  min-height: 0;
+  /* hug: the tiles are as tall as what is in them. A fixed column
+     height left dead space under the shorter ones. */
   display: grid;
   grid-template-columns: var(--aera-layout-left-column) minmax(0, 1fr);
-  gap: var(--aera-space-11);
+  gap: var(--aera-layout-split-gap);
   align-items: stretch;
   width: 100%;
 }
@@ -48,18 +45,12 @@
 .vitals {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: var(--aera-space-7);
-  min-height: 0;
+  gap: var(--aera-card-gap);
 }
 
 /* below the split the two halves stack, and one screen is no longer
    possible or desirable — the stage goes back to scrolling */
 @media (max-width: 1080px) {
-  .stageTwo {
-    height: auto;
-    min-height: 100svh;
-  }
   .grid {
     grid-template-columns: 1fr;
     height: auto;

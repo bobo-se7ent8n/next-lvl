@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import { Card } from '../../components/primitives/Card';
+import { Well } from '../../components/primitives/Surface';
 import { Chip } from '../../components/primitives/Chip';
 import { StatRow } from '../../components/primitives/StatRow';
 import { Display, Label, Text } from '../../components/primitives/Text';
@@ -69,7 +70,7 @@ export interface ShotArcProps {
  *  three readings underneath and the line saying where they came from. */
 export function ShotArc({ className }: ShotArcProps) {
   return (
-    <Card radius="card" padding="10" className={[styles.card, className].filter(Boolean).join(' ')}>
+    <Card radius="card" className={[styles.card, className].filter(Boolean).join(' ')}>
       <div className={styles.head}>
         <Display size="md" as="h3">
           Shot mechanics
@@ -77,6 +78,14 @@ export function ShotArc({ className }: ShotArcProps) {
         <Chip>Measured</Chip>
       </div>
 
+      {/* the caption belongs to the header, not to the foot: it says
+          what the whole card is built from, and at the bottom it read
+          as a footnote to the three stat rows above it */}
+      <Label tone="tertiary" className={styles.source}>
+        {MECHANICS.source}
+      </Label>
+
+      <Well radius="lg" className={styles.arcWell}>
       <svg
         className={styles.arc}
         viewBox={`0 0 ${FRAME.w} ${FRAME.h}`}
@@ -98,10 +107,7 @@ export function ShotArc({ className }: ShotArcProps) {
         <text
           x={RELEASE[0] + 44}
           y={RELEASE[1] - 13}
-          fontSize="12"
-          fontWeight="700"
-          fill={colorInk.primary}
-          fontFamily="Inter, sans-serif"
+          className={styles.mark}
         >
           {MECHANICS.arcAngle}°
         </text>
@@ -139,10 +145,7 @@ export function ShotArc({ className }: ShotArcProps) {
         <text
           x={APEX[0] + 9}
           y={APEX[1] - 6}
-          fontSize="10.5"
-          fontWeight="600"
-          fill={colorInk.secondary}
-          fontFamily="Inter, sans-serif"
+          className={styles.mark}
         >
           apex {ARC.apexY.toFixed(2)} m
         </text>
@@ -151,10 +154,7 @@ export function ShotArc({ className }: ShotArcProps) {
         <text
           x={RELEASE[0] - 4}
           y={RELEASE[1] + 18}
-          fontSize="10"
-          fontWeight="600"
-          fill={colorInk.tertiary}
-          fontFamily="Inter, sans-serif"
+          className={styles.mark}
         >
           release {MECHANICS.releaseHeight} m
         </text>
@@ -174,10 +174,7 @@ export function ShotArc({ className }: ShotArcProps) {
           x={RIM[0] - 6}
           y={RIM[1] - 14}
           textAnchor="end"
-          fontSize="10"
-          fontWeight="600"
-          fill={colorInk.tertiary}
-          fontFamily="Inter, sans-serif"
+          className={styles.mark}
         >
           entry {Math.abs(ARC.entryAngle).toFixed(0)}°
         </text>
@@ -185,14 +182,12 @@ export function ShotArc({ className }: ShotArcProps) {
           x={(RELEASE[0] + RIM[0]) / 2}
           y={FLOOR + 16}
           textAnchor="middle"
-          fontSize="10"
-          fontWeight="600"
-          fill={colorInk.tertiary}
-          fontFamily="Inter, sans-serif"
+          className={styles.mark}
         >
           {MECHANICS.shotDistance} m
         </text>
       </svg>
+      </Well>
 
       {/* label and value, and nothing under either of them */}
       <div className={styles.rows}>
@@ -203,16 +198,17 @@ export function ShotArc({ className }: ShotArcProps) {
             value={
               <>
                 {row.value}
-                <Text as="span" variant="bodySM" tone="tertiary" style={{ display: 'inline' }}>
-                  {row.unit}
-                </Text>
+                {row.degree ? <sup className={styles.degree}>°</sup> : null}
+                {row.unit ? (
+                  <Text as="span" variant="bodySM" tone="tertiary" style={{ display: 'inline' }}>
+                    {row.unit}
+                  </Text>
+                ) : null}
               </>
             }
           />
         ))}
       </div>
-
-      <Label className={styles.source}>{MECHANICS.source}</Label>
     </Card>
   );
 }

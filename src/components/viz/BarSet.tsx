@@ -1,5 +1,7 @@
 import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
+import { useEnterProgress } from '../../lib/enter';
+import { useEnterKey } from '../../lib/enterContext';
 import { dataColor } from '../../lib/color';
 import { Label, Text } from '../primitives/Text';
 import type { SeriesPoint } from '../../data/types';
@@ -33,6 +35,10 @@ export function BarSet({
 }: BarSetProps) {
   const max = Math.max(...items.map((i) => i.value), 1);
   const chromeH = (showValues ? 22 : 0) + (showLabels ? 18 : 0);
+  /* the bars grow up out of the baseline on entry rather than being
+     there already — a reading that arrives, not one that was waiting */
+  const progress = useEnterProgress(useEnterKey());
+
 
   return (
     <div
@@ -60,7 +66,7 @@ export function BarSet({
               {
                 '--bar-color': dataColor(item.tone),
                 '--bar-radius': `var(--aera-radius-${radius})`,
-                '--bar-height': `calc((100% - ${chromeH}px) * ${Math.max(0.08, item.value / max).toFixed(3)})`,
+                '--bar-height': `calc((100% - ${chromeH}px) * ${(Math.max(0.08, item.value / max) * progress).toFixed(3)})`,
               } as CSSProperties
             }
           />

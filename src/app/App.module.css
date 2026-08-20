@@ -10,7 +10,19 @@
   position: relative;
   z-index: 10;
   width: 100%;
-  padding: 0 var(--aera-layout-gutter);
+  /* the bottom reserve is the nav's band. The nav is fixed and out of
+     the flow, so it cannot push anything out of its way — the page has
+     to leave it the room. */
+  padding: 0 var(--aera-layout-gutter) var(--aera-layout-nav-reserve);
+  /* THE PAGE NEVER SCROLLS SIDEWAYS, AND NEVER CLIPS DOWNWARDS.
+     `clip` on one axis only is legal and leaves the other axis
+     genuinely visible — unlike `hidden`, which forces the other axis
+     to `auto` and would have brought the fan's clipping straight
+     back. The fan keeps a transparent buffer card just outside the
+     window so an arriving card animates in rather than popping; that
+     card is what used to push a horizontal scrollbar onto the page. */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 /* ---- page transition ------------------------------------------
@@ -26,16 +38,22 @@
    this div instead of against the viewport.
    --------------------------------------------------------------- */
 .settle {
-  animation: settleIn var(--aera-duration-base) var(--aera-ease-firm) backwards;
+  animation: settleIn var(--aera-duration-page) var(--aera-ease-out) backwards;
 }
 
 @keyframes settleIn {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settle {
+    animation: none;
   }
 }

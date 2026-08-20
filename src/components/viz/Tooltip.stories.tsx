@@ -22,7 +22,7 @@ const meta: Meta<typeof Tooltip> = {
       const [at, setAt] = useState<{ x: number; y: number } | null>(null);
       return (
         <>
-          <Card radius="card" padding="11" clip>
+          <Card radius="card" padding="11">
             <div
               onPointerEnter={(e) => setAt(anchorOf(e.currentTarget))}
               onPointerLeave={() => setAt(null)}

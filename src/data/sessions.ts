@@ -30,6 +30,12 @@ export const SESSIONS: Session[] = [
     ast: 0,
     to: 0,
     stl: 0,
+    extra: [
+      { label: 'shots', value: 120 },
+      { label: 'makes', value: 71 },
+      { label: '% fg', value: 59 },
+      { label: 'best zone', value: 'L wing' },
+    ],
     note: 'Spot shooting, five racks, no defender.',
   },
   {
@@ -61,6 +67,11 @@ export const SESSIONS: Session[] = [
     ast: 0,
     to: 1,
     stl: 0,
+    extra: [
+      { label: 'reps', value: 214 },
+      { label: 'on task', value: '38m' },
+      { label: 'consistency', value: 77 },
+    ],
     note: 'Handle ladder, then pull-ups off two dribbles.',
   },
   {
@@ -87,6 +98,12 @@ export const SESSIONS: Session[] = [
     ast: 0,
     to: 0,
     stl: 0,
+    extra: [
+      { label: 'shots', value: 140 },
+      { label: 'makes', value: 79 },
+      { label: '% fg', value: 56 },
+      { label: 'best zone', value: 'Corner' },
+    ],
     note: 'Baseline read — this is the session the release-time series starts from.',
   },
 ];

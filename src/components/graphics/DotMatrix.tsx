@@ -1,5 +1,7 @@
 import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
+import { staggerAt, useEnterProgress } from '../../lib/enter';
+import { useEnterKey } from '../../lib/enterContext';
 import { dataColor } from '../../lib/color';
 import { buildDotField, type DotPattern } from '../../lib/dotField';
 import { dotDensity, dotMatrix, type DataTone, type DotDensity } from '../../tokens';
@@ -46,6 +48,11 @@ export function DotMatrix({
   const rows = rowsProp ?? dotDensity[density];
   const { cells, width, height } = buildDotField({ pattern, columns, rows });
   const { size, corner } = dotMatrix;
+  /* the field arrives in order rather than all at once — the stagger
+     runs along the same index the cells were generated in, so a dot
+     field assembles the way it reads */
+  const progress = useEnterProgress(useEnterKey());
+
 
   return (
     <svg
@@ -61,7 +68,7 @@ export function DotMatrix({
         } as CSSProperties
       }
     >
-      {cells.map((cell) => (
+      {cells.map((cell, i) => (
         <rect
           key={cell.key}
           className={styles.dot}
@@ -70,7 +77,7 @@ export function DotMatrix({
           width={size}
           height={size}
           rx={corner}
-          opacity={cell.opacity.toFixed(3)}
+          opacity={(cell.opacity * staggerAt(progress, i, cells.length)).toFixed(3)}
           style={
             {
               '--dot-o': cell.opacity.toFixed(3),

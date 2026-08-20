@@ -1,7 +1,7 @@
 import { useCallback, type CSSProperties } from 'react';
 import { cx } from '../../lib/css';
 import { clamp, project, smoothPath } from '../../lib/chart';
-import { Label, Text } from '../../components/primitives/Text';
+import { Label } from '../../components/primitives/Text';
 import { dataInk } from '../../lib/color';
 import { PHASE_SPANS } from '../../lib/pose';
 import { colorData } from '../../tokens';
@@ -19,13 +19,30 @@ export interface SessionTimelineProps {
   /** 0..1 along the moment — the same value the stage scrubber holds */
   playhead: number;
   onScrub: (next: number) => void;
+  playing?: boolean;
+  onPlay?: () => void;
   className?: string;
+}
+
+/** the ruler's minute marks, and the ticks between them */
+const RULER_MINUTES = [0, 2, 4, 6, 8, 10, 12];
+const RULER_TICKS = 48;
+
+function minuteLabel(m: number): string {
+  return `00:${String(m).padStart(2, '0')}:00`;
 }
 
 /** four tracks, one time axis, one playhead. Which insight is current
  *  is not a separate piece of state: it is wherever the playhead is
  *  standing, which is the same rule the blocks underneath follow. */
-export function SessionTimeline({ moment, playhead, onScrub, className }: SessionTimelineProps) {
+export function SessionTimeline({
+  moment,
+  playhead,
+  onScrub,
+  playing,
+  onPlay,
+  className,
+}: SessionTimelineProps) {
   const scrubTo = useCallback(
     (clientX: number, el: HTMLElement) => {
       const rect = el.getBoundingClientRect();
@@ -42,11 +59,57 @@ export function SessionTimeline({ moment, playhead, onScrub, className }: Sessio
 
   return (
     <div className={cx(styles.timeline, className)}>
-      <div className={styles.head}>
-        <Label tone="secondary">Timeline · {moment.timestamp}</Label>
-        <Text as="span" variant="bodySM" tone="tertiary">
-          drag any track to scrub · the block below is whichever insight the playhead is standing on
-        </Text>
+      {/* THE RULER ROW — and there is no card header above it. The
+          `Timeline · 00:11:24` label and the "drag any track to
+          scrub" hint are gone: the time is already on the ruler and
+          on the transport pill, and the hint explained an
+          affordance the playhead makes obvious. */}
+      <div className={styles.rulerRow}>
+        <button
+          type="button"
+          className={styles.play}
+          aria-label={playing ? 'Pause' : 'Play'}
+          onClick={onPlay}
+        >
+          {playing ? (
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <rect x="6" y="5" width="4" height="14" rx="1" />
+              <rect x="14" y="5" width="4" height="14" rx="1" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 5l11 7-11 7z" />
+            </svg>
+          )}
+        </button>
+
+        {/* the ruler starts where the TRACKS start, not at the card
+            edge — its left edge is the same column boundary the
+            lanes below it use */}
+        <div
+          className={styles.ruler}
+          onPointerDown={(e) => scrubTo(e.clientX, e.currentTarget)}
+          onPointerMove={(e) => e.buttons === 1 && scrubTo(e.clientX, e.currentTarget)}
+        >
+          <div className={styles.rulerLabels}>
+            {RULER_MINUTES.map((m) => (
+              <Label key={m} tone="tertiary">
+                {minuteLabel(m)}
+              </Label>
+            ))}
+          </div>
+          <div className={styles.rulerTicks} aria-hidden="true">
+            {Array.from({ length: RULER_TICKS + 1 }, (_, i) => (
+              <span key={i} className={cx(styles.tick, i % 4 === 0 && styles.tickMajor)} />
+            ))}
+          </div>
+          {/* the playhead's handle rides on the tick row */}
+          <span
+            className={styles.handle}
+            style={{ '--x': `${(playhead * 100).toFixed(2)}%` } as CSSProperties}
+            aria-hidden="true"
+          />
+        </div>
       </div>
 
       <div className={styles.tracks}>
@@ -56,7 +119,7 @@ export function SessionTimeline({ moment, playhead, onScrub, className }: Sessio
         </Label>
         <div
           className={styles.lane}
-          style={{ '--lane-h': 'var(--aera-space-12)' } as CSSProperties}
+          style={{ '--lane-h': 'var(--aera-space-13)' } as CSSProperties}
           onPointerDown={(e) => scrubTo(e.clientX, e.currentTarget)}
           onPointerMove={(e) => e.buttons === 1 && scrubTo(e.clientX, e.currentTarget)}
         >
@@ -88,7 +151,7 @@ export function SessionTimeline({ moment, playhead, onScrub, className }: Sessio
         </Label>
         <div
           className={styles.lane}
-          style={{ '--lane-h': 'var(--aera-space-13)' } as CSSProperties}
+          style={{ '--lane-h': 'var(--aera-space-14)' } as CSSProperties}
           onPointerDown={(e) => scrubTo(e.clientX, e.currentTarget)}
           onPointerMove={(e) => e.buttons === 1 && scrubTo(e.clientX, e.currentTarget)}
         >
@@ -115,15 +178,29 @@ export function SessionTimeline({ moment, playhead, onScrub, className }: Sessio
         </Label>
         <div
           className={styles.lane}
-          style={{ '--lane-h': 'var(--aera-space-13)' } as CSSProperties}
+          style={{ '--lane-h': 'var(--aera-space-14)' } as CSSProperties}
           onPointerDown={(e) => scrubTo(e.clientX, e.currentTarget)}
           onPointerMove={(e) => e.buttons === 1 && scrubTo(e.clientX, e.currentTarget)}
         >
+          {/* THE STROKE SHIFTS ALONG ITS LENGTH: green at rest,
+              warming through yellow at the arousal spike, cooling to
+              blue on the descent. One flat colour said the trace was
+              one state throughout, which is the opposite of what it
+              measures. */}
           <svg className={styles.field} viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="physio" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor={colorData.mint} />
+                <stop offset="38%" stopColor={colorData.mint} />
+                <stop offset="55%" stopColor={colorData.yellow} />
+                <stop offset="70%" stopColor={colorData.orange} />
+                <stop offset="100%" stopColor={colorData.blue} />
+              </linearGradient>
+            </defs>
             <path
               d={smoothPath(wave, 0.18)}
               fill="none"
-              stroke={colorData.mint}
+              stroke="url(#physio)"
               strokeWidth="3.6"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -138,7 +215,7 @@ export function SessionTimeline({ moment, playhead, onScrub, className }: Sessio
         </Label>
         <div
           className={cx(styles.lane, styles.laneOpen)}
-          style={{ '--lane-h': 'var(--aera-space-13)' } as CSSProperties}
+          style={{ '--lane-h': 'var(--aera-space-14)' } as CSSProperties}
           onPointerDown={(e) => scrubTo(e.clientX, e.currentTarget)}
         >
           {moment.insights.map((insight) => (

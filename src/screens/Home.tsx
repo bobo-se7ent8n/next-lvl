@@ -1,90 +1,89 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { clamp } from '../lib/chart';
-import { PageHeader } from '../components/chrome/PageHeader';
+import { maxPosition } from '../features/patterns/fanGeometry';
+import { PageHeader, type HeaderView } from '../components/chrome/PageHeader';
 import { PatternFan } from '../features/patterns/PatternFan';
 import { FocusPanel } from '../features/home/FocusPanel';
 import { VitalCard } from '../features/home/VitalCard';
+import { EnterContext } from '../lib/enterContext';
 import { PATTERNS, VITALS } from '../data';
 import styles from './Home.module.css';
 
 /** wheel px that advance the hand by one card */
 const WHEEL_PER_CARD = 170;
-/** the extra push at the end of the set before the page releases */
-const RELEASE_PUSH = 90;
 
-/** Stage one spends the scroll on the hand; at the end of the set the
- *  lock releases and the page moves, once, to stage two. */
+const VIEWS: HeaderView[] = [
+  {
+    id: 'patterns',
+    title: 'Patterns',
+    subhead:
+      'A pattern is a behaviour your sessions keep repeating. Twelve of them are holding right now.',
+  },
+  {
+    id: 'vitals',
+    title: 'Focus & vitals',
+    subhead: 'One thing worth attention this week, and the body readings underneath it.',
+  },
+];
+
+/**
+ * HOME — two views, switched by the headings themselves.
+ *
+ * They used to be two stages of one very long scroll, which meant the
+ * second one could only be reached by exhausting the first: you had to
+ * scroll through all twelve pattern cards to see your vitals. They are
+ * two views of the same screen, not two chapters, so they are switched
+ * rather than travelled through — and the heading is the control,
+ * because a tab strip above a headline would be a second navigation
+ * bar on a screen that already has one.
+ *
+ * Switching re-scopes the enter key, so every number and graph in the
+ * arriving view recalculates exactly as it does on a tab change.
+ */
 export function Home() {
+  const [view, setView] = useState('patterns');
+  /* the hand is anchored left, so it opens on the first card of the
+     set and the window runs rightward from there */
   const [position, setPosition] = useState(0);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const stageTwo = useRef<HTMLDivElement>(null);
-  const push = useRef(0);
-  const snapping = useRef(false);
   const positionRef = useRef(0);
   const openRef = useRef<number | null>(null);
+  const viewRef = useRef(view);
 
-  /* the wheel handler reads the latest values without re-subscribing */
   useEffect(() => {
     positionRef.current = position;
     openRef.current = openIndex;
-  }, [position, openIndex]);
+    viewRef.current = view;
+  }, [position, openIndex, view]);
 
-  const max = PATTERNS.length - 1;
+  /* the last window start that still fills all five slots — past it
+     the hand would run out of cards and leave a hole on the right */
+  const max = maxPosition(PATTERNS.length);
 
-  const animateScrollTo = useCallback((to: number) => {
-    snapping.current = true;
-    const from = window.scrollY;
-    const t0 = performance.now();
-    const step = (now: number) => {
-      const k = Math.min(1, (now - t0) / 420);
-      const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-      window.scrollTo(0, from + (to - from) * e);
-      if (k < 1) requestAnimationFrame(step);
-      else {
-        snapping.current = false;
-        push.current = 0;
-      }
-    };
-    requestAnimationFrame(step);
-  }, []);
-
+  /* The wheel drives the hand while Patterns is up. It no longer has a
+     release at the end of the set: there is nothing below to release
+     into, so the hand simply stops at the last card. */
   const consume = useCallback(
     (delta: number) => {
-      if (snapping.current) return true;
-      /* a card is open — the page holds still behind it */
+      if (viewRef.current !== 'patterns') return false;
       if (openRef.current != null) return true;
 
-      const top = stageTwo.current?.offsetTop ?? window.innerHeight;
-      const inStageOne = window.scrollY < top * 0.5;
-
-      if (inStageOne) {
-        if (delta > 0 && positionRef.current >= max - 0.001) {
-          push.current += delta;
-          if (push.current > RELEASE_PUSH) {
-            push.current = 0;
-            animateScrollTo(top);
-          }
-          return true;
-        }
-        push.current = 0;
-        setPosition((p) => clamp(p + delta / WHEEL_PER_CARD, 0, max));
-        return true;
-      }
-
-      if (delta < 0 && window.scrollY <= top + 2) {
-        setPosition(max);
-        animateScrollTo(0);
-        return true;
-      }
-      return false;
+      const next = clamp(positionRef.current + delta / WHEEL_PER_CARD, 0, max);
+      if (next === positionRef.current) return false;
+      setPosition(next);
+      return true;
     },
-    [animateScrollTo, max],
+    [max],
   );
 
   useEffect(() => {
     const onWheel = (e: WheelEvent) => {
       const delta =
-        e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * window.innerHeight : e.deltaY;
+        e.deltaMode === 1
+          ? e.deltaY * 16
+          : e.deltaMode === 2
+            ? e.deltaY * window.innerHeight
+            : e.deltaY;
       if (consume(delta)) e.preventDefault();
     };
     window.addEventListener('wheel', onWheel, { passive: false });
@@ -112,36 +111,35 @@ export function Home() {
   }, [consume]);
 
   return (
-    <>
-      <section className={styles.stageOne}>
-        <PageHeader
-          title="Patterns"
-          subhead="A pattern is a behaviour your sessions keep repeating. Twelve of them are holding right now."
-        />
-        <PatternFan
-          className={styles.fan}
-          patterns={PATTERNS}
-          position={position}
-          onPosition={(p) => setPosition(clamp(p, 0, max))}
-          openIndex={openIndex}
-          onOpen={setOpenIndex}
-        />
-      </section>
+    <section className={styles.screen}>
+      <PageHeader views={VIEWS} activeView={view} onView={setView} />
 
-      <section className={styles.stageTwo} ref={stageTwo}>
-        <PageHeader
-          title="Focus & vitals"
-          subhead="One thing worth attention this week, and the body readings underneath it."
-        />
-        <div className={styles.grid}>
-          <FocusPanel />
-          <div className={styles.vitals}>
-            {VITALS.map((vital) => (
-              <VitalCard key={vital.id} vital={vital} />
-            ))}
-          </div>
-        </div>
-      </section>
-    </>
+      {/* keyed on the view so the arriving one settles in, and scoped
+          on it so its numbers and graphs recalculate — the same
+          treatment a tab change gets, because this is one */}
+      <div key={view} className={styles.view}>
+        <EnterContext.Provider value={view}>
+          {view === 'patterns' ? (
+            <PatternFan
+              className={styles.fan}
+              patterns={PATTERNS}
+              position={position}
+              onPosition={(p) => setPosition(clamp(p, 0, max))}
+              openIndex={openIndex}
+              onOpen={setOpenIndex}
+            />
+          ) : (
+            <div className={styles.grid}>
+              <FocusPanel />
+              <div className={styles.vitals}>
+                {VITALS.map((vital) => (
+                  <VitalCard key={vital.id} vital={vital} />
+                ))}
+              </div>
+            </div>
+          )}
+        </EnterContext.Provider>
+      </div>
+    </section>
   );
 }

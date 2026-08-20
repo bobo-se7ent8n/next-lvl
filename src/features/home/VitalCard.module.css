@@ -6,7 +6,10 @@
    legend take what they need and the graphic takes the rest.
    ============================================================ */
 .card {
-  gap: var(--aera-space-5);
+  /* gap is a no-op on a block box — this must stay flex */
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-card-gap);
   text-align: left;
   min-height: 0;
 }

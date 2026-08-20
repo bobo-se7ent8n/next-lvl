@@ -12,56 +12,43 @@
    pattern candidate is simply a shorter card.
    ============================================================ */
 .card {
-  gap: var(--aera-space-8);
+  /* gap is a no-op on a block box — this must stay flex */
+  display: flex;
+  flex-direction: column;
+  /* 16px between blocks; the card's own 20px padding comes from the
+     Card primitive and is not repeated here */
+  gap: var(--aera-card-gap);
   text-align: left;
   align-items: stretch;
 }
 
+/* THE GAPS ARE GAPS.
+
+   Every number in here is a `gap` on a real flex container and
+   nothing is a margin, so none of it can collapse and none of it
+   depends on what a child happens to bring with it.
+
+     .card  16px  — between blocks
+     .top    4px  — date line to title, and the block to the stats
+   The stat run's own two gaps (16px between groups, 2px between a
+   number and its unit) live on StatSet, which owns that row. */
 .top {
   display: flex;
   flex-direction: column;
-  gap: var(--aera-space-4);
+  /* the top block breathes at 12px, not the 4px tight step */
+  gap: var(--aera-inner-head-gap);
 }
 
-.dateRow {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--aera-space-6);
-}
-
-.note {
-  color: var(--aera-color-ink-secondary);
-}
-
-.foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--aera-space-6);
-  margin-top: auto;
-  padding-top: var(--aera-space-2);
-}
-
-.arrow {
-  display: flex;
-  align-items: center;
-  color: var(--aera-color-ink-tertiary);
-}
-
-.arrow svg {
-  width: 16px;
-  height: 16px;
-}
 
 /* the candidate block — the one thing that makes a card taller than
-   its neighbour, and the only difference between them */
+   its neighbour, and the only difference between them. It is a Well,
+   so its padding, its corner and its inset light are the standard
+   inner-container treatment rather than a second version of it. */
 .candidate {
+  /* gap is a no-op on a block box — this must stay flex */
   display: flex;
   flex-direction: column;
   gap: var(--aera-space-5);
   align-items: flex-start;
-  padding: var(--aera-space-8) var(--aera-space-9);
-  border-radius: var(--aera-radius-lg);
-  background: var(--aera-color-surface-level1);
+  justify-content: flex-start;
 }

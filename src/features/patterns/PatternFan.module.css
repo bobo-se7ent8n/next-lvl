@@ -29,47 +29,105 @@
   display: flex;
   flex-direction: column;
   gap: var(--aera-space-9);
+  /* nothing on the way down to the fan clips it */
+  overflow: visible;
 }
 
+/* THE STAGE IS SIZED BY THE FAN, AND CLIPS NOTHING.
+
+   Everything that used to cut a card off lived on this one element,
+   and all three of it is gone:
+
+     · `overflow: clip` — the clip itself. A card at the end of the
+       hand, or a title sitting low on a rotated card, was simply
+       sliced by the stage edge.
+     · `height: clamp(420px, 56vh, 560px)` — a height chosen from the
+       VIEWPORT rather than from the cards, so on a short window the
+       stage was shorter than the thing inside it.
+     · `transform: scale(var(--fit))` — shrinking the whole hand to
+       make it fit was treating the symptom. The stage is sized to the
+       content now, so there is nothing to shrink.
+
+   The height is the tallest card plus the room the stagger and the
+   hover lift need above and below it. It is a calc off --card-h, not
+   a viewport number, so it can never be shorter than what it holds. */
+/* THE STAGE IS SIZED BY THE FAN, AND CLIPS NOTHING.
+
+   Everything that used to cut a card off lived here, and all of it
+   is gone: the `overflow: clip`, the `height: clamp(...)` chosen
+   from the viewport rather than from the cards, and the
+   `transform: scale(var(--fit))` that shrank the whole hand to make
+   it fit. The height is a calc off --card-h plus the room the
+   stagger and the hover lift need, so it can never be shorter than
+   what it holds. */
 .stage {
-  /* five cards, so each one can be bigger without the hand widening */
-  --card-w: clamp(196px, 19vw, 292px);
-  --card-h: clamp(282px, 27vw, 406px);
+  /* THE CARDS ARE BIG. The graphic is the dominant element on a
+     pattern card now, and it cannot be dominant at 292px. */
+  --card-w: clamp(250px, 23vw, 380px);
+  /* Big, but not so tall that the hand plus the header plus the
+     hint runs under the fixed nav at the bottom of the viewport.
+     Still far larger than the 292 × 430 the cards were before. */
+  --card-h: clamp(360px, 31vw, 500px);
+  /* the stagger reaches 26px, the hover lift another 8, and the
+     tilt adds a little at the corners */
+  --fan-reach: 56px;
   position: relative;
   width: 100%;
-  height: clamp(420px, 56vh, 560px);
-  /* the ends of the hand sit outside the viewport by design */
-  overflow: clip;
-  /* the whole hand shrinks together when the viewport cannot hold
-     it, so the composition never changes — only its size does. This
-     sits on the STAGE rather than on each slot: the individual
-     `scale` property is applied before `transform`, so scaling a slot
-     would shrink the card without shrinking the offset that places
-     it, and the hand would come apart instead of getting smaller. */
-  transform: scale(var(--fit, 1));
-  transform-origin: 50% 50%;
+  height: calc(var(--card-h) + var(--fan-reach) * 2);
+  overflow: visible;
 }
 
-@supports not (overflow: clip) {
-  .stage {
-    overflow: hidden;
-  }
-}
-
+/* LEFT-ANCHORED. Slot 0 sits at the left edge of the stage and the
+   hand stacks rightward; there is no centring transform anywhere,
+   so advancing the set never slides the composition sideways. */
 .slot {
   position: absolute;
-  left: 50%;
+  left: 0;
   top: 50%;
   width: var(--card-w);
   height: var(--card-h);
-  margin-left: calc(var(--card-w) / -2);
   margin-top: calc(var(--card-h) / -2);
-  transform: translate3d(var(--x), var(--y), 0) rotate(var(--rot)) scale(var(--sc));
+  cursor: pointer;
+  /* THE FAN GEOMETRY AND THE HOVER, COMPOSED.
+
+     The lift, the swell and the straightening are extra terms on
+     the SAME transform as the fan's own placement, not a second
+     transform on an inner box: a card answers the pointer as one
+     object, and the tilt and offset it already carries have to
+     survive that. The defaults resolve to exactly the fan geometry.
+
+     `--straighten` scales the card's own rotation toward 0 — a
+     hovered card stands up a little rather than spinning. */
+  transform: translate3d(var(--x), var(--y), 0) translateY(var(--lift, 0px))
+    rotate(calc(var(--rot) * var(--straighten, 1))) scale(var(--sc))
+    scale(var(--swell, 1));
   opacity: var(--op);
   will-change: transform;
+  /* transform only, and one duration for both the hand moving and a
+     card lifting — leaving one card is the same gesture as arriving
+     at the next, so they must ease at the same rate or it snaps */
   transition:
-    transform var(--aera-duration-slow) var(--aera-ease-out),
+    transform var(--aera-duration-base) var(--aera-ease-out),
     opacity var(--aera-duration-slow) var(--aera-ease-out);
+}
+
+.slotHover {
+  --lift: -8px;
+  --swell: 1.02;
+  /* toward upright, not all the way to it */
+  --straighten: 0.45;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .slot {
+    transition: none;
+  }
+  .slotHover {
+    --lift: 0px;
+    --swell: 1;
+    --straighten: 1;
+  }
 }
 
 .slot > * {

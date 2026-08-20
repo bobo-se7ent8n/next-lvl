@@ -21,7 +21,7 @@ const meta: Meta<typeof SessionTimeline> = {
     docs: {
       description: {
         component:
-          'Four tracks on one time axis with a single playhead. The pose segments are sized by how long each phase actually takes — a drive is long and a release is not, and drawing them equal was the timeline’s worst lie — and the phase names are printed in the segments rather than repeated underneath them. The opponents track is a field of small round dots that thickens on contact and thins as separation opens; the physiology trace is drawn heavily enough to show its stress spike, the flat stretch where the breath is held, and the slow recovery after the shot.',
+          'Four tracks, one time axis, one playhead — and no card header. The `Timeline · 00:11:24` label and the "drag any track to scrub" hint are gone: the time is already on the ruler and the transport pill, and the hint explained an affordance the playhead makes obvious. The card starts at the ruler row, whose play button occupies the same column as the track labels so the ruler and every lane share one left edge. The playhead is a triangle on the tick row with its line running down through all four tracks and into the active insight chip. Physiology’s stroke shifts along its length — green at rest, warming through the arousal spike, cooling on the descent — because one flat colour said the trace was one state throughout.',
       },
     },
   },

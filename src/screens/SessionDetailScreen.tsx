@@ -18,7 +18,11 @@ export function SessionDetailScreen() {
   const { id } = useParams();
   const session = SESSIONS.find((s) => s.id === id);
   const [index, setIndex] = useState(0);
-  const [playhead, setPlayhead] = useState(0);
+  /* the playhead opens ON the first tracked insight rather than at
+     zero: parked at the far left it read as "not started" and the
+     block below it had nothing to show */
+  const [playhead, setPlayhead] = useState(() => MOMENTS[0].insights[0]?.at ?? 0.35);
+  const [playing, setPlaying] = useState(false);
 
   if (!session) return <Navigate to={ROUTES.sessions} replace />;
 
@@ -26,26 +30,21 @@ export function SessionDetailScreen() {
 
   const goto = (next: number) => {
     setIndex(next);
-    setPlayhead(0);
+    setPlayhead(MOMENTS[next].insights[0]?.at ?? 0);
   };
 
   return (
     <section className={styles.screen}>
-      {/* Three type tokens and no more: the title, one body line, and
-          the stat row. The description and the meta used to be two
-          rows in two different voices — a body line and a mono line —
-          which read as two separate facts about the same session. */}
+      {/* ONE ROW: title, stats, description. They were three stacked
+          rows in three different sizes, which made the session's own
+          numbers — the thing the page is about — the smallest type on
+          it. Reading left to right now: what it was, what happened,
+          what it was like. */}
       <header className={styles.head}>
-        <Display size="lg" as="h1">
+        <Display size="lg" as="h1" className={styles.title}>
           {session.title}
         </Display>
 
-        <Text variant="body" tone="secondary" className={styles.note}>
-          {session.note} · {session.date} · {session.duration}
-        </Text>
-
-        {/* the session's own numbers, at the top where they frame
-            everything below rather than at the foot of the page */}
         <StatSet
           className={styles.stats}
           stats={[
@@ -55,13 +54,17 @@ export function SessionDetailScreen() {
             { label: 'ast', value: session.ast },
           ].filter((s, i) => i === 0 || s.value > 0)}
         />
+
+        <Text variant="body" tone="secondary" className={styles.note}>
+          {session.note}
+        </Text>
       </header>
 
       {/* ONE BLOCK. The picture, the transport and the timeline are
           three rows of a single card: one time model has to look like
           one object, and two elevated cards with a gap between them
           read as two independent widgets. */}
-      <Card radius="card" padding="10" className={styles.timeBlock}>
+      <Card radius="card" className={styles.timeBlock}>
         <MotionStage
           moments={MOMENTS}
           index={index}
@@ -70,10 +73,19 @@ export function SessionDetailScreen() {
           onPlayhead={setPlayhead}
         />
 
-        <SessionTimeline moment={moment} playhead={playhead} onScrub={setPlayhead} />
-      </Card>
+        <SessionTimeline
+          moment={moment}
+          playhead={playhead}
+          onScrub={setPlayhead}
+          playing={playing}
+          onPlay={() => setPlaying((p) => !p)}
+        />
 
-      <SessionInsights insights={moment.insights} playhead={playhead} />
+        {/* the block hangs off the chip the playhead is standing on,
+            inside the same card, so the notch has something to point
+            at */}
+        <SessionInsights insights={moment.insights} playhead={playhead} />
+      </Card>
     </section>
   );
 }

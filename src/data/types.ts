@@ -69,6 +69,11 @@ export interface Session {
   stl: number;
   tag?: string;
   candidate?: { title: string; desc: string };
+  /** Stats for a session that is not a game. A solo shooting hour has
+   *  no points, rebounds or assists, so the game stat run collapses
+   *  to nothing and the card reads as broken; these are what that
+   *  session actually measured instead. */
+  extra?: Array<{ label: string; value: string | number }>;
   note: string;
 }
 

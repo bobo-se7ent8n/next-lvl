@@ -1,5 +1,12 @@
 /* ============================================================
-   NAV — one capsule track, centred at the TOP of the page.
+   NAV — one capsule track, centred at the BOTTOM of the viewport.
+
+   FIXED, AND OUT OF THE PAGE FLOW ENTIRELY. It is positioned
+   against the viewport, not against any page element, so its
+   coordinates are identical on all four tabs — the version that
+   sat inside the content column drifted horizontally on Sessions
+   and Scoreboard, because a scrollbar on those pages changed the
+   column's width and the nav was centred on the column.
 
    No shadow: the track and the active pill are told apart by fill
    contrast alone, which is the same rule the rest of the product
@@ -11,9 +18,14 @@
    ============================================================ */
 .nav {
   position: fixed;
-  top: var(--aera-space-8);
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: var(--aera-space-8);
+  /* centred on the VIEWPORT: left and right pinned together with a
+     zero-width margin box is immune to scrollbar width, which the
+     left: 50% / translateX version was not */
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: fit-content;
   z-index: 950;
 }
 
@@ -28,8 +40,14 @@
 
 .item {
   position: relative;
+  display: grid;
+  grid-template-areas: 'label';
+  place-items: center;
   border-radius: var(--aera-radius-pill);
   padding: var(--aera-space-5) var(--aera-space-9);
+  /* every item reserves the same width, so which one is current can
+     never reflow its neighbours */
+  min-width: var(--aera-layout-nav-item);
   font-family: var(--aera-text-body-family);
   font-size: var(--aera-text-body-sm-size);
   font-weight: var(--aera-weight-medium);
@@ -38,24 +56,44 @@
   transition:
     color var(--aera-duration-fast) var(--aera-ease-out),
     background var(--aera-duration-fast) var(--aera-ease-out),
-    transform var(--aera-duration-press) var(--aera-ease-firm);
+    transform var(--aera-duration-fast) var(--aera-ease-out);
 }
 
-/* the fill shifts under the pointer; nothing lifts and nothing grows */
+.label {
+  grid-area: label;
+}
+
+/* the fill shifts under the pointer, and the item lifts a little */
 .item:hover {
   color: var(--aera-color-ink-primary);
   background: var(--aera-color-utility-hover);
+  transform: translateY(-2px);
 }
 
+/* the press has resistance: it compresses, immediately */
 .item:active {
-  transform: scale(0.97);
+  transform: scale(0.985);
+  transition-duration: var(--aera-duration-press);
 }
 
+.item:focus-visible {
+  outline: 2px solid var(--aera-color-utility-focus);
+  outline-offset: 2px;
+}
+
+/* THE ACTIVE PILL IS THE SAME OBJECT ON EVERY TAB.
+
+   It changes exactly one thing — the fill — and nothing that has a
+   size. No border, no padding change, and NO weight change: a
+   semibold label is wider than a medium one, so making the current
+   item bolder re-measured the whole track and moved the bar every
+   time you switched tabs. The active item is told apart by its fill
+   against the track, which is the same rule every other surface in
+   the product follows. */
 .itemOn,
 .itemOn:hover {
   background: var(--aera-color-surface-background);
   color: var(--aera-color-ink-primary);
-  font-weight: var(--aera-weight-semibold);
 }
 
 .item:disabled {
@@ -66,7 +104,16 @@
 /* static placement, for stories and docs */
 .inline {
   position: static;
-  transform: none;
+  margin-inline: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .item:hover,
+  .item:active {
+    transition: none;
+    transform: none;
+  }
 }
 
 @media (max-width: 560px) {

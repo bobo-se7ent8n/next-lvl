@@ -26,7 +26,7 @@ const meta: Meta<typeof PatternFan> = {
     docs: {
       description: {
         component:
-          'Every pattern is in the set and eight of them are in the window, heavily overlapped — each card covers nearly two thirds of the one behind it. THE ACTIVE CARD IS ALWAYS CENTRED: the hand flows leftward through the middle of the stage as you scroll, and the ends look asymmetric only because the first and last cards have no neighbour on one side. Each card carries its own tilt and vertical stagger, both pure functions of the card index, so the hand never re-shuffles on a render; the slot supplies the spread and the scale falloff. Nothing inside the window fades, and a card leaving it animates out rather than popping. Clicking a card grows that card — the same element, on its own left, top, width, height and corner — into the expanded panel.',
+          'The hand, LEFT-ANCHORED. The first visible card sits at the left edge and the stack runs rightward; scrolling changes which five cards are on the stage, not where the stack sits. Depth runs left to right — the leftmost card is furthest back, the rightmost is front-most and active — so rotation and scale both climb with the slot index rather than falling away from a centre. The stage clips nothing and is sized by the cards: the `overflow: clip`, the viewport `height: clamp(...)` and the `transform: scale(--fit)` that used to slice cards off are all gone. Hover composes translateY(-8px), scale(1.02) and a partial straightening of the card’s own tilt onto the same transform as the fan geometry.',
       },
     },
   },

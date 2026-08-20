@@ -19,10 +19,16 @@
   flex: 0 0 auto;
 }
 
+/* the number and its unit, 2px apart. This has to declare its own
+   flex: `.row` sets it, but a rule that owns a gap must own the
+   display that makes the gap real — that coupling is exactly what
+   kept breaking. */
 .inline {
+  display: inline-flex;
+  align-items: baseline;
   padding: 0;
   border: 0;
-  gap: var(--aera-space-3);
+  gap: var(--aera-card-unit-gap);
 }
 
 .inline + .inline {
@@ -32,5 +38,5 @@
 .set {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--aera-space-4) var(--aera-space-11);
+  gap: var(--aera-card-group-gap);
 }

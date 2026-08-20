@@ -14,20 +14,30 @@
    that order. The description used to sit inline beside the title,
    there was a fourth mono row repeating the date and the duration,
    and the stats were at the bottom of the page. */
+/* title, stats and description on ONE row, baseline-aligned */
 .head {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--aera-space-5);
+  flex-direction: row;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--aera-card-gap) var(--aera-space-11);
 }
 
-.note {
-  max-width: var(--aera-layout-max-prose-width);
+.title {
+  flex: 0 0 auto;
 }
 
 .stats {
-  margin-top: var(--aera-space-5);
+  flex: 0 0 auto;
 }
+
+.note {
+  flex: 1 1 20ch;
+  min-width: 0;
+  max-width: var(--aera-layout-max-prose-width);
+}
+
+
 
 /* the stage, the transport and the timeline, as one surface */
 .timeBlock {
