@@ -60,6 +60,12 @@ export const layout = {
    *  at two different sizes — 32 on two screens and 40 on a third —
    *  which made the same layout read as three layouts. */
   splitGap: '32px',
+  /** the widest an insight bubble gets before its text wraps */
+  insightBubble: '500px',
+  /** THE RESERVED BAND the bubble opens into. It is always this tall
+   *  whether a bubble is showing or not, so nothing above it moves
+   *  when the playhead crosses a tag. */
+  insightRow: '132px',
   /** the width every nav item reserves, so the current one cannot
    *  reflow its neighbours */
   navItem: '104px',

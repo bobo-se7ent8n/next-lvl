@@ -1,4 +1,4 @@
-import { colorData, colorSurface } from '../tokens';
+import { colorData } from '../tokens';
 import type { Pattern, PatternState } from './types';
 
 export const STATE_LABEL: Record<PatternState, string> = {
@@ -12,14 +12,20 @@ export const STATE_LABEL: Record<PatternState, string> = {
    tokens, so a fanned hand never shows the same colour twice side by
    side. Both ends are tokens: the warm cream that used to sit in this
    list was a seventh colour that existed nowhere else in the system. */
+/* THE FIVE HUES, AND ONLY THE FIVE.
+
+   This list used to end with `level2` and `inverse`, which put one
+   near-white card and one black card into the fan. With five cards
+   on the stage they sat outside the window and were never seen;
+   with eight they are, and a black card in a row of coloured ones
+   reads as a rendering fault rather than as a card. Surfaces are
+   surfaces and data hues are data hues — a card face is the latter. */
 export const FAN_FILLS = [
   colorData.mint,
   colorData.yellow,
   colorData.orange,
   colorData.lilac,
   colorData.blue,
-  colorSurface.level2,
-  colorSurface.inverse,
 ] as const;
 
 /* Trend copy is deliberately flat: it states the direction and the
@@ -188,7 +194,7 @@ export const PATTERNS: Pattern[] = [
     hero: '+6',
     unit: 'pts',
     tone: 'mint',
-    fill: FAN_FILLS[5],
+    fill: FAN_FILLS[0],
     trend: 'Up four sessions running.',
     measured: 'Conversion on contested finishes taken inside five feet.',
     body: 'Finishes taken through contact are landing six points above your clean-look baseline gap from four sessions ago. The blocked rate has not risen with it.',
@@ -217,7 +223,7 @@ export const PATTERNS: Pattern[] = [
     hero: '+22',
     unit: '%',
     tone: 'orange',
-    fill: FAN_FILLS[6],
+    fill: FAN_FILLS[1],
     trend: 'Up ten points over four sessions.',
     measured: 'Share of shots taken as pull-ups in the final ten minutes.',
     body: 'In the last ten minutes of a session the mix moves toward pull-ups and away from the rim. The shift is larger now than it was in March, and it tracks with the handle pattern rather than with the shooting ones.',

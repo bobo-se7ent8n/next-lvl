@@ -10,16 +10,21 @@
   overflow: visible;
 }
 
-/* 1 — title left, tag hard right */
+/* 1 — the tag, hard left */
 .head {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: var(--aera-space-6);
 }
 
+/* 5 — the name, at the foot of the card. The display letters are
+   individually rotated and shifted, so they reach below the box the
+   line-height reserves for them; the headroom is its own rather than
+   borrowed from the card's padding. */
 .title {
   min-width: 0;
+  padding-bottom: var(--aera-space-2);
 }
 
 /* the kind pill. On a saturated card face a surface token would
@@ -58,8 +63,14 @@
   justify-content: stretch;
   padding: var(--aera-inner-padding);
   border-radius: var(--aera-radius-lg);
-  background: var(--viz-well);
+  /* FLAT level1, not a tint of the card's own face. The wash made
+     every illustration frame a slightly different colour, which is
+     the opposite of one recessed surface used everywhere. */
+  background: var(--aera-color-surface-level1);
   box-shadow: var(--aera-surface-inner-glow);
+  /* the illustration is measured off THIS box and clipped to it —
+     the dot grids and the bar sets were both breaking the frame */
+  overflow: hidden;
 }
 
 .viz > * {

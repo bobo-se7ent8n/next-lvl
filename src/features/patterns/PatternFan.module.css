@@ -63,26 +63,30 @@
 .stage {
   /* THE CARDS ARE BIG. The graphic is the dominant element on a
      pattern card now, and it cannot be dominant at 292px. */
-  --card-w: clamp(250px, 23vw, 380px);
-  /* Big, but not so tall that the hand plus the header plus the
-     hint runs under the fixed nav at the bottom of the viewport.
-     Still far larger than the 292 × 430 the cards were before. */
-  --card-h: clamp(360px, 31vw, 500px);
-  /* the stagger reaches 26px, the hover lift another 8, and the
-     tilt adds a little at the corners */
-  --fan-reach: 56px;
+  /* Five cards, so only two steps sit on each side of the centre and
+     the card can be large again. */
+  --card-w: clamp(190px, 21vw, 320px);
+  --card-h: clamp(330px, 29vw, 460px);
+  /* the drop reaches 2 × 16px, each card's own height offset another
+     ±22, the hover lift 8, and the tilt adds a little at the corners */
+  --fan-reach: 92px;
   position: relative;
   width: 100%;
   height: calc(var(--card-h) + var(--fan-reach) * 2);
   overflow: visible;
 }
 
-/* LEFT-ANCHORED. Slot 0 sits at the left edge of the stage and the
-   hand stacks rightward; there is no centring transform anywhere,
-   so advancing the set never slides the composition sideways. */
+/* THE ACTIVE CARD IS ON THE CENTRE LINE.
+
+   Every card is placed at 50% of the stage and then offset by its
+   own distance from the active one, so the active card — distance
+   zero — resolves to exactly the centre with no offset at all. The
+   set moves through that line; the line never moves along the set,
+   which is what stopped the whole fan translating off the canvas. */
 .slot {
   position: absolute;
-  left: 0;
+  left: 50%;
+  margin-left: calc(var(--card-w) / -2);
   top: 50%;
   width: var(--card-w);
   height: var(--card-h);
@@ -192,3 +196,30 @@
 }
 
 
+
+/* the active-position marker: centred, under the fan, above the
+   caption, pointing up at the active card */
+/* THE ACTIVE MARKER — an upward pointer with rounded corners.
+
+   A triangle built from borders cannot take a radius at all, so this
+   is a square rotated 45° carrying a real radius token, with the
+   window around it half as tall so only the upper half shows. What
+   is left is a pointer whose two visible corners are genuinely
+   rounded, and the radius is a token rather than a number. */
+.marker {
+  align-self: center;
+  width: var(--aera-space-10);
+  height: calc(var(--aera-space-10) / 2);
+  overflow: hidden;
+}
+
+.marker::before {
+  content: '';
+  display: block;
+  width: var(--aera-space-10);
+  height: var(--aera-space-10);
+  border-radius: var(--aera-radius-xs);
+  background: var(--aera-color-surface-level2);
+  transform: rotate(45deg) scale(0.72);
+  transform-origin: top center;
+}

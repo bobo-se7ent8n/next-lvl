@@ -8,7 +8,7 @@ import {
   cardHand,
   fanStep,
   slotDelta,
-  slotHidden,
+  windowFor,
   slotOpacity,
   slotShape,
 } from './fanGeometry';
@@ -194,6 +194,7 @@ export function PatternFan({
 
   const open = openIndex != null ? patterns[openIndex] : null;
   const step = fanStep(cardWidth);
+  const win = windowFor(position, patterns.length);
 
   return (
     <div className={cx(styles.wrap, className)}>
@@ -209,7 +210,9 @@ export function PatternFan({
           const d = slotDelta(i, position);
           const shape = slotShape(d);
           const hand = cardHand(i);
-          const hidden = slotHidden(d);
+          /* membership only — the window never moves a card, it only
+             decides whether the card is on the stage at all */
+          const onStage = i >= win.lo && i <= win.hi;
           /* the card that is currently flying is not also in the fan */
           const flying = openIndex === i;
 
@@ -227,7 +230,7 @@ export function PatternFan({
                   '--y': `${(shape.y + hand.dy).toFixed(1)}px`,
                   '--rot': `${(shape.rot + hand.rot).toFixed(2)}deg`,
                   '--sc': shape.scale.toFixed(4),
-                  '--op': flying ? 0 : slotOpacity(d),
+                  '--op': flying ? 0 : slotOpacity(onStage),
                   /* Cards outside the window are taken OUT OF LAYOUT,
                      not just hidden. Now that the stage no longer
                      clips, an absolutely-positioned slot sitting off
@@ -235,12 +238,9 @@ export function PatternFan({
                      scroll width — so the twelve-card set gave the
                      page a horizontal scrollbar even though only five
                      of them were visible. */
-                  display: hidden ? 'none' : undefined,
-                  /* DEPTH RUNS LEFT TO RIGHT: every card sits above
-                     the one to its left, so the rightmost is
-                     front-most and active. The old model stacked
-                     toward a centre, which is the opposite shape. */
-                  zIndex: hover === i ? 700 : 600 + d,
+                  display: onStage ? undefined : 'none',
+                  /* the apex is front-most; both sides fall behind it */
+                  zIndex: hover === i ? 700 : 600 - Math.round(Math.abs(d) * 10),
                 } as CSSProperties
               }
               onPointerEnter={() => !open && setHover(i)}
@@ -262,6 +262,12 @@ export function PatternFan({
 
       {/* the hint is pinned to the middle of the viewport and stays
           there however far the hand has travelled */}
+      {/* THE ACTIVE MARKER — a small triangle on the centre line,
+          pointing up at the card the fan is currently on. It is the
+          one fixed reference in a composition that otherwise moves:
+          the cards travel through it. */}
+      <span className={styles.marker} aria-hidden="true" />
+
       <div className={styles.hintRow}>
         <Label className={styles.hint}>
           {open ? 'click anywhere outside the card, or press escape, to close it' : hint}

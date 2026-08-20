@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cx } from '../../lib/css';
 import { Label, Mono } from '../../components/primitives/Text';
 import { Legend } from '../../components/viz/Legend';
@@ -100,6 +100,15 @@ export interface MotionStageProps {
   /** 0..1 along the moment — the same axis the timeline draws */
   playhead: number;
   onPlayhead: (next: number) => void;
+  /** the parent owns transport state now — the play button lives in
+   *  the timeline's ruler row, not on the stage */
+  playing?: boolean;
+  /** playback reached the end, or stopped itself on an insight */
+  onStop?: () => void;
+  /** called every animation frame with the live time. The parent uses
+   *  it to move the timeline playhead imperatively, so a running
+   *  playback re-renders nothing. */
+  onFrame?: (t: number) => void;
   className?: string;
 }
 
@@ -115,11 +124,14 @@ export function MotionStage({
   onMoment,
   playhead,
   onPlayhead,
+  playing,
+  onStop,
+  onFrame,
   className,
 }: MotionStageProps) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const menu = useRef<HTMLDivElement>(null);
-  const [playing, setPlaying] = useState(false);
+
   const [open, setOpen] = useState(false);
   const [size, setSize] = useState({ w: 900, h: 480 });
   /* where the camera is standing. Dragging the stage walks it around
@@ -151,30 +163,6 @@ export function MotionStage({
   /* Playback runs to the end of the moment and PAUSES on the next one.
      A moment is a thing you look at: the transport rolls you up to the
      next one and then waits for you. */
-  useEffect(() => {
-    if (!playing) return;
-    let raf = 0;
-    let last = performance.now();
-    const step = (now: number) => {
-      const dt = (now - last) / 1000;
-      last = now;
-      const next = head.current + dt / seconds;
-      if (next >= 1) {
-        setPlaying(false);
-        if (index < moments.length - 1) {
-          onMoment(index + 1);
-          onPlayhead(0);
-        } else {
-          onPlayhead(1);
-        }
-        return;
-      }
-      onPlayhead(next);
-      raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
-  }, [playing, seconds, index, moments.length, onMoment, onPlayhead]);
 
   /* the dropdown closes on escape, or on a press anywhere outside it */
   useEffect(() => {
@@ -191,8 +179,13 @@ export function MotionStage({
     };
   }, [open]);
 
-  /* ---- the frame: volume → camera → canvas ---- */
-  useEffect(() => {
+  /* ---- the frame: volume → camera → canvas ----
+
+     `draw` takes the time EXPLICITLY rather than reading a piece of
+     React state, which is what lets playback run without a render:
+     the loop below advances a ref and calls this directly, sixty
+     times a second, and React never hears about it. */
+  const draw = useCallback((t: number) => {
     const el = canvas.current;
     if (!el) return;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -221,7 +214,7 @@ export function MotionStage({
 
     /* the orbit is applied before anything is sorted or projected, so
        depth ordering follows the camera rather than the model */
-    const points: VolumePoint[] = [...floor, ...frameVolume(playhead)];
+    const points: VolumePoint[] = [...floor, ...frameVolume(t)];
     const spun = points.map((p) => ({ p, q: orbit(p, view.yaw) }));
     /* far points first, so nearer ones paint over them */
     spun.sort((a, b) => b.q.z - a.q.z);
@@ -248,7 +241,49 @@ export function MotionStage({
       ctx.roundRect(x - r / 2, y - r / 2, r, r, r * 0.3);
       ctx.fill();
     }
-  }, [playhead, size, floor, view]);
+  }, [size, floor, view]);
+
+  /* a scrub, a resize or a camera move redraws once, off state */
+  useEffect(() => {
+    draw(head.current);
+  }, [draw, playhead]);
+
+  /* PLAYBACK RUNS OFF A REF, NOT OFF STATE.
+   *
+   *  It was calling `onPlayhead` on every frame, which re-rendered
+   *  the screen, the canvas, the timeline and the insight block sixty
+   *  times a second — that is what the stutter was. Now the time
+   *  lives in a ref: the loop advances it, draws the canvas directly
+   *  and hands the value to `onFrame` for the parent to write into a
+   *  CSS variable. React is told once, when playback stops. */
+  useEffect(() => {
+    if (!playing) return;
+    let raf = 0;
+    let last = performance.now();
+
+    const step = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      const next = head.current + dt / seconds;
+
+      if (next >= 1) {
+        head.current = 1;
+        draw(1);
+        onFrame?.(1);
+        onPlayhead(1);
+        onStop?.();
+        return;
+      }
+
+      head.current = next;
+      draw(next);
+      onFrame?.(next);
+      raf = requestAnimationFrame(step);
+    };
+
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [playing, seconds, draw, onFrame, onPlayhead, onStop]);
 
   /* ---- drag to orbit ---- */
   const onOrbitStart = (e: React.PointerEvent<HTMLCanvasElement>) => {

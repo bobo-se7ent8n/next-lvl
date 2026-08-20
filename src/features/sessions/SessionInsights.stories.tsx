@@ -30,7 +30,7 @@ const meta: Meta<typeof SessionInsights> = {
     docs: {
       description: {
         component:
-          'The block under the timeline. Exactly one is on screen — the one the playhead is standing on — and it hangs off that chip rather than sitting centred in the card, with a small upward notch positioned from the insight’s own place along the lane so it points at its own chip. The empty "move the playhead onto a marker" placeholder is gone.',
+          'The bubble under the timeline. Exactly one is open — the insight the playhead is standing on — and it hangs off that chip with a notch pointing at it. It is two lines and nothing else: heading and tag share the first, the description sits under them. Width comes from the content and caps at 500px. The band it opens into is a FIXED height whether a bubble is showing or not, so the tracks above never shift as the playhead crosses a tag. It is clickable, so it carries a soft drop shadow rather than the inset light the non-clickable recesses use.',
       },
     },
   },

@@ -20,7 +20,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--aera-layout-split-gap);
-  align-items: start;
+  /* the three columns end on one line. `start` let each column stop
+     wherever its own content ran out, which left the shot field's
+     bottom edge floating well above the ratings column beside it. */
+  align-items: stretch;
   width: 100%;
 }
 
@@ -39,7 +42,6 @@
   flex-direction: column;
   gap: var(--aera-space-8);
   min-width: 0;
-  min-height: 0;
 }
 
 .stack > * {

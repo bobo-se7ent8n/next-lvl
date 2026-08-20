@@ -36,7 +36,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--aera-space-13);
+  /* sized to the TRACK-LABEL COLUMN, not to itself: it sits directly
+     above MOTION · POSE / OPPONENTS / PHYSIOLOGY / INSIGHTS and reads
+     as the head of that column */
+  width: 100%;
   height: var(--aera-space-13);
   border-radius: var(--aera-radius-md);
   background: var(--aera-color-surface-inverse);
@@ -103,14 +106,16 @@
    the line running down from it through every track below. */
 .handle {
   position: absolute;
-  left: var(--x);
+  /* --head is written imperatively every frame during playback; the
+     scrubbed value is the fallback */
+  left: var(--head, var(--x));
   bottom: 0;
   width: 0;
   height: 0;
-  margin-left: -5px;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 7px solid var(--aera-color-ink-primary);
+  margin-left: -8px;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 11px solid var(--aera-color-ink-primary);
   pointer-events: none;
 }
 
@@ -174,8 +179,8 @@
   transform: translate(-50%, -50%);
   border-radius: var(--aera-radius-sm);
   padding: var(--aera-space-3) var(--aera-space-6);
-  background: var(--aera-color-surface-inverse);
-  color: var(--aera-color-ink-on-inverse);
+  background: var(--aera-color-surface-level1);
+  color: var(--aera-color-ink-primary);
   white-space: nowrap;
   transition:
     background var(--aera-duration-fast) var(--aera-ease-out),
@@ -207,9 +212,9 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  left: var(--x);
-  width: 2px;
-  margin-left: -1px;
+  left: var(--head, var(--x));
+  width: 3px;
+  margin-left: -1.5px;
   border-radius: var(--aera-radius-pill);
   background: var(--aera-color-ink-primary);
 }

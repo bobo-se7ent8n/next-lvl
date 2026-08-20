@@ -6,12 +6,24 @@
    only chrome is the way back out of it. There is no page header
    here either — the stage starts directly under the back button.
    ============================================================ */
+/* ONE SCREEN, NO PAGE SCROLL. The shell is exactly the viewport and
+   the body inside it takes whatever the back button leaves, so the
+   header, the canvas and the tools block share the height rather
+   than the page growing past it. */
 .shell {
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  min-height: 100svh;
+  height: 100svh;
+  overflow: hidden;
   background: var(--aera-color-surface-background);
-  padding: var(--aera-space-9) var(--aera-layout-gutter) var(--aera-space-12);
+  padding: var(--aera-space-8) var(--aera-layout-gutter) var(--aera-space-8);
+}
+
+.back {
+  flex: 0 0 auto;
+  align-self: flex-start;
 }
 
 .back {
@@ -43,5 +55,9 @@
 }
 
 .body {
-  margin-top: var(--aera-space-9);
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--aera-space-8);
 }

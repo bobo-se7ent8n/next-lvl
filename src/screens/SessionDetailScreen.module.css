@@ -3,10 +3,37 @@
    and then the insight block for wherever the playhead is.
    Full bleed, no page header, no side panels.
    ============================================================ */
+/* ONE SCREEN, NO PAGE SCROLL. The header takes what it needs, the
+   canvas takes the slack and the tools block takes what it needs —
+   together exactly the viewport. */
 .screen {
   display: flex;
   flex-direction: column;
-  gap: var(--aera-space-11);
+  gap: var(--aera-space-8);
+  width: 100%;
+  /* the layout shell already owns the viewport; this just fills it */
+  flex: 1 1 auto;
+  min-height: 0;
+  min-height: 0;
+}
+
+/* the canvas runs full width with no frame of its own */
+.stageWrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.toolsFrame {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.tools {
   width: 100%;
 }
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 import { Card } from '../../components/primitives/Card';
 import { Chip } from '../../components/primitives/Chip';
@@ -8,7 +8,8 @@ import { accuracyColor } from '../../lib/color';
 import { COURT, CORNER_ANGLE, CORNER_Y, arcPoints } from '../../lib/court';
 import { SIZE_STOPS, buildShotField, dotSizeFor, zoneAt, zoneReading } from '../../lib/shotField';
 import { accuracyRamp, colorInk, dotMatrix } from '../../tokens';
-import { ZONES, ZONE_TOTALS } from '../../data/scoreboard';
+import { ZONES } from '../../data/scoreboard';
+import { usePeriod } from './periodContext';
 import styles from './ShotZonesField.module.css';
 
 /* The court is drawn in ONE neutral ink, over the field. The zone
@@ -25,10 +26,22 @@ const MARK = { keep: 0.3, faint: 0.12 } as const;
 /** how far a dot outside the hovered zone recedes */
 const DOT_FADE = 0.18;
 
+/* Opacity is fast because it answers the pointer; the geometry and
+   the colour are slower because they answer a period change. The
+   two are on one declaration so the hover behaviour — which works
+   and is deliberately untouched — keeps its own timing. */
+const DOT_TRANSITION =
+  'opacity var(--aera-duration-fast) var(--aera-ease-out),' +
+  ' x var(--aera-duration-slow) var(--aera-ease-out),' +
+  ' y var(--aera-duration-slow) var(--aera-ease-out),' +
+  ' width var(--aera-duration-slow) var(--aera-ease-out),' +
+  ' height var(--aera-duration-slow) var(--aera-ease-out),' +
+  ' fill var(--aera-duration-slow) var(--aera-ease-out)';
+
 const RAMP_FLOOR = 0.25;
 const RAMP_CEIL = 0.5;
 
-const FIELD = buildShotField();
+
 
 /** the markings, drawn once from the court's own numbers */
 function CourtLines() {
@@ -90,9 +103,13 @@ export interface ShotZonesFieldProps {
  *  the card header rather than in a tooltip that follows the pointer —
  *  a floating panel over a map covers the thing being read. */
 export function ShotZonesField({ className }: ShotZonesFieldProps) {
-  const overall = Math.round((ZONE_TOTALS.makes / ZONE_TOTALS.attempts) * 100);
+  const { data } = usePeriod();
+  /* the field is rebuilt from THIS window's zones, so switching the
+     period re-renders the dots rather than relabelling them */
+  const FIELD = useMemo(() => buildShotField(data.zones), [data.zones]);
+  const overall = data.totals.pct;
   const [active, setActive] = useState<string | null>(null);
-  const reading = active ? zoneReading(active) : null;
+  const reading = active ? zoneReading(active, data.zones) : null;
   const svg = useRef<SVGSVGElement>(null);
 
   /* Tap-away closes on touch, where there is no pointer-leave. */
@@ -128,7 +145,7 @@ export function ShotZonesField({ className }: ShotZonesFieldProps) {
     point.x = e.clientX;
     point.y = e.clientY;
     const local = point.matrixTransform(ctm.inverse());
-    return zoneAt(local.x, local.y);
+    return zoneAt(local.x, local.y, data.zones);
   };
 
   /* where the active zone's reading sits on the ramp, 0 = cold end */
@@ -159,7 +176,7 @@ export function ShotZonesField({ className }: ShotZonesFieldProps) {
           <>
             <Metric value={overall} unit="% FG" size="md" />
             <Text variant="bodySM" tone="tertiary" numeric>
-              {ZONE_TOTALS.makes} / {ZONE_TOTALS.attempts} on the session
+              {data.totals.makes} / {data.totals.attempts} on this window
             </Text>
           </>
         )}
@@ -204,6 +221,10 @@ export function ShotZonesField({ className }: ShotZonesFieldProps) {
                 rx={dotMatrix.corner}
                 fill={accuracyColor(dot.accuracy)}
                 opacity={faded ? DOT_FADE : 1}
+                /* the size and the colour both transition, so
+                   switching the period re-renders the field as a
+                   move rather than as a cut */
+                style={{ transition: DOT_TRANSITION }}
               />
             );
           })}

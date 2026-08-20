@@ -22,7 +22,7 @@
 
 import { COURT } from './court';
 import { dotMatrix } from '../tokens';
-import { ZONES, ZONE_TOTALS } from '../data/scoreboard';
+import { ZONES } from '../data/scoreboard';
 
 /** Each zone is a KERNEL: a centre where those shots were actually
  *  taken, and a reach. The reach is per-zone rather than global — the
@@ -73,13 +73,13 @@ const FLOOR = 0.07;
  *  zone owns it. The dots and the pointer hit layer both read this, so
  *  what you hover is exactly what lights up — a hit test that
  *  disagreed with the drawing would light the wrong neighbourhood. */
-function sampleAt(x: number, y: number): { attempts: number; made: number; zone: string } {
+function sampleAt(x: number, y: number, zones: typeof ZONES = ZONES): { attempts: number; made: number; zone: string } {
   let attempts = 0;
   let made = 0;
   let bestClaim = 0;
-  let zone = ZONES[0].id;
+  let zone = zones[0].id;
 
-  for (const z of ZONES) {
+  for (const z of zones) {
     const kernel = KERNEL[z.id];
     if (!kernel) continue;
     const d = Math.hypot(x - kernel.at[0], y - kernel.at[1]);
@@ -102,9 +102,9 @@ function sampleAt(x: number, y: number): { attempts: number; made: number; zone:
  *  single transparent rect over the whole court rather than one shape
  *  per zone: the dots have gaps between them, and a hit area made of
  *  dots is mostly holes. */
-export function zoneAt(x: number, y: number): string | null {
+export function zoneAt(x: number, y: number, zones: typeof ZONES = ZONES): string | null {
   if (!onCourt(x, y)) return null;
-  const { attempts, zone } = sampleAt(x, y);
+  const { attempts, zone } = sampleAt(x, y, zones);
   return attempts > 0 ? zone : null;
 }
 
@@ -132,14 +132,14 @@ function onCourt(x: number, y: number): boolean {
 }
 
 /** the field, built once from the same readings the zones carried */
-export function buildShotField(): { dots: FieldDot[]; peak: number } {
+export function buildShotField(zones: typeof ZONES = ZONES): { dots: FieldDot[]; peak: number } {
   const raw: Array<FieldDot & { attempts: number }> = [];
 
   for (let y = FIELD_PITCH / 2; y < COURT.height; y += FIELD_PITCH) {
     for (let x = FIELD_PITCH / 2; x < COURT.width; x += FIELD_PITCH) {
       if (!onCourt(x, y)) continue;
 
-      const { attempts, made, zone } = sampleAt(x, y);
+      const { attempts, made, zone } = sampleAt(x, y, zones);
       if (attempts <= 0) continue;
 
       raw.push({
@@ -192,12 +192,14 @@ export interface ZoneReading {
   comparison: string;
 }
 
-export function zoneReading(id: string): ZoneReading | null {
-  const zone = ZONES.find((z) => z.id === id);
+export function zoneReading(id: string, zones: typeof ZONES = ZONES): ZoneReading | null {
+  const zone = zones.find((z) => z.id === id);
   if (!zone) return null;
 
+  const totalMakes = zones.reduce((a, z) => a + z.makes, 0);
+  const totalAttempts = zones.reduce((a, z) => a + z.attempts, 0);
   const pct = Math.round((zone.makes / zone.attempts) * 100);
-  const average = Math.round((ZONE_TOTALS.makes / ZONE_TOTALS.attempts) * 100);
+  const average = Math.round((totalMakes / totalAttempts) * 100);
   const delta = pct - average;
   const size = Math.abs(delta);
 

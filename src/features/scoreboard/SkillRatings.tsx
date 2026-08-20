@@ -5,7 +5,7 @@ import { Metric } from '../../components/primitives/Metric';
 import { Display, Text } from '../../components/primitives/Text';
 import { Legend } from '../../components/viz/Legend';
 import { semanticColor } from '../../lib/color';
-import { SKILLS, SKILL_AVERAGE, WHERE_NEXT } from '../../data/scoreboard';
+import { usePeriod } from './periodContext';
 import styles from './SkillRatings.module.css';
 
 export interface SkillRatingsProps {
@@ -24,6 +24,8 @@ const quality = (value: number) => (value - 45) / 45;
  *  caption is gone — it explained where the numbers came from to a
  *  reader who had not asked, on the one card with the least room. */
 export function SkillRatings({ className }: SkillRatingsProps) {
+  const { data } = usePeriod();
+
   return (
     <Card radius="card" className={[styles.card, className].filter(Boolean).join(' ')}>
       <div className={styles.head}>
@@ -34,7 +36,7 @@ export function SkillRatings({ className }: SkillRatingsProps) {
       </div>
 
       <div className={styles.top}>
-        <Metric value={String(SKILL_AVERAGE)} unit="/ 100" size="md" />
+        <Metric value={String(data.average)} unit="/ 100" size="md" />
         <Legend
           items={[
             { label: 'strong', color: semanticColor(0.9) },
@@ -49,7 +51,7 @@ export function SkillRatings({ className }: SkillRatingsProps) {
           {/* sentence case, and not mono: this is a heading inside a
               card, not an annotation on a reading */}
           <Text variant="bodyStrong">Shooting</Text>
-          {SKILLS.shooting.map((s) => (
+          {data.skills.shooting.map((s) => (
             <ProgressRow
               key={s.label}
               className={styles.ratingRow}
@@ -61,7 +63,7 @@ export function SkillRatings({ className }: SkillRatingsProps) {
         </div>
         <div className={styles.group}>
           <Text variant="bodyStrong">Handling &amp; movement</Text>
-          {SKILLS.handling.map((s) => (
+          {data.skills.handling.map((s) => (
             <ProgressRow
               key={s.label}
               className={styles.ratingRow}
@@ -83,6 +85,8 @@ export function SkillRatings({ className }: SkillRatingsProps) {
  *  above it when it is the conclusion drawn from them. Repeatable: a
  *  rating row, and one line saying what that number actually does. */
 export function WhereToWorkNext({ className }: SkillRatingsProps) {
+  const { data } = usePeriod();
+
   return (
     <Card radius="card" className={[styles.card, className].filter(Boolean).join(' ')}>
       <div className={styles.head}>
@@ -92,7 +96,7 @@ export function WhereToWorkNext({ className }: SkillRatingsProps) {
       </div>
 
       <div className={styles.entries}>
-        {WHERE_NEXT.map((entry) => (
+        {data.workNext.map((entry) => (
           <div key={entry.label} className={styles.entry}>
             <ProgressRow
               className={styles.ratingRow}

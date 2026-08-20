@@ -13,6 +13,8 @@ export interface SparklineProps {
   weight?: number;
   /** mark the most recent reading with a dot */
   showEnd?: boolean;
+  /** flood the region under the curve, in the line's own colour */
+  area?: boolean;
   height?: number;
   ariaLabel?: string;
   className?: string;
@@ -22,12 +24,16 @@ export interface SparklineProps {
 const W = 100;
 const H = 40;
 
+/** how present the flood under a line is */
+const AREA_OPACITY = 0.28;
+
 /** a single series as a line — direction only, no axis, no grid */
 export function Sparkline({
   values,
   color,
   weight = 3,
   showEnd = true,
+  area,
   height = 44,
   ariaLabel,
   className,
@@ -37,6 +43,9 @@ export function Sparkline({
   const points = project(values, W, H, pad);
   const end = points[points.length - 1];
   const d = smoothPath(points);
+  /* the area is the same curve, closed down to the floor of the box.
+     Flat fill at a fixed alpha — never a gradient. */
+  const areaPath = `${d} L ${W} ${H} L 0 ${H} Z`;
 
   /* THE LINE DRAWS ITSELF IN, AND THEN THE DASH IS GONE.
    *
@@ -73,6 +82,7 @@ export function Sparkline({
         role="img"
         aria-label={ariaLabel ?? 'trend'}
       >
+        {area ? <path d={areaPath} fill={color} opacity={AREA_OPACITY} stroke="none" /> : null}
         <path
           ref={path}
           d={d}

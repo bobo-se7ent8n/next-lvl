@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { cx } from '../../lib/css';
 import { Chip } from '../../components/primitives/Chip';
-import { Label, Text } from '../../components/primitives/Text';
+import { Text } from '../../components/primitives/Text';
 import { ROUTES } from '../../app/routes';
 import type { MomentInsight } from '../../data/moments';
 import styles from './SessionInsights.module.css';
@@ -28,7 +28,13 @@ const TRACK_INSET = 'calc(var(--aera-space-16) + var(--aera-space-8))';
  *  once with the unreached ones greyed out. Clicking the description
  *  goes through to the full insight in the library. */
 export function SessionInsights({ insights, playhead, className }: SessionInsightsProps) {
-  const shown = insights.filter((insight) => Math.abs(playhead - insight.at) <= INSIGHT_WINDOW);
+  /* ONLY ONE. The nearest insight inside the window, never all of
+     the ones that happen to fall inside it — two open bubbles would
+     both claim to be the thing the playhead is standing on. */
+  const nearest = insights
+    .filter((insight) => Math.abs(playhead - insight.at) <= INSIGHT_WINDOW)
+    .sort((a, b) => Math.abs(playhead - a.at) - Math.abs(playhead - b.at));
+  const shown = nearest.slice(0, 1);
 
   return (
     <div className={cx(styles.list, className)}>
@@ -40,35 +46,32 @@ export function SessionInsights({ insights, playhead, className }: SessionInsigh
             className={styles.block}
             /* the notch points at the chip this block belongs to,
                which is at the insight's own position along the lane */
+            /* the bubble is pushed along the lane to sit under its own
+               tag, and the notch sits at its own left edge — anchored
+               to the tag, never centred in the container */
             style={
               {
-                '--notch': `calc(${TRACK_INSET} + (100% - ${TRACK_INSET}) * ${insight.at.toFixed(4)})`,
+                left: `calc(${TRACK_INSET} + (100% - ${TRACK_INSET}) * ${insight.at.toFixed(4)} - var(--aera-layout-insight-bubble) / 2)`,
+                '--notch': '50%',
               } as CSSProperties
             }
           >
             <span className={styles.notch} aria-hidden="true" />
-            {/* the chips sit in their own row above the title. They
-                used to share a grid column with it, which is what put
-                PATTERN CANDIDATE straight through the heading. */}
+            {/* TWO LINES, AND NOTHING ELSE. Heading and tag share the
+                first; the description sits under them. The pattern
+                name, and the "open the insight" footer, are both gone
+                — the whole block is the link, so a second affordance
+                inside it was saying the same thing twice. */}
             <div className={styles.tags}>
+              <Text variant="bodyStrong" className={styles.title}>
+                {insight.title}
+              </Text>
               <Chip tone="lilac">Pattern candidate</Chip>
-              <Label tone="tertiary">{insight.pattern}</Label>
             </div>
 
-            <Text variant="body" className={styles.title}>
-              {insight.title}
-            </Text>
             <Text variant="bodySM" tone="secondary">
               {insight.line}
             </Text>
-
-            <span className={styles.go}>
-              <Label tone="inherit">Open the insight</Label>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M7 17L17 7" />
-                <path d="M8 7h9v9" />
-              </svg>
-            </span>
           </Link>
         ))
       ) : null}

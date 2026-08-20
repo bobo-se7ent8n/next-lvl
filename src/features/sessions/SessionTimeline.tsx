@@ -188,12 +188,19 @@ export function SessionTimeline({
               one state throughout, which is the opposite of what it
               measures. */}
           <svg className={styles.field} viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true">
+            {/* THE COLOUR MAPS TO HEIGHT, NOT TO TIME.
+                A vertical gradient in the lane's own user space: high
+                on the track is hot, the middle band is the healthy
+                one, low is cold. Because the gradient is vertical the
+                line picks up its colour from where it actually IS,
+                and it interpolates continuously along its own path
+                rather than switching in blocks. */}
             <defs>
-              <linearGradient id="physio" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor={colorData.mint} />
-                <stop offset="38%" stopColor={colorData.mint} />
-                <stop offset="55%" stopColor={colorData.yellow} />
-                <stop offset="70%" stopColor={colorData.orange} />
+              <linearGradient id="physio" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={colorData.orange} />
+                <stop offset="34%" stopColor={colorData.yellow} />
+                <stop offset="52%" stopColor={colorData.mint} />
+                <stop offset="74%" stopColor={colorData.blue} />
                 <stop offset="100%" stopColor={colorData.blue} />
               </linearGradient>
             </defs>

@@ -10,7 +10,7 @@ const meta: Meta<typeof Scoreboard> = {
     docs: {
       description: {
         component:
-          'A compact bento grid — shot zones, points across three windows, shot mechanics and skills. Sport statistics only.',
+          'The bento. There is no period selector on the page: the window is chosen on ENTRY to the tab, stepping a deterministic cycle, so arriving at the scoreboard recalculates every number and re-renders the shot field. The dots transition their size and colour into the new dataset rather than cutting to it. Hover behaviour on the field is untouched.',
       },
     },
   },

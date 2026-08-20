@@ -143,8 +143,8 @@ export function ShotArc({ className }: ShotArcProps) {
 
         <circle cx={APEX[0]} cy={APEX[1]} r="4.5" fill={colorInk.primary} />
         <text
-          x={APEX[0] + 9}
-          y={APEX[1] - 6}
+          x="150"
+          y="24"
           className={styles.mark}
         >
           apex {ARC.apexY.toFixed(2)} m
@@ -171,15 +171,15 @@ export function ShotArc({ className }: ShotArcProps) {
           />
         </g>
         <text
-          x={RIM[0] - 6}
-          y={RIM[1] - 14}
+          x="315"
+          y="110"
           textAnchor="end"
           className={styles.mark}
         >
           entry {Math.abs(ARC.entryAngle).toFixed(0)}°
         </text>
         <text
-          x={(RELEASE[0] + RIM[0]) / 2}
+          x="178"
           y={FLOOR + 16}
           textAnchor="middle"
           className={styles.mark}

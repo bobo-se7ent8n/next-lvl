@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { Card } from '../components/primitives/Card';
 import { Display, Text } from '../components/primitives/Text';
@@ -18,11 +18,35 @@ export function SessionDetailScreen() {
   const { id } = useParams();
   const session = SESSIONS.find((s) => s.id === id);
   const [index, setIndex] = useState(0);
-  /* the playhead opens ON the first tracked insight rather than at
-     zero: parked at the far left it read as "not started" and the
-     block below it had nothing to show */
-  const [playhead, setPlayhead] = useState(() => MOMENTS[0].insights[0]?.at ?? 0.35);
+  /* the session opens at the beginning, playhead hard left */
+  const [playhead, setPlayhead] = useState(0);
   const [playing, setPlaying] = useState(false);
+  /* the live time, so a running playback never re-renders the tree */
+  const headRef = useRef(0);
+  const tools = useRef<HTMLDivElement>(null);
+
+  /* Every frame writes the playhead straight into a CSS variable on
+     the tools block. The line and its handle read that variable, so
+     they track the canvas at refresh rate without React doing any
+     work at all. */
+  const onFrame = useCallback(
+    (t: number) => {
+      headRef.current = t;
+      tools.current?.style.setProperty('--head', `${(t * 100).toFixed(3)}%`);
+
+      /* PLAYBACK STOPS ITSELF ON AN INSIGHT. Crossing a marker is the
+         one thing during a run that has to reach React, because the
+         tag goes active and its bubble opens. */
+      const hit = MOMENTS[index].insights.find(
+        (ins) => t >= ins.at && headRef.current >= ins.at && Math.abs(t - ins.at) < 0.012,
+      );
+      if (hit) {
+        setPlaying(false);
+        setPlayhead(hit.at);
+      }
+    },
+    [index],
+  );
 
   if (!session) return <Navigate to={ROUTES.sessions} replace />;
 
@@ -30,7 +54,7 @@ export function SessionDetailScreen() {
 
   const goto = (next: number) => {
     setIndex(next);
-    setPlayhead(MOMENTS[next].insights[0]?.at ?? 0);
+    setPlayhead(0);
   };
 
   return (
@@ -64,19 +88,33 @@ export function SessionDetailScreen() {
           three rows of a single card: one time model has to look like
           one object, and two elevated cards with a gap between them
           read as two independent widgets. */}
-      <Card radius="card" className={styles.timeBlock}>
+      {/* THE CANVAS IS FULL-BLEED — no frame around it, no border on
+          the page container. The tools below get the bordered box. */}
+      <div className={styles.stageWrap}>
         <MotionStage
           moments={MOMENTS}
           index={index}
           onMoment={goto}
           playhead={playhead}
           onPlayhead={setPlayhead}
+          playing={playing}
+          onStop={() => setPlaying(false)}
+          onFrame={onFrame}
         />
 
+      </div>
+
+      {/* THE TOOLS BLOCK — ruler, four tracks and the insight bubble,
+          all inside one bordered container. */}
+      <div ref={tools} className={styles.toolsFrame}>
+        <Card radius="card" className={styles.tools}>
         <SessionTimeline
           moment={moment}
           playhead={playhead}
-          onScrub={setPlayhead}
+          onScrub={(next) => {
+            headRef.current = next;
+            setPlayhead(next);
+          }}
           playing={playing}
           onPlay={() => setPlaying((p) => !p)}
         />
@@ -84,8 +122,9 @@ export function SessionDetailScreen() {
         {/* the block hangs off the chip the playhead is standing on,
             inside the same card, so the notch has something to point
             at */}
-        <SessionInsights insights={moment.insights} playhead={playhead} />
-      </Card>
+          <SessionInsights insights={moment.insights} playhead={playhead} />
+        </Card>
+      </div>
     </section>
   );
 }

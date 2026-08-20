@@ -18,6 +18,9 @@
   flex-direction: column;
   gap: var(--aera-card-gap);
   text-align: left;
+  /* fill the column so the card's bottom edge lands level with the
+     ratings column; the court is the part that takes the slack */
+  height: 100%;
 }
 
 .head {
@@ -35,10 +38,12 @@
   flex-wrap: wrap;
 }
 
-/* the court carries its own aspect now that the card hugs rather than
-   stretches — it used to take whatever a fixed-height card had left */
+/* the court is the elastic part of the card: it keeps its aspect as
+   a floor and grows into whatever the readings and legends leave */
 .court {
   display: block;
+  flex: 1 1 auto;
+  min-height: 0;
   width: 100%;
   aspect-ratio: 50 / 47;
   border-radius: var(--aera-radius-lg);
