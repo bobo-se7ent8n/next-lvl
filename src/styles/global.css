@@ -100,6 +100,17 @@ ul {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+    /* THE DELAYS HAVE TO GO TOO.
+
+       Collapsing the DURATION alone is not enough for anything
+       staggered: the delay survives, so a shot-field dot or a
+       calendar cell nine hundred milliseconds down the run sits at
+       its `backwards` fill — invisible — for the whole of that wait
+       and then snaps in. Which is a worse experience than the
+       animation it was meant to spare, and the one case where
+       reduced motion has to reach past duration. */
+    animation-delay: 0.001ms !important;
+    transition-delay: 0.001ms !important;
   }
 }
 

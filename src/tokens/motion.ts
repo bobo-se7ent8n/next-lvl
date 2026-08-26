@@ -53,11 +53,14 @@ export const duration = {
   historyDelay: '60ms',
   /** and one row's head start over the row above it */
   historyStep: '45ms',
-  /** THE OPENED PANEL'S OWN COUNT-UP. Shorter than the page-enter
-   *  `count`, and deliberately: the panel's numbers start while the
-   *  box is still flying, so they have to be done close to when it
-   *  lands rather than a third of a second afterwards. */
-  countPanel: '480ms',
+  /** THE SHORT COUNT-UP — a reading that arrives WITH its container
+   *  rather than with the page. The opened pattern panel's numbers
+   *  start while the box is still flying and the session rows' start
+   *  as the rows rise in, so both have to be done close to when the
+   *  thing carrying them lands rather than a third of a second
+   *  afterwards. Shorter than the page-enter `count` for that reason
+   *  and no other. */
+  countQuick: '480ms',
   /** the fan card opening into the expanded state */
   expand: '440ms',
   /** a long, quiet loop — the dot fields and the shot arc */

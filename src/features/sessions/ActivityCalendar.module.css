@@ -106,16 +106,48 @@
   justify-self: stretch;
   border-radius: var(--aera-radius-md);
   background: var(--cell-bg);
+  /* what this cell settles at once it has arrived. A day from the
+     neighbouring month rests quieter — see `.outside` — and the
+     entrance has to land on that value rather than on 1, or an
+     outside day flashes to full strength and then drops back. */
+  --cell-rest: 1;
   transition:
     background var(--aera-duration-fast) var(--aera-ease-out),
     transform var(--aera-duration-press) var(--aera-ease-firm);
+  /* THE MONTH FILLS IN, IN READING ORDER.
+
+     One stagger step per cell, written by the component from the
+     cell's place in the grid. `backwards` so a cell is invisible
+     through its own delay, and no fill forwards so the hover
+     transform below owns the element the moment the run ends.
+
+     EVERY DAY ANIMATES, including the ones with nothing on them: an
+     empty day arrives as an empty cell on the rest step of the ramp.
+     Skipping it would leave holes that fill in afterwards, which is
+     a way of pointing at the days you did not play. */
+  animation: cellIn var(--aera-duration-base) var(--aera-ease-out) backwards;
+  animation-delay: var(--cell-delay, 0ms);
+}
+
+@keyframes cellIn {
+  from {
+    opacity: 0;
+    transform: translateY(var(--aera-space-3)) scale(0.92);
+  }
+  to {
+    opacity: var(--cell-rest);
+    transform: translateY(0) scale(1);
+  }
 }
 
 .cell:hover {
   transform: scale(0.985);
 }
 
+/* a day belonging to the neighbouring month. It still arrives with
+   the rest — it is a day in the grid — just quieter once it lands. */
 .outside {
+  --cell-rest: 0.28;
   opacity: 0.28;
   pointer-events: none;
 }

@@ -88,7 +88,7 @@ export function ActivityCalendar({ className }: ActivityCalendarProps) {
       </div>
 
       <div className={styles.grid} onPointerLeave={() => setHover(null)}>
-        {days.map((day) => (
+        {days.map((day, i) => (
           <div
             key={day.key}
             className={[styles.cell, !day.inMonth && styles.outside].filter(Boolean).join(' ')}
@@ -96,6 +96,12 @@ export function ActivityCalendar({ className }: ActivityCalendarProps) {
               {
                 '--cell-bg': LEVEL_FILL[day.level],
                 '--cell-ink': day.level === 3 ? colorInk.primary : colorInk.secondary,
+                /* one stagger step per cell, in the order the grid is
+                   read — left to right, top to bottom. An empty day
+                   takes its turn like any other: it arrives on the
+                   rest step of the ramp, because a day you did not
+                   play is a day, not a miss. */
+                '--cell-delay': `calc(var(--aera-duration-stagger) * ${i})`,
               } as CSSProperties
             }
             onPointerEnter={(e) => day.inMonth && setHover({ day, ...anchorOf(e.currentTarget) })}

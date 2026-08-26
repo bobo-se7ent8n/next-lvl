@@ -178,7 +178,7 @@ export function ExpandedCard({
             inherit
             /* the panel's numbers start while the box is still
                flying, so they run shorter than a page-enter count */
-            countOver={duration.countPanel}
+            countOver={duration.countQuick}
           />
 
           <div className={cx(styles.cellMeasured, styles.measured)}>

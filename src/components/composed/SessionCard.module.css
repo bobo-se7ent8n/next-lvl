@@ -20,6 +20,41 @@
   gap: var(--aera-card-gap);
   text-align: left;
   align-items: stretch;
+  /* THE ROW RISES IN, ONE STAGGER STEP BEHIND THE ONE ABOVE IT.
+
+     `backwards` so a row is invisible through its own delay rather
+     than sitting finished waiting its turn, and no fill forwards, so
+     the moment the run ends the hover transform owns the element
+     again. The delay is written by the log, from the row's index. */
+  animation: rowRise var(--aera-duration-base) var(--aera-ease-out) backwards;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
+@keyframes rowRise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--aera-space-3));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* THE HOVER IS THE CARD SYSTEM'S OWN, MINUS THE WASH.
+
+   `Card` gives an interactive card a lift and a fill shift. The lift
+   is the treatment every clickable surface in the product shares and
+   it stays; the wash does not, because a session row is a dense block
+   of readings and tinting the whole face of it to say "you can click
+   this" dulls every number on it at once. The lift plus the shadow
+   step says the same thing and touches nothing that carries meaning. */
+.card:hover {
+  box-shadow: var(--aera-elevation-high);
+}
+
+.card:hover::after {
+  background: transparent;
 }
 
 /* THE GAPS ARE GAPS.

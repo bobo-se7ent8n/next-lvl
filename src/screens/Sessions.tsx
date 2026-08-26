@@ -4,7 +4,7 @@ import { SessionCard } from '../components/composed/SessionCard';
 import { ActivityCalendar } from '../features/sessions/ActivityCalendar';
 import { SESSIONS } from '../data';
 import { columnize, columnCountFor } from '../lib/columns';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { sessionPath } from '../app/routes';
 import styles from './Sessions.module.css';
 
@@ -13,6 +13,11 @@ import styles from './Sessions.module.css';
  *  the log on the right is what scrolls. */
 export function Sessions() {
   const navigate = useNavigate();
+
+  /* every session's place in the log, built once — the entrance
+     stagger reads it, and `columnize` has already thrown the order
+     away by the time the rows are rendered */
+  const order = useMemo(() => new Map(SESSIONS.map((s, i) => [s.id, i])), []);
 
   /* the bento is real flex columns, not CSS multi-column: a
      multi-column box has no flex gap, so the space between stacked
@@ -45,6 +50,14 @@ export function Sessions() {
                 <SessionCard
                   key={session.id}
                   session={session}
+                  /* THE STAGGER FOLLOWS THE SET, NOT THE COLUMN.
+                     `columnize` deals the log out into vertical
+                     stacks, so a per-column index would restart the
+                     count at the top of every column and the rows
+                     would arrive in three simultaneous races. The
+                     session's place in the log is its place in the
+                     order you read it. */
+                  index={order.get(session.id) ?? 0}
                   onClick={() => navigate(sessionPath(session.id))}
                 />
               ))}

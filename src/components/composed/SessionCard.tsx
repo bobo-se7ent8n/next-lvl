@@ -1,14 +1,20 @@
+import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
 import { Card } from '../primitives/Card';
 import { Chip } from '../primitives/Chip';
+import { Counted } from '../primitives/Metric';
 import { Well } from '../primitives/Surface';
 import { StatSet } from '../primitives/StatRow';
 import { Display, Label, Text } from '../primitives/Text';
+import { duration as durationToken } from '../../tokens';
 import type { Session } from '../../data/types';
 import styles from './SessionCard.module.css';
 
 export interface SessionCardProps {
   session: Session;
+  /** the row's place in the log — one stagger step per row, so the
+   *  list arrives in reading order rather than all at once */
+  index?: number;
   onClick?: () => void;
   className?: string;
 }
@@ -22,7 +28,7 @@ export interface SessionCardProps {
  *  line, and the "new pattern" pill went entirely — the candidate
  *  block below already says a pattern came out of this session, and
  *  saying it twice made the card look like it was selling something. */
-export function SessionCard({ session, onClick, className }: SessionCardProps) {
+export function SessionCard({ session, index = 0, onClick, className }: SessionCardProps) {
   const stats = [
     { label: 'pts', value: session.pts },
     { label: 'stl', value: session.stl },
@@ -41,14 +47,25 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
       interactive={Boolean(onClick)}
       onClick={onClick}
       className={cx(styles.card, className)}
+      style={
+        {
+          '--enter-delay': `calc(var(--aera-duration-stagger) * ${index})`,
+        } as CSSProperties
+      }
     >
       {/* THE TITLE BLOCK, then the stats, 4px apart — one real gap on
           one real flex column, not a margin on either of them. */}
       <div className={styles.top}>
         {/* date and duration are one line: they are both when, and
             they were two rows at opposite ends of the card */}
+        {/* THE DURATION IS A READING, so it counts like every other
+            number on the screen. It is split out of the line rather
+            than counted inside it because `Counted` needs the target
+            string on its own — and it keeps the unit: "62 min" counts
+            to "62 min", never to "62". */}
         <Label>
-          {session.date} · {session.duration}
+          {session.date} ·{' '}
+          <Counted value={session.duration} over={durationToken.countQuick} />
         </Label>
         <Display size="md" as="h3">
           {session.title}
