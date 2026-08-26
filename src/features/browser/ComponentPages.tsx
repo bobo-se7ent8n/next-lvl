@@ -353,23 +353,18 @@ export function PatternCardPage() {
 }
 
 export function CardFanPage() {
-  const [position, setPosition] = useState(0);
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <BrowserSection title="Eight cards, dropped rather than plotted">
+    <BrowserSection title="A hand, dropped rather than plotted">
       <Note>
-        The tilt and the vertical stagger are pure functions of the card index, so the hand is the
-        same on every render. Scale and opacity fall off toward the edges — the outermost pair sits
-        at 85% and 60% — so the set reads as continuing off-screen.
+        The tilt and the vertical nudge are pure functions of the card index, so the hand is the same
+        on every render. Scroll does not move it: scroll moves a target, and a rAF loop eases the
+        hand toward that target by a share of the remaining distance each frame. How many cards
+        stand is not a setting — a card shows while it is within 4.4 of the hand, so the set reads as
+        continuing off-screen at both ends.
       </Note>
       <Demo>
-        <PatternFan
-          patterns={PATTERNS}
-          position={position}
-          onPosition={setPosition}
-          openIndex={open}
-          onOpen={setOpen}
-        />
+        <PatternFan patterns={PATTERNS} openIndex={open} onOpen={setOpen} />
       </Demo>
     </BrowserSection>
   );

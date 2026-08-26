@@ -3,11 +3,11 @@ import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
 import { inkOn, mix, tintOf, vizWell } from '../../lib/color';
 import { Card } from '../../components/primitives/Card';
-import { Metric } from '../../components/primitives/Metric';
+import { Counted, Metric } from '../../components/primitives/Metric';
+import { useEnterKey } from '../../lib/enterContext';
+import { duration } from '../../tokens';
 import { Display, Label, Text } from '../../components/primitives/Text';
-import { Sparkline } from '../../components/viz/Sparkline';
-import { AreaChart } from '../../components/viz/AreaChart';
-import { BarSet } from '../../components/viz/BarSet';
+import { PatternChart } from './PatternChart';
 import { buildLadder, historyLabel } from './fitPlan';
 import { STATE_LABEL } from '../../data/patterns';
 import type { Pattern } from '../../data/types';
@@ -107,6 +107,9 @@ export function ExpandedCard({
 
   const plan = ladder[Math.min(rung, ladder.length - 1)];
   const rows = pattern.history.slice(-plan.historyRows);
+  /* the recalc's own trigger — the fan re-scopes this 140ms into the
+     flight, and everything that animates in here reads it */
+  const enterKey = useEnterKey();
 
   return (
     <Card
@@ -151,75 +154,117 @@ export function ExpandedCard({
           </Text>
         </div>
 
+        {/* FIVE CELLS ON THREE SHARED ROWS.
+
+            Both columns used to be flex stacks, which is why nothing
+            lined up: each one packed its own blocks at its own
+            heights, so the two body paragraphs started at different
+            y positions and the panel read as two unrelated columns
+            side by side. On a real grid the row starts are the same
+            line on both sides by construction.
+
+            The chart spans rows one and two, so its bottom edge and
+            the bottom of "what was measured" land together — which
+            is what puts the paragraph and the history heading on one
+            line. One row gap and one column gap, both from the
+            density steps; no block carries a margin of its own. */}
         <div className={styles.grid}>
-          <div className={styles.column}>
-            <Metric value={pattern.hero} unit={pattern.unit} size="lg" caption="current value" inherit />
+          <Metric
+            className={styles.cellHero}
+            value={pattern.hero}
+            unit={pattern.unit}
+            size="lg"
+            caption="current value"
+            inherit
+            /* the panel's numbers start while the box is still
+               flying, so they run shorter than a page-enter count */
+            countOver={duration.countPanel}
+          />
 
-            <div className={styles.measured}>
-              <Label tone="inherit" className={styles.quiet}>
-                What was measured
-              </Label>
-              <Text variant="bodySM" tone="inherit">
-                {pattern.measured}
-              </Text>
-            </div>
-
-            <Text variant="bodySM" tone="inherit" className={styles.body}>
-              {pattern.body}
+          <div className={cx(styles.cellMeasured, styles.measured)}>
+            <Label tone="inherit" className={styles.quiet}>
+              What was measured
+            </Label>
+            <Text variant="bodySM" tone="inherit">
+              {pattern.measured}
             </Text>
           </div>
 
-          <div className={styles.column}>
-            <div className={styles.viz} style={{ '--viz-well': vizWell(pattern.fill) } as CSSProperties}>
-              {pattern.viz === 'bars' ? (
-                <BarSet items={pattern.bars} height={plan.vizHeight} showLabels inherit />
-              ) : pattern.viz === 'dots' ? (
-                <AreaChart values={pattern.series} color={mark} height={plan.vizHeight} />
-              ) : (
-                <Sparkline values={pattern.series} color={mark} height={plan.vizHeight} weight={3} />
-              )}
-            </div>
+          <Text variant="bodySM" tone="inherit" className={cx(styles.cellBody, styles.body)}>
+            {pattern.body}
+          </Text>
 
-            <div>
-              <Label tone="inherit" className={styles.quiet}>
-                {historyLabel(rows.length, pattern.history.length)}
-              </Label>
-              <div className={styles.history}>
-                {rows.map((row) => (
-                  <div key={row.label} className={styles.historyRow}>
-                    <Text as="span" variant="bodySM" tone="inherit" className={styles.historyName}>
-                      {row.label}
-                    </Text>
-                    <span className={styles.historyBar}>
-                      <i
-                        className={styles.historyFill}
-                        style={
-                          {
-                            '--w': `${Math.max(4, Math.min(100, row.pct))}%`,
-                            '--fill': tint,
-                          } as CSSProperties
-                        }
-                      />
-                    </span>
-                    <Text
-                      as="span"
-                      variant="metricMD"
-                      tone="inherit"
-                      numeric
-                      className={styles.historyValue}
-                    >
-                      {row.value}
-                    </Text>
-                  </div>
-                ))}
-              </div>
+          <div
+            className={cx(styles.cellChart, styles.viz)}
+            style={{ '--viz-well': vizWell(pattern.fill) } as CSSProperties}
+          >
+            {/* THE SAME CHART THE CARD IN THE HAND DRAWS, at the
+                height the fit plan has budgeted and with its
+                annotations on */}
+            <PatternChart pattern={pattern} color={mark} height={plan.vizHeight} inherit />
+          </div>
+
+          <div className={styles.cellHistory}>
+            <Label tone="inherit" className={styles.quiet}>
+              {historyLabel(rows.length, pattern.history.length)}
+            </Label>
+            {/* KEYED ON THE ENTER KEY so the rows' CSS entrance
+                restarts when the panel recalculates 140ms into the
+                flight. A custom property change cannot re-fire an
+                animation; a remount can, and the count-up beside it
+                follows the same key through its own hook. */}
+            <div key={String(enterKey)} className={styles.history}>
+              {rows.map((row, i) => (
+                <div
+                  key={row.label}
+                  className={styles.historyRow}
+                  style={
+                    {
+                      '--row-delay': `calc(var(--aera-duration-history-delay) + var(--aera-duration-history-step) * ${i})`,
+                    } as CSSProperties
+                  }
+                >
+                  <Text
+                    as="span"
+                    variant="metricSM"
+                    tone="inherit"
+                    className={styles.historyName}
+                  >
+                    {row.label}
+                  </Text>
+                  <span className={styles.historyBar}>
+                    <i
+                      className={styles.historyFill}
+                      style={
+                        {
+                          '--w': `${Math.max(4, Math.min(100, row.pct))}%`,
+                          '--fill': tint,
+                        } as CSSProperties
+                      }
+                    />
+                  </span>
+                  {/* the value counts up and the label does not — and
+                      it is tabular, in a slot of a fixed width, so
+                      the row cannot reflow while it runs */}
+                  <Text
+                    as="span"
+                    variant="metricSM"
+                    tone="inherit"
+                    numeric
+                    className={styles.historyValue}
+                  >
+                    <Counted value={row.value} over={duration.countRow} />
+                  </Text>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        <Text variant="bodySM" tone="inherit" className={styles.note}>
+        {/* the same mono caps every other small label wears */}
+        <Label tone="inherit" className={styles.note}>
           Click anywhere to put it back.
-        </Text>
+        </Label>
       </div>
     </Card>
   );

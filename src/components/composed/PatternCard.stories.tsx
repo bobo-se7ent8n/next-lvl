@@ -57,14 +57,17 @@ export const States: Story = {
 };
 
 export const VizKinds: Story = {
-  name: 'Viz kinds',
+  name: 'Chart kinds',
   render: () => (
-    <StoryFrame name="PatternCard" note="sparkline · bars · dots — chosen by the pattern’s own shape">
+    <StoryFrame
+      name="PatternCard"
+      note="bars · area · line — the pattern’s own data, the same chart the panel opens with"
+    >
       <Row gap={24}>
-        {['rushing', 'contested3', 'fatigue'].map((id) => {
-          const pattern = PATTERNS.find((p) => p.id === id)!;
+        {[0, 1, 2].map((i) => {
+          const pattern = PATTERNS[i];
           return (
-            <div key={id} style={{ width: 226, height: 316 }}>
+            <div key={pattern.id} style={{ width: 226, height: 316 }}>
               <PatternCard pattern={pattern} />
             </div>
           );

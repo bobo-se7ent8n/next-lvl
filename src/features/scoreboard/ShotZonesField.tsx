@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type React from 'react';
 import { Card } from '../../components/primitives/Card';
 import { Chip } from '../../components/primitives/Chip';
@@ -6,7 +6,14 @@ import { Metric } from '../../components/primitives/Metric';
 import { Display, Label, Text } from '../../components/primitives/Text';
 import { accuracyColor } from '../../lib/color';
 import { COURT, CORNER_ANGLE, CORNER_Y, arcPoints } from '../../lib/court';
-import { SIZE_STOPS, buildShotField, dotSizeFor, zoneAt, zoneReading } from '../../lib/shotField';
+import {
+  FIELD_PITCH,
+  SIZE_STOPS,
+  buildShotField,
+  dotSizeFor,
+  zoneAt,
+  zoneReading,
+} from '../../lib/shotField';
 import { accuracyRamp, colorInk, dotMatrix } from '../../tokens';
 import { ZONES } from '../../data/scoreboard';
 import { usePeriod } from './periodContext';
@@ -40,6 +47,14 @@ const DOT_TRANSITION =
 
 const RAMP_FLOOR = 0.25;
 const RAMP_CEIL = 0.5;
+
+/** Which row of the grid a dot stands on. The entrance is staggered by
+ *  ROW rather than by dot — see the note on `.dot` in the stylesheet —
+ *  and the count runs from the baseline up, so the field fills in from
+ *  the basket outward the way the shots were taken. */
+function fieldRow(y: number): number {
+  return Math.max(0, Math.round((COURT.height - y) / FIELD_PITCH));
+}
 
 
 
@@ -174,7 +189,7 @@ export function ShotZonesField({ className }: ShotZonesFieldProps) {
           </>
         ) : (
           <>
-            <Metric value={overall} unit="% FG" size="md" />
+            <Metric value={String(overall)} unit="% FG" size="md" />
             <Text variant="bodySM" tone="tertiary" numeric>
               {data.totals.makes} / {data.totals.attempts} on this window
             </Text>
@@ -224,7 +239,12 @@ export function ShotZonesField({ className }: ShotZonesFieldProps) {
                 /* the size and the colour both transition, so
                    switching the period re-renders the field as a
                    move rather than as a cut */
-                style={{ transition: DOT_TRANSITION }}
+                style={
+                  {
+                    transition: DOT_TRANSITION,
+                    '--dot-delay': `calc(var(--aera-duration-stagger) * ${fieldRow(dot.y)})`,
+                  } as CSSProperties
+                }
               />
             );
           })}

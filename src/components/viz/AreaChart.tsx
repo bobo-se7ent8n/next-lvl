@@ -8,7 +8,9 @@ export interface AreaChartProps {
   color: string;
   /** how solid the filled body is */
   fillOpacity?: number;
-  height?: number;
+  /** a px number, or any CSS length — `'100%'` lets the chart fill
+   *  a cell that already has a definite height */
+  height?: number | string;
   ariaLabel?: string;
   className?: string;
   style?: CSSProperties;
@@ -36,7 +38,7 @@ export function AreaChart({
   return (
     <div
       className={cx(styles.chartBox, className)}
-      style={{ '--chart-h': `${height}px`, ...style } as CSSProperties}
+      style={{ '--chart-h': typeof height === 'number' ? `${height}px` : height, ...style } as CSSProperties}
     >
       <svg
         className={styles.chart}

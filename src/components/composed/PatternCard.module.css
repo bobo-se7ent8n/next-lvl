@@ -10,21 +10,22 @@
   overflow: visible;
 }
 
-/* 1 — the tag, hard left */
+/* 1 — THE HEADER ROW: the name takes the line, the kind tag is
+   pushed to the far right and never wraps under it. Aligned on the
+   FIRST BASELINE rather than on the box tops, so a two-line name
+   still sits level with the tag on its first line. */
 .head {
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
+  align-items: baseline;
+  justify-content: space-between;
   gap: var(--aera-space-6);
 }
 
-/* 5 — the name, at the foot of the card. The display letters are
-   individually rotated and shifted, so they reach below the box the
-   line-height reserves for them; the headroom is its own rather than
-   borrowed from the card's padding. */
+/* the name. It takes whatever the tag leaves and wraps inside it —
+   the tag is the fixed part of the row, never the name. */
 .title {
+  flex: 1 1 auto;
   min-width: 0;
-  padding-bottom: var(--aera-space-2);
 }
 
 /* the kind pill. On a saturated card face a surface token would
@@ -62,7 +63,10 @@
   flex-direction: column;
   justify-content: stretch;
   padding: var(--aera-inner-padding);
-  border-radius: var(--aera-radius-lg);
+  /* THE CARD CORNER, not the inner one. The chart block is the whole
+     lower half of the card face, so a tighter radius on it read as a
+     second, smaller card sitting inside the first. */
+  border-radius: var(--aera-radius-card);
   /* FLAT level1, not a tint of the card's own face. The wash made
      every illustration frame a slightly different colour, which is
      the opposite of one recessed surface used everywhere. */

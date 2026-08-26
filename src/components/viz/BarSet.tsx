@@ -9,7 +9,9 @@ import styles from './Charts.module.css';
 
 export interface BarSetProps {
   items: SeriesPoint[];
-  height?: number;
+  /** a px number, or any CSS length — `'100%'` lets the chart fill
+   *  a cell that already has a definite height */
+  height?: number | string;
   /** show the number above each bar */
   showValues?: boolean;
   /** show the category under each bar */
@@ -43,7 +45,7 @@ export function BarSet({
   return (
     <div
       className={cx(styles.bars, className)}
-      style={{ '--chart-h': `${height}px`, ...style } as CSSProperties}
+      style={{ '--chart-h': typeof height === 'number' ? `${height}px` : height, ...style } as CSSProperties}
       role="img"
       aria-label={items.map((i) => `${i.label} ${i.value}`).join(', ')}
     >

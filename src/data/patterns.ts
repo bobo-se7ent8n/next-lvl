@@ -1,4 +1,4 @@
-import { colorData } from '../tokens';
+import { colorData, colorFace } from '../tokens';
 import type { Pattern, PatternState } from './types';
 
 export const STATE_LABEL: Record<PatternState, string> = {
@@ -8,29 +8,38 @@ export const STATE_LABEL: Record<PatternState, string> = {
   declining: 'Declining',
 };
 
-/* The card faces cycle through the AERA palette plus two surface
-   tokens, so a fanned hand never shows the same colour twice side by
-   side. Both ends are tokens: the warm cream that used to sit in this
-   list was a seventh colour that existed nowhere else in the system. */
-/* THE FIVE HUES, AND ONLY THE FIVE.
+/* SEVEN FACES, IN THIS ORDER, BY INDEX MODULO SEVEN.
 
-   This list used to end with `level2` and `inverse`, which put one
-   near-white card and one black card into the fan. With five cards
-   on the stage they sat outside the window and were never seen;
-   with eight they are, and a black card in a row of coloured ones
-   reads as a rendering fault rather than as a card. Surfaces are
-   surfaces and data hues are data hues — a card face is the latter. */
+   FIVE IS THE WRONG NUMBER and it was the wrong number for a
+   structural reason, not a taste one: with five fills and twelve
+   patterns the sixth card wears the first card's colour, and a hand
+   that repeats on a five-beat reads as a loop rather than as a set
+   you are part-way through. Seven does not divide twelve, so no two
+   cards on the stage at once ever share a face.
+
+   The last two are what actually break it. Beige and near-black are
+   LOW-CHROMA — they are not trying to be hues — so they read as
+   punctuation in a row of colour, and the eye stops looking for the
+   pattern the moment it hits one. Five saturated cards cannot do
+   that for each other however they are ordered.
+
+   Ink is COMPUTED from the face, never listed alongside it: `inkOn`
+   measures the fill's luminance and returns light ink or dark, so
+   the near-black card gets light type and the other six get dark
+   without a single special case anywhere in the component. */
 export const FAN_FILLS = [
   colorData.mint,
   colorData.yellow,
   colorData.orange,
   colorData.lilac,
   colorData.blue,
+  colorFace.beige,
+  colorFace.ink,
 ] as const;
 
 /* Trend copy is deliberately flat: it states the direction and the
    window, and stops there. No praise, no warning, no exclamation. */
-export const PATTERNS: Pattern[] = [
+const PATTERN_SET: Array<Omit<Pattern, 'fill'>> = [
   {
     id: 'rushing',
     name: 'Rushing under pressure',
@@ -39,7 +48,6 @@ export const PATTERNS: Pattern[] = [
     hero: '0.42',
     unit: 's',
     tone: 'mint',
-    fill: FAN_FILLS[0],
     trend: 'Down 0.19s across the last six sessions.',
     measured: 'Time from catch to release on contested catch-and-shoot reps.',
     body: 'Release time under a closeout has moved steadily toward your unpressured baseline. The change shows up on all three shot types, not just the catch-and-shoot, which is what separates a real adjustment from a good night.',
@@ -71,7 +79,6 @@ export const PATTERNS: Pattern[] = [
     hero: '+8',
     unit: 'pts',
     tone: 'yellow',
-    fill: FAN_FILLS[1],
     trend: 'Held above +6 for three sessions.',
     measured: 'Field-goal percentage on the possession directly after a make.',
     body: 'The possession after a make now carries more of your average than it did six sessions ago. The gap between after-make and after-miss has narrowed from eleven points to eight.',
@@ -101,7 +108,6 @@ export const PATTERNS: Pattern[] = [
     hero: '52',
     unit: '%',
     tone: 'orange',
-    fill: FAN_FILLS[2],
     trend: 'Down six points over five sessions.',
     measured: 'Field-goal percentage with a defender inside four feet at release.',
     body: 'Contested threes are converting less often than they did in March. The open-shot number has not moved, so this reads as a response to pressure rather than a change in the shot itself.',
@@ -131,7 +137,6 @@ export const PATTERNS: Pattern[] = [
     hero: '0.3',
     unit: 's',
     tone: 'orange',
-    fill: FAN_FILLS[3],
     trend: 'Up from 0.12s over six sessions.',
     measured: 'The pause between catch and gather on left-wing catches.',
     body: 'A pause appears on the left wing that does not appear on the right. It has grown session over session and now sits at three tenths of a second — long enough to change what the defender can do.',
@@ -163,7 +168,6 @@ export const PATTERNS: Pattern[] = [
     hero: '+0.08',
     unit: 's',
     tone: 'mint',
-    fill: FAN_FILLS[4],
     trend: 'Up steadily since session 9.',
     measured: 'Acceleration over the first metre out of a live triple-threat.',
     body: 'First-step acceleration in live reps has moved four times further than it has in drills. The change is showing up where it counts rather than where it is easy.',
@@ -194,7 +198,6 @@ export const PATTERNS: Pattern[] = [
     hero: '+6',
     unit: 'pts',
     tone: 'mint',
-    fill: FAN_FILLS[0],
     trend: 'Up four sessions running.',
     measured: 'Conversion on contested finishes taken inside five feet.',
     body: 'Finishes taken through contact are landing six points above your clean-look baseline gap from four sessions ago. The blocked rate has not risen with it.',
@@ -223,7 +226,6 @@ export const PATTERNS: Pattern[] = [
     hero: '+22',
     unit: '%',
     tone: 'orange',
-    fill: FAN_FILLS[1],
     trend: 'Up ten points over four sessions.',
     measured: 'Share of shots taken as pull-ups in the final ten minutes.',
     body: 'In the last ten minutes of a session the mix moves toward pull-ups and away from the rim. The shift is larger now than it was in March, and it tracks with the handle pattern rather than with the shooting ones.',
@@ -252,7 +254,6 @@ export const PATTERNS: Pattern[] = [
     hero: '13',
     unit: '%',
     tone: 'blue',
-    fill: FAN_FILLS[0],
     trend: 'Flat across four sessions.',
     measured: 'Variance in dribble height and cadence over the final ten minutes.',
     body: 'Dribble variance climbs late in every session by about the same amount. It has not grown and it has not settled — it is simply a shape your sessions have.',
@@ -282,7 +283,6 @@ export const PATTERNS: Pattern[] = [
     hero: '85',
     unit: '%',
     tone: 'blue',
-    fill: FAN_FILLS[1],
     trend: 'Within one point for six sessions.',
     measured: 'Free-throw conversion across streaks of five or more attempts.',
     body: 'Free throws sit inside a one-point band whatever else the session does. Long make-streaks and long miss-streaks both return to the same number.',
@@ -313,7 +313,6 @@ export const PATTERNS: Pattern[] = [
     hero: '74',
     unit: '/ 100',
     tone: 'mint',
-    fill: FAN_FILLS[2],
     trend: 'Up six points over six sessions.',
     measured: 'Foot placement and set time on catches taken in the corner.',
     body: 'Corner catches are being set up more completely than they were: feet arrive before the ball more often, and the rushed share has dropped by a quarter.',
@@ -344,7 +343,6 @@ export const PATTERNS: Pattern[] = [
     hero: '91',
     unit: '%',
     tone: 'lilac',
-    fill: FAN_FILLS[3],
     trend: 'Inside a three-point band all season.',
     measured: 'Share of possessions that end without a live-ball turnover.',
     body: 'Possessions ending clean stay in a narrow band whatever the opponent does. The nine percent that do not are concentrated in the last ten minutes.',
@@ -375,7 +373,6 @@ export const PATTERNS: Pattern[] = [
     hero: '+0.4',
     unit: 's',
     tone: 'yellow',
-    fill: FAN_FILLS[4],
     trend: 'Seen in three sessions so far.',
     measured: 'Length of the free-throw routine, measured from the ball arriving.',
     body: 'The free-throw routine is running four tenths longer than it did two sessions ago. Three readings is enough to name it and not yet enough to call it settled.',
@@ -396,3 +393,24 @@ export const PATTERNS: Pattern[] = [
     scoreboardBlock: 'Shot mechanics',
   },
 ];
+
+/* ------------------------------------------------------------
+   THE FACE IS A PROPERTY OF THE CARD'S PLACE IN THE SET, not of
+   the pattern.
+
+   It used to be written out on each pattern by hand, which is how
+   the cycle drifted: the sixth, eighth and ninth cards had all been
+   given fill 0 or 1 at different times, so three of the twelve wore
+   mint and three wore yellow while beige and near-black went unused
+   entirely. Index modulo seven cannot drift.
+   ------------------------------------------------------------ */
+
+/** the face the card at `index` wears */
+export function faceFor(index: number): string {
+  return FAN_FILLS[index % FAN_FILLS.length];
+}
+
+export const PATTERNS: Pattern[] = PATTERN_SET.map((pattern, i) => ({
+  ...pattern,
+  fill: faceFor(i),
+}));

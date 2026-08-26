@@ -1,6 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { clamp } from '../lib/chart';
-import { maxPosition } from '../features/patterns/fanGeometry';
+import { useState } from 'react';
 import { PageHeader, type HeaderView } from '../components/chrome/PageHeader';
 import { PatternFan } from '../features/patterns/PatternFan';
 import { FocusPanel } from '../features/home/FocusPanel';
@@ -8,9 +6,6 @@ import { VitalCard } from '../features/home/VitalCard';
 import { EnterContext } from '../lib/enterContext';
 import { PATTERNS, VITALS } from '../data';
 import styles from './Home.module.css';
-
-/** wheel px that advance the hand by one card */
-const WHEEL_PER_CARD = 170;
 
 const VIEWS: HeaderView[] = [
   {
@@ -42,73 +37,19 @@ const VIEWS: HeaderView[] = [
  */
 export function Home() {
   const [view, setView] = useState('patterns');
-  /* the hand is anchored left, so it opens on the first card of the
-     set and the window runs rightward from there */
-  const [position, setPosition] = useState(0);
+  /* THE HAND OWNS ITS OWN POSITION.
+   *
+   *  This screen used to hold it in React state and drive it from a
+   *  wheel handler up here, which meant every notch of the wheel
+   *  re-rendered Home, the fan, twelve cards and everything inside
+   *  them. The hand is a float in a ref inside PatternFan now, eased
+   *  toward its target by a rAF loop that writes custom properties
+   *  straight onto the slots — so scrolling the fan re-renders
+   *  nothing at all, and there is no position to thread through here.
+   *
+   *  Which card is OPEN is still React's business: that changes when
+   *  someone clicks, not sixty times a second. */
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const positionRef = useRef(0);
-  const openRef = useRef<number | null>(null);
-  const viewRef = useRef(view);
-
-  useEffect(() => {
-    positionRef.current = position;
-    openRef.current = openIndex;
-    viewRef.current = view;
-  }, [position, openIndex, view]);
-
-  /* the last window start that still fills all five slots — past it
-     the hand would run out of cards and leave a hole on the right */
-  const max = maxPosition(PATTERNS.length);
-
-  /* The wheel drives the hand while Patterns is up. It no longer has a
-     release at the end of the set: there is nothing below to release
-     into, so the hand simply stops at the last card. */
-  const consume = useCallback(
-    (delta: number) => {
-      if (viewRef.current !== 'patterns') return false;
-      if (openRef.current != null) return true;
-
-      const next = clamp(positionRef.current + delta / WHEEL_PER_CARD, 0, max);
-      if (next === positionRef.current) return false;
-      setPosition(next);
-      return true;
-    },
-    [max],
-  );
-
-  useEffect(() => {
-    const onWheel = (e: WheelEvent) => {
-      const delta =
-        e.deltaMode === 1
-          ? e.deltaY * 16
-          : e.deltaMode === 2
-            ? e.deltaY * window.innerHeight
-            : e.deltaY;
-      if (consume(delta)) e.preventDefault();
-    };
-    window.addEventListener('wheel', onWheel, { passive: false });
-    return () => window.removeEventListener('wheel', onWheel);
-  }, [consume]);
-
-  useEffect(() => {
-    let last: number | null = null;
-    const onStart = (e: TouchEvent) => {
-      last = e.touches[0].clientY;
-    };
-    const onMove = (e: TouchEvent) => {
-      if (last == null) return;
-      const y = e.touches[0].clientY;
-      const delta = (last - y) * 1.4;
-      last = y;
-      if (consume(delta)) e.preventDefault();
-    };
-    window.addEventListener('touchstart', onStart, { passive: true });
-    window.addEventListener('touchmove', onMove, { passive: false });
-    return () => {
-      window.removeEventListener('touchstart', onStart);
-      window.removeEventListener('touchmove', onMove);
-    };
-  }, [consume]);
 
   return (
     <section className={styles.screen}>
@@ -123,8 +64,6 @@ export function Home() {
             <PatternFan
               className={styles.fan}
               patterns={PATTERNS}
-              position={position}
-              onPosition={(p) => setPosition(clamp(p, 0, max))}
               openIndex={openIndex}
               onOpen={setOpenIndex}
             />

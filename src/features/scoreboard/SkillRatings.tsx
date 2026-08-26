@@ -51,24 +51,29 @@ export function SkillRatings({ className }: SkillRatingsProps) {
           {/* sentence case, and not mono: this is a heading inside a
               card, not an annotation on a reading */}
           <Text variant="bodyStrong">Shooting</Text>
-          {data.skills.shooting.map((s) => (
+          {data.skills.shooting.map((s, i) => (
             <ProgressRow
               key={s.label}
               className={styles.ratingRow}
               label={s.label}
               value={s.value}
+              index={i}
               color={semanticColor(quality(s.value))}
             />
           ))}
         </div>
         <div className={styles.group}>
           <Text variant="bodyStrong">Handling &amp; movement</Text>
-          {data.skills.handling.map((s) => (
+          {/* the second group carries on the first group's count, so
+              the two read as one run down the card rather than as two
+              runs starting at the same moment */}
+          {data.skills.handling.map((s, i) => (
             <ProgressRow
               key={s.label}
               className={styles.ratingRow}
               label={s.label}
               value={s.value}
+              index={data.skills.shooting.length + i}
               color={semanticColor(quality(s.value))}
             />
           ))}
@@ -96,12 +101,13 @@ export function WhereToWorkNext({ className }: SkillRatingsProps) {
       </div>
 
       <div className={styles.entries}>
-        {data.workNext.map((entry) => (
+        {data.workNext.map((entry, i) => (
           <div key={entry.label} className={styles.entry}>
             <ProgressRow
               className={styles.ratingRow}
               label={entry.label}
               value={entry.value}
+              index={i}
               color={semanticColor(quality(entry.value))}
             />
             <Text variant="bodySM" tone="tertiary">

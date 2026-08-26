@@ -1,12 +1,10 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
-import { inkOn, tintOf } from '../../lib/color';
+import { chartInk, inkOn } from '../../lib/color';
 import { Card } from '../primitives/Card';
 import { Display, Text } from '../primitives/Text';
 import { Metric } from '../primitives/Metric';
-import { Sparkline } from '../viz/Sparkline';
-import { BarSet } from '../viz/BarSet';
-import { DotCount } from '../viz/DotCount';
+import { PatternChart } from '../../features/patterns/PatternChart';
 import type { Pattern } from '../../data/types';
 import styles from './PatternCard.module.css';
 
@@ -21,39 +19,10 @@ export interface PatternCardProps {
   style?: CSSProperties;
 }
 
-/**
- * THE ILLUSTRATION IS SIZED OFF ITS OWN FRAME.
- *
- * It used to take a fixed height, which is why the dot grids and the
- * bar sets broke their card bounds: the card scales with the fan and
- * with the viewport, and a constant cannot follow it. `height` here
- * is whatever the frame actually measures, so the geometry is always
- * derived from the box it has to fit inside — not from the card, not
- * from the viewport, and not from a number written in this file.
- */
-function CardViz({ pattern, tint, height }: { pattern: Pattern; tint: string; height: number }) {
-  const GRAPHIC_H = Math.max(40, Math.round(height));
-  if (pattern.viz === 'bars') {
-    return <BarSet items={pattern.bars} height={GRAPHIC_H} showValues={false} radius="pill" inherit />;
-  }
-  if (pattern.viz === 'dots') {
-    const filled = Math.round((pattern.series[pattern.series.length - 1] / 100) * 24);
-    return (
-      <DotCount
-        value={filled}
-        total={24}
-        columns={12}
-        color={tint}
-        ariaLabel={`${pattern.name}: ${filled} of 24`}
-      />
-    );
-  }
-  return <Sparkline values={pattern.series} color={tint} height={GRAPHIC_H} weight={4} area />;
-}
-
-/** the fan card front — label, headline reading, a neutral trend line,
- *  a compact viz, and the pattern name at the bottom. No links here:
- *  those exist only in the expanded state. */
+/** the fan card front — a header row carrying the name and the kind
+ *  tag, the headline reading under it, one line of context, and then
+ *  the chart block taking every pixel the three rows above it leave.
+ *  No links here: those exist only in the expanded state. */
 export function PatternCard({
   pattern,
   hovered,
@@ -62,19 +31,16 @@ export function PatternCard({
   className,
   style,
 }: PatternCardProps) {
-  const tint = tintOf(pattern.fill);
+  /* TYPE INK COMES FROM THE FACE; CHART INK COMES FROM THE WELL.
+     They are two different questions and they were being answered by
+     one helper. `inkOn` measures the FACE and hands back light type
+     or dark, which is why beige and near-black cards need no special
+     case. But the chart does not sit on the face — it sits in a
+     level1 well cut into it — so its ink is the face darkened toward
+     the page's own ink, which reads on that well for every face in
+     the set including the near-black one. */
   const ink = inkOn(pattern.fill);
-
-  /* the illustration frame measures itself and hands its box down */
-  const frame = useRef<HTMLDivElement>(null);
-  const [vizH, setVizH] = useState(0);
-  useEffect(() => {
-    const el = frame.current;
-    if (!el) return;
-    const ro = new ResizeObserver(([entry]) => setVizH(entry.contentRect.height));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+  const chart = chartInk(pattern.fill);
 
   return (
     <Card
@@ -87,33 +53,36 @@ export function PatternCard({
       className={cx(styles.card, className)}
       style={{ color: ink, ...style }}
     >
-      {/* 1 — THE TAG, top-left. It leads on its own; the title has
-          moved to the foot of the card so the reading runs number →
-          graphic → name, and the name is what you are left holding. */}
+      {/* 1 — THE HEADER ROW: the pattern's name on the left, how the
+          number was arrived at on the right. The name leads the card
+          again — it used to sit at the foot, which meant the reading
+          arrived before you knew what it was a reading OF. */}
       <div className={styles.head}>
+        <Display size="md" as="h3" tone="inherit" className={styles.title}>
+          {pattern.name}
+        </Display>
         <span className={styles.tag}>{pattern.kind}</span>
       </div>
 
-      {/* 2 — the reading */}
+      {/* 2 — THE HERO NUMERAL, the biggest thing on the card, with its
+          unit riding beside it at label size */}
       <Metric value={pattern.hero} unit={pattern.unit} size="lg" inherit />
 
-      {/* 3 — the line under it */}
+      {/* 3 — one line of context under it, quieter than the numeral */}
       <Text variant="bodySM" tone="inherit" className={styles.trend}>
         {pattern.trend}
       </Text>
 
-      {/* 4 — THE GRAPHIC, and it takes everything left. A swappable
-          slot: whatever renders inside is free to change without the
-          card's layout knowing, which is the point — these will be
-          generated artwork later, not dot fields. */}
-      <div ref={frame} className={styles.viz}>
-        {vizH > 0 ? <CardViz pattern={pattern} tint={tint} height={vizH} /> : null}
-      </div>
+      {/* 4 — THE CHART, and it takes everything left.
 
-      {/* 5 — the name, at the foot */}
-      <Display size="md" as="h3" tone="inherit" className={styles.title}>
-        {pattern.name}
-      </Display>
+          THE SAME CHART THE OPENED PANEL DRAWS, from the same series,
+          with its annotations off. It fills the block rather than
+          being measured into it: `100%` resolves because this block
+          has a definite height from the card's own, so no
+          ResizeObserver has to publish a pixel height to it. */}
+      <div className={styles.viz}>
+        <PatternChart pattern={pattern} color={chart} height="100%" compact />
+      </div>
 
       {showTag ? (
         <span className={cx(styles.nameTag, hovered && styles.tagOn)}>

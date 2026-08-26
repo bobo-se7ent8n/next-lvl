@@ -83,20 +83,65 @@
   opacity: 0.82;
 }
 
+/* THE SHARED GRID — three rows, and both columns start on them.
+
+   This was two flex stacks side by side, each packing its own blocks
+   at its own heights, which is why the left column's paragraph and
+   the right column's history heading began at different y positions
+   and the whole panel read as two unrelated columns.
+
+   Row starts are now the same line on both sides by construction.
+   The chart spans rows one and two so its bottom edge lands with the
+   bottom of "what was measured", which is what puts the paragraph
+   and the history heading on one line.
+
+   ONE ROW GAP AND ONE COLUMN GAP, both from the density step. No
+   block below sets a margin of its own — every gap in this grid is
+   this declaration. */
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-  gap: var(--column-gap);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: var(--row-gap) var(--column-gap);
   align-items: start;
   min-height: 0;
 }
 
-.column {
+.cellHero {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.cellMeasured {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+}
+
+.cellBody {
+  grid-column: 1;
+  grid-row: 3;
+  min-width: 0;
+}
+
+/* the chart takes both of the rows beside it, and stretches to them:
+   the well is the full height of hero-plus-measured and the chart
+   sits on its floor, the way every well in the product works */
+.cellChart {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: stretch;
+  min-width: 0;
+}
+
+.cellHistory {
+  grid-column: 2;
+  grid-row: 3;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--row-gap);
-  min-width: 0;
-  min-height: 0;
+  gap: var(--history-gap);
 }
 
 .measured {
@@ -112,6 +157,8 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  min-height: 0;
+  overflow: hidden;
   padding: var(--aera-space-6);
   border-radius: var(--aera-radius-md);
   background: var(--viz-well);
@@ -121,7 +168,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--history-gap);
-  margin-top: var(--row-gap);
 }
 
 .historyRow {
@@ -130,6 +176,9 @@
   gap: var(--aera-space-6);
 }
 
+/* the label and the value are the same type token — see the note on
+   the five styles in ExpandedCard.tsx. The label is quieter, and that
+   is opacity rather than a sixth size. */
 .historyName {
   width: 88px;
   flex: 0 0 auto;
@@ -145,6 +194,18 @@
   overflow: hidden;
 }
 
+/* THE ROW'S BAR GROWS OUT OF NOTHING ON EVERY RECALC.
+
+   The transition carries a width that CHANGES while you are looking
+   at it; it cannot carry the first appearance, because a width
+   declared at its final value has nothing to travel from. The
+   animation does that, staggered a row at a time, and it re-fires
+   because the list is keyed on the enter key and therefore remounts
+   when the panel recalculates.
+
+   It runs for exactly as long as the value beside it counts, so a
+   row's bar and its number finish together. No fill forwards: the
+   moment the run ends the declared width owns the bar again. */
 .historyFill {
   display: block;
   height: 100%;
@@ -152,23 +213,63 @@
   background: var(--fill);
   width: var(--w);
   transition: width var(--aera-duration-slow) var(--aera-ease-out);
+  animation: rowGrow var(--aera-duration-count-row) var(--aera-ease-out) backwards;
+  animation-delay: var(--row-delay, 0ms);
 }
 
+@keyframes rowGrow {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--w);
+  }
+}
+
+/* A FIXED SLOT, IN TABULAR FIGURES. The value counts up on every
+   recalc, and a proportional numeral in an auto-width slot re-lays
+   the whole row on every frame of that count. */
 .historyValue {
   width: 52px;
   flex: 0 0 auto;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
+/* THE HINT LINE. Mono caps like every other small label in the
+   panel, on the left column's own left edge, and one spacing token
+   below the grid — which is the `--stack-gap` the inner box already
+   applies to its children. It used to be pushed to the bottom with
+   `margin-top: auto`, a one-off that made the space above it depend
+   on how much content happened to be in the panel. */
 .note {
   opacity: 0.5;
-  margin-top: auto;
 }
 
-@media (max-width: 860px) {
+/* THE PROTOTYPE'S OWN BREAKPOINT. It was 860, which the panel can
+   no longer reach: the flight is capped at 760 wide now, so an 860
+   threshold meant every opened card stacked, always. */
+@media (max-width: 720px) {
+  /* STACKED, THE EXPLICIT PLACEMENTS COME OFF.
+
+     They have to: the chart is placed at `1 / span 2`, and in a
+     single-column grid that puts it straight on top of the hero and
+     the measured block. Released to `auto`, the five cells fall into
+     document order down one column — which is the reading order the
+     grid was expressing sideways anyway. */
   .grid {
     grid-template-columns: 1fr;
-    gap: var(--column-gap);
+    grid-template-rows: none;
+    gap: var(--row-gap);
+  }
+  .cellHero,
+  .cellMeasured,
+  .cellBody,
+  .cellChart,
+  .cellHistory {
+    grid-column: 1;
+    grid-row: auto;
+    align-self: auto;
   }
   .inner {
     padding: var(--pad-y) var(--pad-x);

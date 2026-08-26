@@ -17,11 +17,17 @@ export interface SessionInsightsProps {
   className?: string;
 }
 
-/** where the block's notch has to point. The track area starts one
- *  label column plus one gap in from the card edge, so the chip's
- *  position along the lane has to be mapped back onto the block's
- *  own width to line the notch up with it. */
+/** Where the lane the markers stand in actually begins. The track
+ *  area starts one label column plus one gap in from the card edge,
+ *  so a marker at `t` along the lane is at that inset plus `t` of
+ *  whatever is left — which is the x the bubble has to centre on. */
 const TRACK_INSET = 'calc(var(--aera-space-16) + var(--aera-space-8))';
+
+/** the centre of the marker an insight belongs to, as a length the
+ *  bubble can be positioned from */
+function markerX(at: number): string {
+  return `calc(${TRACK_INSET} + (100% - ${TRACK_INSET}) * ${at.toFixed(4)})`;
+}
 
 /** The block under the timeline. Exactly one is on screen at a time —
  *  the one the playhead is standing on — rather than all of them at
@@ -44,17 +50,19 @@ export function SessionInsights({ insights, playhead, className }: SessionInsigh
             key={insight.id}
             to={`${ROUTES.insights}#${insight.insightId}`}
             className={styles.block}
-            /* the notch points at the chip this block belongs to,
-               which is at the insight's own position along the lane */
-            /* the bubble is pushed along the lane to sit under its own
-               tag, and the notch sits at its own left edge — anchored
-               to the tag, never centred in the container */
-            style={
-              {
-                left: `calc(${TRACK_INSET} + (100% - ${TRACK_INSET}) * ${insight.at.toFixed(4)} - var(--aera-layout-insight-bubble) / 2)`,
-                '--notch': '50%',
-              } as CSSProperties
-            }
+            /* THE BUBBLE IS CENTRED ON ITS OWN MARKER, and the
+               centring is done by the bubble's OWN width.
+
+               It used to be pushed left by half of
+               `--aera-layout-insight-bubble` — the CAP on the width,
+               not the width. A bubble whose text did not reach the cap
+               is narrower than that, so every short one sat left of the
+               marker it belonged to, by half the difference. Anchoring
+               the left edge on the marker and translating back by half
+               of `100%` uses the width the bubble actually has, which
+               is also what puts the notch — dead centre of the bubble —
+               under the marker rather than beside it. */
+            style={{ left: markerX(insight.at) } as CSSProperties}
           >
             <span className={styles.notch} aria-hidden="true" />
             {/* TWO LINES, AND NOTHING ELSE. Heading and tag share the
@@ -69,7 +77,11 @@ export function SessionInsights({ insights, playhead, className }: SessionInsigh
               <Chip tone="lilac">Pattern candidate</Chip>
             </div>
 
-            <Text variant="bodySM" tone="secondary">
+            {/* TWO LINES, HARD. The bubble's ceiling — and therefore
+                the height of the band it opens into — is measured for
+                two lines of this, so a third would push the bubble
+                through the bottom of the band it was sized for. */}
+            <Text variant="bodySM" tone="secondary" lines={2}>
               {insight.line}
             </Text>
           </Link>

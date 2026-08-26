@@ -24,6 +24,40 @@ export const duration = {
   page: '260ms',
   /** a number counting up to its value on page enter */
   count: '600ms',
+  /** THE STAGGER STEP — one item's head start over the one before
+   *  it in a field, a tile row or a card grid entering together. It
+   *  is a delay rather than a duration: every staggered item still
+   *  runs for `base`, it just starts this much later than its
+   *  neighbour. One number, so every staggered entrance in the
+   *  product arrives at the same cadence. */
+  stagger: '30ms',
+  /** A FAN CARD ANSWERING THE POINTER.
+   *
+   *  Numerically the same as `page`, and deliberately its own token:
+   *  one is a tab giving way to the next and the other is a card
+   *  lifting under the cursor, and the day one of them is retuned
+   *  the other must not move with it. */
+  fanCard: '260ms',
+  /** the opened panel's contents arriving, once the panel itself has
+   *  somewhere to be */
+  reveal: '200ms',
+  /** how long they wait first, so the box is already travelling
+   *  before anything inside it appears */
+  revealDelay: '100ms',
+  /** how far into the flight the opened card re-reads itself — the
+   *  numbers count up, the bars grow, the line draws */
+  recalc: '140ms',
+  /** a history row's value counting up inside the opened panel */
+  countRow: '380ms',
+  /** the first history row's head start after the recalc fires */
+  historyDelay: '60ms',
+  /** and one row's head start over the row above it */
+  historyStep: '45ms',
+  /** THE OPENED PANEL'S OWN COUNT-UP. Shorter than the page-enter
+   *  `count`, and deliberately: the panel's numbers start while the
+   *  box is still flying, so they have to be done close to when it
+   *  lands rather than a third of a second afterwards. */
+  countPanel: '480ms',
   /** the fan card opening into the expanded state */
   expand: '440ms',
   /** a long, quiet loop — the dot fields and the shot arc */

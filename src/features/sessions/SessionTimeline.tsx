@@ -1,4 +1,4 @@
-import { useCallback, type CSSProperties } from 'react';
+import { useCallback, useRef, type CSSProperties } from 'react';
 import { cx } from '../../lib/css';
 import { clamp, project, smoothPath } from '../../lib/chart';
 import { Label } from '../../components/primitives/Text';
@@ -13,6 +13,13 @@ import styles from './SessionTimeline.module.css';
 /** the phases cycle through the AERA palette so the segments read
  *  apart from one another without carrying any judgement */
 const PHASE_TONES = ['blue', 'lilac', 'mint', 'yellow', 'orange'] as const;
+
+/** How heavy the physiology trace is drawn, in device pixels — the
+ *  stroke is non-scaling, so this is the width on screen whatever the
+ *  lane is stretched to. It is the second-heaviest mark on the whole
+ *  timeline on purpose: the events in the trace are the reason the
+ *  track is there, and at a hairline they read as noise. */
+const PHYSIO_STROKE = 4;
 
 export interface SessionTimelineProps {
   moment: Moment;
@@ -43,12 +50,30 @@ export function SessionTimeline({
   onPlay,
   className,
 }: SessionTimelineProps) {
+  /* THE LANE COLUMN IS THE MEASURING STICK.
+
+     Every track shares one time axis and the playfield spans exactly
+     that axis, so it is what a pointer x is resolved against — not
+     whichever lane happened to be under the pointer, and certainly
+     not the track region itself, which is a label column wider than
+     the axis and would map every click a hundred px early. */
+  const axis = useRef<HTMLDivElement>(null);
+
   const scrubTo = useCallback(
     (clientX: number, el: HTMLElement) => {
       const rect = el.getBoundingClientRect();
       onScrub(clamp((clientX - rect.left) / rect.width, 0, 1));
     },
     [onScrub],
+  );
+
+  /** scrub from a pointer anywhere in the track region */
+  const scrubAxis = useCallback(
+    (clientX: number) => {
+      const el = axis.current;
+      if (el) scrubTo(clientX, el);
+    },
+    [scrubTo],
   );
 
   /* barely smoothed: the whole point of this trace is the events in
@@ -112,16 +137,18 @@ export function SessionTimeline({
         </div>
       </div>
 
-      <div className={styles.tracks}>
+      <div
+        className={styles.tracks}
+        onPointerDown={(e) => scrubAxis(e.clientX)}
+        onPointerMove={(e) => e.buttons === 1 && scrubAxis(e.clientX)}
+      >
         {/* motion · pose — segment widths are the real phase durations */}
         <Label tone="tertiary" className={styles.trackName}>
           {TIMELINE_TRACKS[0].label}
         </Label>
         <div
-          className={styles.lane}
+          className={cx(styles.lane, styles.laneFlat)}
           style={{ '--lane-h': 'var(--aera-space-13)' } as CSSProperties}
-          onPointerDown={(e) => scrubTo(e.clientX, e.currentTarget)}
-          onPointerMove={(e) => e.buttons === 1 && scrubTo(e.clientX, e.currentTarget)}
         >
           {PHASE_SPANS.map((phase, i) => {
             const tone = PHASE_TONES[i % PHASE_TONES.length];
@@ -152,8 +179,6 @@ export function SessionTimeline({
         <div
           className={styles.lane}
           style={{ '--lane-h': 'var(--aera-space-14)' } as CSSProperties}
-          onPointerDown={(e) => scrubTo(e.clientX, e.currentTarget)}
-          onPointerMove={(e) => e.buttons === 1 && scrubTo(e.clientX, e.currentTarget)}
         >
           {/* no viewBox: the dots are placed in percentages and drawn
               at a fixed radius, so they stay round however wide the
@@ -179,8 +204,6 @@ export function SessionTimeline({
         <div
           className={styles.lane}
           style={{ '--lane-h': 'var(--aera-space-14)' } as CSSProperties}
-          onPointerDown={(e) => scrubTo(e.clientX, e.currentTarget)}
-          onPointerMove={(e) => e.buttons === 1 && scrubTo(e.clientX, e.currentTarget)}
         >
           {/* THE STROKE SHIFTS ALONG ITS LENGTH: green at rest,
               warming through yellow at the arousal spike, cooling to
@@ -208,7 +231,7 @@ export function SessionTimeline({
               d={smoothPath(wave, 0.18)}
               fill="none"
               stroke="url(#physio)"
-              strokeWidth="3.6"
+              strokeWidth={PHYSIO_STROKE}
               strokeLinecap="round"
               strokeLinejoin="round"
               vectorEffect="non-scaling-stroke"
@@ -223,7 +246,6 @@ export function SessionTimeline({
         <div
           className={cx(styles.lane, styles.laneOpen)}
           style={{ '--lane-h': 'var(--aera-space-14)' } as CSSProperties}
-          onPointerDown={(e) => scrubTo(e.clientX, e.currentTarget)}
         >
           {moment.insights.map((insight) => (
             <button
@@ -244,7 +266,7 @@ export function SessionTimeline({
           ))}
         </div>
 
-        <div className={styles.playfield} aria-hidden="true">
+        <div ref={axis} className={styles.playfield} aria-hidden="true">
           <span
             className={styles.playhead}
             style={{ '--x': `${(playhead * 100).toFixed(2)}%` } as CSSProperties}

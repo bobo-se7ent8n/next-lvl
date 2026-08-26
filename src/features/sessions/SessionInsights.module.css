@@ -19,14 +19,44 @@
    fixed height and the bubble appears inside it, so the timeline,
    the tracks and the container never move. */
 .list {
+  /* HOW FAR THE BUBBLE REACHES BACK UP TOWARD ITS PILL.
+
+     The pill is centred in the insights lane, so there is half a
+     lane less half a pill of empty track under it, and then the
+     card's own row gap before this band starts. The bubble has to
+     climb back over both of those to land `insight-gap` beneath the
+     pill — which is why the offset is negative. Written as a
+     composition of the tokens that actually produce the distance,
+     so it stays true if any of them is retuned. */
+  --pill-clear: calc((var(--aera-space-14) - var(--aera-space-11)) / 2);
+  --bubble-top: calc(
+    var(--aera-layout-insight-gap) - var(--aera-card-gap) - var(--pill-clear)
+  );
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  height: var(--aera-layout-insight-row);
+  /* THE BAND IS DERIVED, NOT CHOSEN: exactly enough to seat a
+     full-height bubble at its offset and leave `insight-foot` under
+     it. Every pixel this stopped reserving is a pixel the stage
+     above took, and the stage is the part of this screen that wants
+     height. */
+  height: calc(
+    var(--bubble-top) + var(--aera-layout-insight-bubble-h) +
+      var(--aera-layout-insight-foot)
+  );
   flex: 0 0 auto;
 }
+
+/* THE BUBBLE HANGS FROM THE PILL, AT A FIXED GAP.
+
+   Bottom-anchoring it pinned the wrong end: the bubble kept its
+   clearance from the container and drifted away from the tag it
+   belongs to whenever its text was short. The tag is what it is
+   about, so the tag is what it hangs from — the gap above is the
+   constant, and the slack falls out at the bottom, where nothing is
+   reading it. */
 
 /* THE BUBBLE — sized to its own text, capped, and it FLOATS.
 
@@ -39,10 +69,19 @@
    the rest of the system. */
 .block {
   position: absolute;
-  top: 0;
+  top: var(--bubble-top);
+  /* `left` is the marker's own centre, written by the component; the
+     translate takes back half of the bubble's REAL width, so the
+     bubble is centred on its marker whatever its text measures */
   left: 0;
+  transform: translateX(-50%);
   width: max-content;
   max-width: var(--aera-layout-insight-bubble);
+  /* the ceiling the band's height was computed from. The description
+     is clamped to two lines in the component, so this should never
+     be the thing doing the limiting — it is here so that if it ever
+     is, the bubble stays inside the band it was measured for. */
+  max-height: var(--aera-layout-insight-bubble-h);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -50,7 +89,11 @@
   padding: var(--aera-inner-padding);
   border-radius: var(--aera-radius-lg);
   background: var(--aera-color-surface-level1);
-  box-shadow: var(--aera-elevation-low);
+  /* the drop shadow because it is clickable, AND the reusable inset
+     light every other inner container in the product wears — the
+     bubble is a container in a card like any other, and it was the
+     only one going without */
+  box-shadow: var(--aera-elevation-low), var(--aera-surface-inner-glow);
   text-decoration: none;
   color: inherit;
   transition:
@@ -62,8 +105,11 @@
   background: var(--aera-color-surface-level2);
 }
 
+/* the press keeps the centring — a bare `scale()` here replaced the
+   translate outright and threw the bubble half its width to the right
+   for the length of the press */
 .block:active {
-  transform: scale(0.996);
+  transform: translateX(-50%) scale(0.996);
 }
 
 /* the chips, on their own line and never over the title */
@@ -90,19 +136,49 @@
   }
 }
 
-/* THE NOTCH — a small upward triangle joining the block to the chip
-   the playhead is standing on. It is positioned from the insight's
-   own place along the lane, so it points at its own chip rather than
-   at the middle of the card. */
+/* THE NOTCH — the bubble's own upward pointer, dead centre.
+
+   Dead centre of the BUBBLE, which is also dead centre of the marker
+   above it, because the bubble is centred on that marker. It used to
+   be driven by a `--notch` position written per-insight, which is
+   what put it off to one side of a bubble that was itself off to one
+   side of its marker — two offsets compounding.
+
+   Same construction as the playhead's pointer: a real square with a
+   real radius token, rotated 45° in a window half its height, so the
+   tip and shoulders are rounded rather than knife-edged. Bigger than
+   the old 7px triangle, and it carries the bubble's own fill, so the
+   pointer and the bubble are one shape flowing into the pill above.
+
+   Drawn from the bubble's fill on all four sides, so the inset light
+   on the bubble does not have to be repeated on it. */
 .notch {
+  --point: var(--aera-space-9);
   position: absolute;
-  top: -7px;
-  left: var(--notch);
-  width: 0;
-  height: 0;
-  margin-left: -7px;
-  border-left: 7px solid transparent;
-  border-right: 7px solid transparent;
-  border-bottom: 7px solid var(--aera-color-surface-level1);
+  top: calc(var(--point) / -2 + 1px);
+  left: 50%;
+  width: var(--point);
+  height: calc(var(--point) / 2);
+  margin-left: calc(var(--point) / -2);
+  overflow: hidden;
   pointer-events: none;
+}
+
+.notch::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  /* the square's centre sits on the window's BOTTOM edge, so what
+     shows above it is the upper half — an upward pointer */
+  top: calc(var(--point) / 2 - var(--point) * 0.3536);
+  width: calc(var(--point) * 0.7071);
+  height: calc(var(--point) * 0.7071);
+  margin-left: calc(var(--point) * -0.3536);
+  border-radius: var(--aera-radius-xs);
+  background: var(--aera-color-surface-level1);
+  transform: rotate(45deg);
+}
+
+.block:hover .notch::before {
+  background: var(--aera-color-surface-level2);
 }

@@ -32,6 +32,9 @@ export interface MetricProps {
   align?: 'start' | 'center';
   /** opt out of the count-up — a value that is not a reading */
   static?: boolean;
+  /** how long the count-up runs. Defaults to the page-enter duration;
+   *  the opened pattern panel passes its own, shorter one. */
+  countOver?: string;
   /** append a true superscript degree, tight to the number. Written
    *  as a separate flag rather than as part of the value because a
    *  degree glyph in the unit slot sat on the baseline with the
@@ -42,13 +45,24 @@ export interface MetricProps {
   style?: CSSProperties;
 }
 
-/** A reading counts up to itself on entry. Only a plain numeric string
- *  is animated: anything else is passed straight through, so a value
- *  that is a node or a word never flickers through nonsense. */
-function CountedValue({ value }: { value: ReactNode }) {
+/**
+ * A READING COUNTS UP TO ITSELF ON ENTRY.
+ *
+ * Only a plain numeric string is animated: anything else is passed
+ * straight through, so a value that is a node or a word never
+ * flickers through nonsense. A number is accepted too and stringified
+ * — the caller should not have to remember which slot wants which.
+ *
+ * Exported because it is not the metric's own trick: the skill rating
+ * rows and the shot-mechanics readings are numerals on the same
+ * screen, and a screen where some numbers count in and others are
+ * simply there reads as half-finished.
+ */
+export function Counted({ value, over }: { value: ReactNode; over?: string }) {
   const enterKey = useEnterKey();
-  const text = useCountUpText(typeof value === 'string' ? value : '', enterKey);
-  return <>{typeof value === 'string' ? text : value}</>;
+  const source = typeof value === 'number' ? String(value) : value;
+  const text = useCountUpText(typeof source === 'string' ? source : '', enterKey, over);
+  return <>{typeof source === 'string' ? text : source}</>;
 }
 
 /** big number + unit — the headline reading of any card */
@@ -60,6 +74,7 @@ export function Metric({
   inherit,
   align = 'start',
   static: isStatic,
+  countOver,
   degree,
   className,
   style,
@@ -82,7 +97,7 @@ export function Metric({
       }
     >
       <span className={styles.value}>
-        {isStatic ? value : <CountedValue value={value} />}
+        {isStatic ? value : <Counted value={value} over={countOver} />}
         {degree ? <sup className={styles.degree}>°</sup> : null}
       </span>
       {unit ? <span className={styles.unit}>{unit}</span> : null}

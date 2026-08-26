@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { Card } from '../../components/primitives/Card';
 import { Well } from '../../components/primitives/Surface';
 import { Chip } from '../../components/primitives/Chip';
+import { Counted } from '../../components/primitives/Metric';
 import { StatRow } from '../../components/primitives/StatRow';
 import { Display, Label, Text } from '../../components/primitives/Text';
 import { sampleArc, solveArc } from '../../lib/arc';
@@ -135,6 +136,9 @@ export function ShotArc({ className }: ShotArcProps) {
               style={
                 {
                   '--dot-delay': `calc(var(--aera-duration-settle) * ${((i / TRAIL.length) * 4 - 4).toFixed(2)})`,
+                  /* the entrance runs release-to-rim, one stagger step
+                     per sample, so the path draws rather than appears */
+                  '--enter-delay': `calc(var(--aera-duration-stagger) * ${i})`,
                 } as CSSProperties
               }
             />
@@ -197,7 +201,7 @@ export function ShotArc({ className }: ShotArcProps) {
             label={row.label}
             value={
               <>
-                {row.value}
+                <Counted value={row.value} />
                 {row.degree ? <sup className={styles.degree}>°</sup> : null}
                 {row.unit ? (
                   <Text as="span" variant="bodySM" tone="tertiary" style={{ display: 'inline' }}>

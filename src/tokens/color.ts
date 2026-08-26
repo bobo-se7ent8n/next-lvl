@@ -57,6 +57,31 @@ export const colorData = {
   blue: '#A6DBFF',
 } as const;
 
+/* ------------------------------------------------------------
+   THE TWO CARD FACES THAT ARE NOT HUES
+
+   A pattern card's face cycles through the five palette hues and
+   then these two. They are the reason a twelve-card hand stops
+   reading as a loop: five hues repeat every five cards and the eye
+   catches it immediately, and no amount of reordering hides that.
+   Two LOW-CHROMA faces in the cycle break the rhythm, because
+   neither of them is competing to be a hue at all.
+
+   They live here rather than in `data` on purpose — `data` is the
+   palette, and a palette entry carries a meaning slot in the
+   charts. These carry none; they are just paper and just ink.
+
+   The near-black is `surface.inverse` referenced, not a second copy
+   of the same hex: there is one near-black in this product and it
+   is used for inverted pills, tooltips and this card face alike.
+   ------------------------------------------------------------ */
+export const colorFace = {
+  /** warm paper — the low-chroma card face */
+  beige: '#F0E9D8',
+  /** the near-black card face */
+  ink: colorSurface.inverse,
+} as const;
+
 /** legible ink for text sitting directly on each palette colour */
 export const colorDataInk = {
   mint: '#062017',
@@ -133,6 +158,7 @@ export const color = {
   surface: colorSurface,
   ink: colorInk,
   data: colorData,
+  face: colorFace,
   dataInk: colorDataInk,
   semantic: colorSemantic,
   onFace: colorOnFace,

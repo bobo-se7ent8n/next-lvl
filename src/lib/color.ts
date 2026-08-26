@@ -3,6 +3,7 @@
 import {
   colorData,
   colorDataInk,
+  colorInk,
   colorOnFace,
   colorSemantic,
   colorSurface,
@@ -71,6 +72,22 @@ export function dataInk(tone: DataTone): string {
 
 /** a barely-there field behind a viz, so a mark can never disappear into
  *  a card face that happens to share its colour */
+/**
+ * The ink a chart draws in when it sits in a LEVEL1 WELL rather than
+ * directly on a card's face — which is where every chart on a fan
+ * card sits.
+ *
+ * `tintOf` is the wrong helper for this: it pushes a colour toward
+ * whichever end its own luminance is nearest, so a near-black face
+ * came back LIGHTER and then had to be read against near-white
+ * paper. This always darkens, at the same 0.45 the opened panel
+ * mixes its own mark at, so every face in the set — mint through
+ * beige through near-black — lands somewhere legible on level1.
+ */
+export function chartInk(face: string): string {
+  return mix(face, colorInk.primary, 0.45);
+}
+
 export function vizWell(face: string): string {
   return luminance(face) > 0.5 ? colorOnFace.vizLight : colorOnFace.vizDark;
 }

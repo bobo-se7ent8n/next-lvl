@@ -62,10 +62,35 @@ export const layout = {
   splitGap: '32px',
   /** the widest an insight bubble gets before its text wraps */
   insightBubble: '500px',
-  /** THE RESERVED BAND the bubble opens into. It is always this tall
-   *  whether a bubble is showing or not, so nothing above it moves
-   *  when the playhead crosses a tag. */
-  insightRow: '132px',
+
+  /* ---- THE INSIGHT BAND, AS A RHYTHM -----------------------------
+     The band the bubble opens into used to be one number picked to
+     be comfortably taller than the bubble, which meant the space
+     under the bubble was whatever happened to be left — and it
+     changed with the length of the text. It is three numbers now,
+     and the band's own height is derived from them rather than
+     guessed alongside them:
+
+       pill → bubble        insightGap
+       the tallest bubble   insightBubbleH   (two lines of text)
+       bubble → container   insightFoot
+
+     The bubble hangs from the TOP of the band at `insightGap` below
+     the pill, so it always sits the same distance under the tag it
+     belongs to. A one-line bubble is simply shorter and leaves more
+     than `insightFoot` beneath it; a full-height one lands on
+     exactly `insightFoot`. Either way the band does not move, so
+     nothing above it moves either.
+     -------------------------------------------------------------- */
+  /** the gap between the insight pill and the bubble hanging off it */
+  insightGap: '12px',
+  /** THE CAP ON A BUBBLE. Its own padding, the title/chip row, the
+   *  row gap and two lines of description — the description is
+   *  clamped to two lines, so this is a real ceiling and not an
+   *  estimate the text can walk through. */
+  insightBubbleH: '96px',
+  /** the clearance under a full-height bubble */
+  insightFoot: '16px',
   /** the width every nav item reserves, so the current one cannot
    *  reflow its neighbours */
   navItem: '104px',

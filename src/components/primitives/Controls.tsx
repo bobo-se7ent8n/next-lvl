@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
+import { Counted } from './Metric';
 import { Label, Mono, Text } from './Text';
 import styles from './Controls.module.css';
 
@@ -126,6 +127,8 @@ export interface ProgressBarProps {
   value: number;
   color: string;
   size?: 'sm' | 'md';
+  /** this bar's place in a run of them — one stagger step per index */
+  index?: number;
   ariaLabel?: string;
   className?: string;
 }
@@ -135,6 +138,7 @@ export function ProgressBar({
   value,
   color,
   size = 'md',
+  index = 0,
   ariaLabel,
   className,
 }: ProgressBarProps) {
@@ -148,6 +152,7 @@ export function ProgressBar({
           '--bar-h': size === 'sm' ? '6px' : '8px',
           '--bar-w': `${Math.max(0, Math.min(100, value))}%`,
           '--bar-color': color,
+          '--bar-delay': `calc(var(--aera-duration-stagger) * ${index})`,
         } as CSSProperties
       }
     >
@@ -160,17 +165,28 @@ export interface ProgressRowProps {
   label: string;
   value: number;
   color: string;
+  /** this row's place in a run of them — one stagger step per index */
+  index?: number;
   className?: string;
 }
 
-/** a named progress bar with its reading — the skills row */
-export function ProgressRow({ label, value, color, className }: ProgressRowProps) {
+/** a named progress bar with its reading — the skills row.
+ *
+ *  THE BAR AND THE NUMERAL ARRIVE TOGETHER. The reading counts up on
+ *  the same entry the fill grows on, in a slot of a fixed width set
+ *  in tabular figures, so nothing beside it moves while it runs. */
+export function ProgressRow({ label, value, color, index, className }: ProgressRowProps) {
   return (
     <div className={cx(styles.progressRow, className)}>
       <Text variant="bodySM" tone="secondary" className={styles.progressRowName}>
         {label}
       </Text>
-      <ProgressBar value={value} color={color} ariaLabel={`${label}: ${value} of 100`} />
+      <ProgressBar
+        value={value}
+        color={color}
+        index={index}
+        ariaLabel={`${label}: ${value} of 100`}
+      />
       <Text
         as="span"
         variant="metricMD"
@@ -178,7 +194,7 @@ export function ProgressRow({ label, value, color, className }: ProgressRowProps
         numeric
         className={styles.progressRowValue}
       >
-        {value}
+        <Counted value={value} />
       </Text>
     </div>
   );

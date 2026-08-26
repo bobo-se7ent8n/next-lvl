@@ -1,27 +1,30 @@
 /* ============================================================
    THE FAN
 
-   Every pattern is in the set; eight of them are in the window.
-   Each card carries its own tilt and its own vertical stagger —
-   both pure functions of the card index, so the hand is identical
-   on every render — and the slot it sits in supplies the spread
-   and the scale falloff.
+   TWO TRANSFORM LAYERS, TWO JOBS, AND THEY DO NOT MIX.
 
-   THE ACTIVE CARD IS ALWAYS CENTRED. The hand flows leftward
-   through the middle of the stage as the page scrolls; the ends
-   of the set look asymmetric because the first and last cards
-   have no neighbour on one side, not because the hand has been
-   pushed against an edge.
+   · THE SLOT carries the fan placement — the step, the arc, the
+     sweep, the scale falloff. It is rewritten by the rAF loop on
+     every frame of every scroll, and it therefore carries NO
+     TRANSITION AT ALL. A transition on top of a per-frame write is
+     the browser interpolating toward a value that has already
+     moved: it does not smooth anything, it just adds a frame of
+     lag to every frame.
 
-   Nothing inside the window fades. Every card in the hand is at
-   full fill: an opacity ramp toward the edges made the outer
-   cards look broken rather than distant. A card LEAVING the
-   window fades and shrinks over the same transition every other
-   slot property uses, so it goes rather than pops.
+   · THE CARD inside it carries the response to the pointer — the
+     straighten, the swell, the recede while another card is open.
+     Those are event-paced rather than frame-paced, so this layer
+     IS transitioned.
 
-   The hint line does not travel with the hand: it is pinned to
-   the middle of the viewport and stays there. Scroll is vertical
-   only.
+   The smoothing lives in the loop, not in CSS. Scroll moves a
+   target; the loop eases the hand toward it by a share of the
+   remaining distance each frame. That exponential decay is the
+   whole feel of the thing.
+
+   There is no window and no card count in here either. A card is
+   on the stage when its distance from the hand is inside the
+   cutoff, and the layout pass writes the answer straight onto the
+   element.
    ============================================================ */
 .wrap {
   position: relative;
@@ -35,107 +38,107 @@
 
 /* THE STAGE IS SIZED BY THE FAN, AND CLIPS NOTHING.
 
-   Everything that used to cut a card off lived on this one element,
-   and all three of it is gone:
-
-     · `overflow: clip` — the clip itself. A card at the end of the
-       hand, or a title sitting low on a rotated card, was simply
-       sliced by the stage edge.
-     · `height: clamp(420px, 56vh, 560px)` — a height chosen from the
-       VIEWPORT rather than from the cards, so on a short window the
-       stage was shorter than the thing inside it.
-     · `transform: scale(var(--fit))` — shrinking the whole hand to
-       make it fit was treating the symptom. The stage is sized to the
-       content now, so there is nothing to shrink.
-
-   The height is the tallest card plus the room the stagger and the
-   hover lift need above and below it. It is a calc off --card-h, not
-   a viewport number, so it can never be shorter than what it holds. */
-/* THE STAGE IS SIZED BY THE FAN, AND CLIPS NOTHING.
-
-   Everything that used to cut a card off lived here, and all of it
-   is gone: the `overflow: clip`, the `height: clamp(...)` chosen
-   from the viewport rather than from the cards, and the
-   `transform: scale(var(--fit))` that shrank the whole hand to make
-   it fit. The height is a calc off --card-h plus the room the
-   stagger and the hover lift need, so it can never be shorter than
+   No `overflow: clip`, no viewport-derived height, and no
+   scale-to-fit transform: all three of those were ways of making
+   the hand fit a box instead of giving it the box it needs. The
+   height is a calc off the card, so it can never be shorter than
    what it holds. */
 .stage {
-  /* THE CARDS ARE BIG. The graphic is the dominant element on a
-     pattern card now, and it cannot be dominant at 292px. */
-  /* Five cards, so only two steps sit on each side of the centre and
-     the card can be large again. */
   --card-w: clamp(190px, 21vw, 320px);
   --card-h: clamp(330px, 29vw, 460px);
-  /* the drop reaches 2 × 16px, each card's own height offset another
-     ±22, the hover lift 8, and the tilt adds a little at the corners */
-  --fan-reach: 92px;
+  /* THE ARC'S OWN CEILING, plus the wobble. The quadratic drop is
+     capped at 96px and a card's own nudge reaches another 8, so 104
+     is the furthest below the centre line anything ever gets — this
+     is measured off the geometry rather than guessed at. */
+  --fan-reach: 104px;
   position: relative;
   width: 100%;
   height: calc(var(--card-h) + var(--fan-reach) * 2);
   overflow: visible;
+  touch-action: pan-y;
 }
 
-/* THE ACTIVE CARD IS ON THE CENTRE LINE.
+/* THE SLOT — placement only, and never transitioned.
 
-   Every card is placed at 50% of the stage and then offset by its
-   own distance from the active one, so the active card — distance
-   zero — resolves to exactly the centre with no offset at all. The
-   set moves through that line; the line never moves along the set,
-   which is what stopped the whole fan translating off the canvas. */
+   Every card sits at 50% of the stage and is then offset by its own
+   distance from the hand, so the card the hand is on — distance zero
+   — resolves to exactly the centre with no offset at all. The set
+   travels through that line; the line never travels along the set.
+
+   The custom properties are written imperatively by the layout pass.
+   The fallbacks are what the first paint uses, before the loop has
+   run once. */
 .slot {
   position: absolute;
   left: 50%;
-  margin-left: calc(var(--card-w) / -2);
   top: 50%;
   width: var(--card-w);
   height: var(--card-h);
+  margin-left: calc(var(--card-w) / -2);
   margin-top: calc(var(--card-h) / -2);
-  cursor: pointer;
-  /* THE FAN GEOMETRY AND THE HOVER, COMPOSED.
-
-     The lift, the swell and the straightening are extra terms on
-     the SAME transform as the fan's own placement, not a second
-     transform on an inner box: a card answers the pointer as one
-     object, and the tilt and offset it already carries have to
-     survive that. The defaults resolve to exactly the fan geometry.
-
-     `--straighten` scales the card's own rotation toward 0 — a
-     hovered card stands up a little rather than spinning. */
-  transform: translate3d(var(--x), var(--y), 0) translateY(var(--lift, 0px))
-    rotate(calc(var(--rot) * var(--straighten, 1))) scale(var(--sc))
-    scale(var(--swell, 1));
-  opacity: var(--op);
+  transform: translate3d(var(--x, 0px), var(--y, 0px), 0) rotate(var(--rot, 0deg))
+    scale(var(--sc, 1));
   will-change: transform;
-  /* transform only, and one duration for both the hand moving and a
-     card lifting — leaving one card is the same gesture as arriving
-     at the next, so they must ease at the same rate or it snaps */
+  cursor: pointer;
+}
+
+/* THE CARD — the pointer response, and this one transitions.
+
+   `--dsc` and `--drot` are the only things hover touches. They
+   compose with the slot's own transform because they are on a
+   different element, which is the entire reason the two layers are
+   separate: the hand's placement and the card's answer to the
+   cursor must not be able to overwrite one another. */
+.card {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(var(--dx, 0px), var(--dy, 0px), 0) rotate(var(--drot, 0deg))
+    scale(var(--dsc, 1));
   transition:
-    transform var(--aera-duration-base) var(--aera-ease-out),
-    opacity var(--aera-duration-slow) var(--aera-ease-out);
+    transform var(--aera-duration-fan-card) var(--aera-ease-out),
+    box-shadow var(--aera-duration-fan-card) var(--aera-ease-out),
+    opacity var(--aera-duration-fan-card) var(--aera-ease-out);
 }
 
-.slotHover {
-  --lift: -8px;
-  --swell: 1.02;
-  /* toward upright, not all the way to it */
-  --straighten: 0.45;
+.card > * {
+  height: 100%;
 }
 
+/* HOVER.
+
+   The z-index needs `!important` and it is not a shortcut: the
+   layout pass writes a z-index inline on the slot every frame, and
+   an inline declaration beats a class. This is the one place in the
+   stylesheet allowed to win that argument. */
+.hov {
+  z-index: 700 !important;
+}
+
+.hov .card {
+  --drot: -3.4deg;
+  --dsc: 1.075;
+}
+
+/* WHILE A CARD IS OPEN THE HAND RECEDES.
+
+   It does not re-fan, it does not re-order and it does not move.
+   Every card simply steps back and stops answering the pointer, so
+   the opened panel is the only live thing on the screen. */
+.dimmed .card {
+  opacity: 0.16;
+  --dsc: 0.94;
+  pointer-events: none;
+  box-shadow: none;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .slot {
+  .card {
     transition: none;
   }
-  .slotHover {
-    --lift: 0px;
-    --swell: 1;
-    --straighten: 1;
+  .hov .card {
+    --drot: 0deg;
+    --dsc: 1;
   }
-}
-
-.slot > * {
-  height: 100%;
 }
 
 .hintRow {
@@ -153,25 +156,25 @@
 }
 
 /* ---- the opened state ----------------------------------------
-   A flat dim over the whole page, and the focused card above it
-   at full saturation. No blur, no backdrop panel, no chrome.
+   THERE IS NO SCRIM AND THERE IS NO OVERLAY. The page behind the
+   opened card stays fully visible; the only thing that changes is
+   that the HAND recedes, which `.dimmed` above does in place and on
+   the card layer's own transition. A dim was a second object
+   arriving at the same moment as the panel, and it made a detail
+   view feel like a modal — the whole point of growing the card out
+   of the fan is that you never left the page.
 
-   The panel is the card, grown. It is planted on the source
-   card's own bounding rect and then given the expanded one, and
-   the five values between those two states — left, top, width,
-   height and the corner — are what animate. Nothing is scaled and
-   nothing cross-fades: a transform would stretch the type on the
-   way, and a fade would be two objects rather than one. */
-.dim {
-  position: fixed;
-  inset: 0;
-  /* above the nav: an opened pattern is a detail view, and a detail
-     view has no nav links in it */
-  z-index: 960;
-  background: var(--aera-color-utility-dim);
-  animation: dimIn var(--aera-duration-base) var(--aera-ease-out) both;
-}
+   The panel is the card, grown. It is planted on the source card's
+   own bounding rect, the rect is read back to force the reflow, and
+   only then is it given the expanded one — the five values between
+   those two states, left, top, width, height and the corner, are
+   what animate. Nothing is scaled and nothing cross-fades: a
+   transform would stretch the type on the way, and a fade would be
+   two objects rather than one.
 
+   The corner travels on `ease-out` while the four box values travel
+   on `ease-expand` — a hard decelerate that leaves fast and settles
+   with no overshoot in it at all. That is the tactility. */
 .flight {
   position: fixed;
   z-index: 970;
@@ -185,41 +188,66 @@
     border-radius var(--aera-duration-expand) var(--aera-ease-out);
 }
 
+/* THE CONTENTS ARRIVE SEPARATELY, AND LATE.
 
-@keyframes dimIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+   The box travels first and its contents fade in behind the start of
+   that journey. Fading them with the box would put type at the wrong
+   size on screen for the whole flight; holding them back until it
+   lands would make the panel look empty. */
+.poIn {
+  height: 100%;
+  opacity: 0;
+  transition: opacity var(--aera-duration-reveal) var(--aera-ease-out)
+    var(--aera-duration-reveal-delay);
 }
 
+.open .poIn {
+  opacity: 1;
+}
 
+/* THE ACTIVE MARKER — AND IT POINTS UP.
 
-/* the active-position marker: centred, under the fan, above the
-   caption, pointing up at the active card */
-/* THE ACTIVE MARKER — an upward pointer with rounded corners.
+   It sits below the hand, centred, aimed at the card the hand is on.
 
-   A triangle built from borders cannot take a radius at all, so this
-   is a square rotated 45° carrying a real radius token, with the
-   window around it half as tall so only the upper half shows. What
-   is left is a pointer whose two visible corners are genuinely
-   rounded, and the radius is a token rather than a number. */
+   A border-drawn triangle cannot take a corner radius at all, so
+   this is a real square carrying a real radius token, rotated 45°
+   inside a window exactly half as tall, with the overflow hidden so
+   only the upper half shows. What is left is an upward pointer whose
+   tip and two shoulders are genuinely round.
+
+   The geometry is one number. `--point` is the pointer's width; the
+   window is half that tall, and the square that draws it has a side
+   of width/√2 so the diamond's widest span lands exactly on the
+   window's bottom edge and its tip exactly on the top one. An
+   earlier version rotated about `top center` and scaled, which put
+   the visible wedge off to one side — it pointed RIGHT.
+
+   THE RADIUS MUST BE SMALL. `sm` on a 32px square is a quarter of
+   the side, and a quarter of the side on a shape rotated 45° eats
+   the apex outright — what was left read as a dome, not a pointer.
+   `xs` softens the three visible corners and leaves the apex a
+   recognisable point, which is the whole job. If this ever looks
+   blunt again, the radius is the thing to reduce, never the size. */
 .marker {
+  --point: var(--aera-space-11);
+  position: relative;
   align-self: center;
-  width: var(--aera-space-10);
-  height: calc(var(--aera-space-10) / 2);
+  width: var(--point);
+  height: calc(var(--point) / 2);
   overflow: hidden;
 }
 
 .marker::before {
   content: '';
-  display: block;
-  width: var(--aera-space-10);
-  height: var(--aera-space-10);
+  position: absolute;
+  left: 50%;
+  /* the square's centre sits on the window's BOTTOM edge, so the half
+     that shows above it is the pointer */
+  top: calc(var(--point) / 2 - var(--point) * 0.3536);
+  width: calc(var(--point) * 0.7071);
+  height: calc(var(--point) * 0.7071);
+  margin-left: calc(var(--point) * -0.3536);
   border-radius: var(--aera-radius-xs);
   background: var(--aera-color-surface-level2);
-  transform: rotate(45deg) scale(0.72);
-  transform-origin: top center;
+  transform: rotate(45deg);
 }

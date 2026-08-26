@@ -137,6 +137,18 @@
   overflow: hidden;
 }
 
+/* THE FILL GROWS OUT OF THE TRACK ON ENTRY.
+
+   The transition carries a bar that CHANGES while you are looking at
+   it — a period switch, a live reading. The animation carries the
+   first appearance, which the transition cannot: a width declared at
+   its final value has nothing to transition from, so every rating on
+   the scoreboard used to be simply there the moment the tab arrived.
+
+   Both run on the same house curve, and the entrance takes the
+   count-up's own duration so a bar and the numeral beside it finish
+   together. No fill-forwards: the moment the run ends the declared
+   width takes over again and the transition owns the bar. */
 .progressFill {
   position: absolute;
   inset: 0 auto 0 0;
@@ -144,6 +156,17 @@
   width: var(--bar-w);
   background: var(--bar-color);
   transition: width var(--aera-duration-slow) var(--aera-ease-out);
+  animation: barIn var(--aera-duration-count) var(--aera-ease-out) backwards;
+  animation-delay: var(--bar-delay, 0ms);
+}
+
+@keyframes barIn {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--bar-w);
+  }
 }
 
 .progressRow {

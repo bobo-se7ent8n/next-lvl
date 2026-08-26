@@ -93,8 +93,35 @@
   pointer-events: none;
 }
 
+/* THE FIELD ARRIVES AS A SWEEP UP THE COURT.
+
+   One stagger step per ROW of the grid rather than per dot: the grid
+   is a few hundred cells, and a step each would still be filling in
+   half a minute after the tab arrived. A row is also the unit the eye
+   actually reads here — what you see is a wave crossing the floor,
+   not three hundred separate arrivals.
+
+   `backwards` so a dot is invisible through its own delay rather
+   than sitting at full strength waiting its turn, and no fill
+   forwards, so the moment the run ends the dot's own opacity — the
+   one carrying the hover fade — takes the property back. */
 .dot {
+  transform-box: fill-box;
+  transform-origin: center;
   transition: opacity var(--aera-duration-fast) var(--aera-ease-out);
+  animation: dotIn var(--aera-duration-base) var(--aera-ease-out) backwards;
+  animation-delay: var(--dot-delay, 0ms);
+}
+
+@keyframes dotIn {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .hit {
@@ -104,6 +131,7 @@
 @media (prefers-reduced-motion: reduce) {
   .dot {
     transition: none;
+    animation: none;
   }
 }
 

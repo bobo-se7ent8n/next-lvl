@@ -3,19 +3,11 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { PatternFan } from './PatternFan';
 import { PATTERNS } from '../../data';
 
-/** the fan owns its own position, so the story does too */
+/** the hand owns its own position now — the story only has to say
+ *  which card it opens on, and hold the open state */
 function FanHarness({ start = 0 }: { start?: number }) {
-  const [position, setPosition] = useState(start);
   const [open, setOpen] = useState<number | null>(null);
-  return (
-    <PatternFan
-      patterns={PATTERNS}
-      position={position}
-      onPosition={setPosition}
-      openIndex={open}
-      onOpen={setOpen}
-    />
-  );
+  return <PatternFan patterns={PATTERNS} start={start} openIndex={open} onOpen={setOpen} />;
 }
 
 const meta: Meta<typeof PatternFan> = {
@@ -26,7 +18,7 @@ const meta: Meta<typeof PatternFan> = {
     docs: {
       description: {
         component:
-          'The hand: five cards, the active one pinned to the centre of the stage, the rest fanning symmetrically around it. Rotation and height are the even base sweep PLUS each card’s own hand — hashed from the card INDEX, so a card’s tilt belongs to the card rather than to where it happens to be standing, and it is identical on every render with no randomisation at paint time. The stage clips nothing and is sized off the cards; the step lives in a single `--fan-gap` property. The active marker below the fan is a rotated square with a real radius token, half-clipped, because a border-drawn triangle cannot take a corner radius.',
+          'The hand. SCROLL DOES NOT MOVE IT — scroll moves a target, and a requestAnimationFrame loop eases the hand toward that target by 22% of the remaining distance every frame. That exponential decay is the whole feel of the thing, and it is why the position is a float in a ref rather than React state: the loop writes custom properties straight onto the slots and the component re-renders exactly never while the hand is moving. The arc is quadratic — the middle rides high and the ends fall away on a curve — and each card carries its own tilt and height, hashed from the card INDEX so they belong to the card rather than to the slot it is standing in. How many cards are on stage is not a setting: a card shows while it is within 4.4 of the hand, which is nine through the middle of the set and fewer at the two ends. Two transform layers — the slot places the card and is never transitioned, the card answers the pointer and is. The marker below the fan is a rotated square carrying a real radius token, half-clipped, because a border-drawn triangle cannot take a corner radius.',
       },
     },
   },

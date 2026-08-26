@@ -32,15 +32,20 @@
   align-items: end;
 }
 
+/* WIDE AND SHORT — the shape of a bar, not of a block.
+
+   It keeps the full width of the track-label column, so it still
+   reads as the head of MOTION · POSE / OPPONENTS / PHYSIOLOGY /
+   INSIGHTS and the ruler's left edge still lands on the same line as
+   every lane's. What it loses is height: at 48px it was very nearly
+   square and stood taller than the ruler beside it, which made a
+   transport control the heaviest object in the row. */
 .play {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* sized to the TRACK-LABEL COLUMN, not to itself: it sits directly
-     above MOTION · POSE / OPPONENTS / PHYSIOLOGY / INSIGHTS and reads
-     as the head of that column */
   width: 100%;
-  height: var(--aera-space-13);
+  height: var(--aera-space-11);
   border-radius: var(--aera-radius-md);
   background: var(--aera-color-surface-inverse);
   color: var(--aera-color-ink-on-inverse);
@@ -102,23 +107,63 @@
   opacity: 0.7;
 }
 
-/* THE PLAYHEAD'S HANDLE — a triangle sitting on the tick row, with
-   the line running down from it through every track below. */
+/* THE PLAYHEAD IS ONE SHAPE: POINTER, LINE, PILL.
+
+   It used to be three things that happened to be near each other — a
+   hairline border-triangle on the tick row, a 14px gap, and then a
+   separate line starting at the top of the tracks. The pointer is
+   bigger now and its corners are genuinely rounded, the gap is closed
+   (see `.playfield`), and the line stops dead on the top edge of the
+   insight pill it is pointing at instead of running through the
+   label's text and out the bottom.
+
+   A border-triangle cannot take a radius at all, so the pointer is a
+   real square carrying a real radius token, rotated 45° inside a
+   window half its height — what shows is the lower half, which is a
+   downward pointer with two rounded shoulders and a rounded tip.
+
+   The geometry is one number. `--point` is the pointer's width; its
+   visible height is half that, and the square that draws it has a
+   side of width/√2 so the diamond's widest point lands exactly on
+   the window's top edge. */
 .handle {
+  --point: var(--aera-space-9);
   position: absolute;
   /* --head is written imperatively every frame during playback; the
      scrubbed value is the fallback */
   left: var(--head, var(--x));
   bottom: 0;
-  width: 0;
-  height: 0;
-  margin-left: -8px;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 11px solid var(--aera-color-ink-primary);
+  width: var(--point);
+  height: calc(var(--point) / 2);
+  margin-left: calc(var(--point) / -2);
+  overflow: hidden;
   pointer-events: none;
 }
 
+.handle::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  /* the square's centre sits on the window's top edge: half the
+     visible height up, less half the square's own side */
+  bottom: calc(var(--point) / 2 - var(--point) * 0.3536);
+  width: calc(var(--point) * 0.7071);
+  height: calc(var(--point) * 0.7071);
+  margin-left: calc(var(--point) * -0.3536);
+  border-radius: var(--aera-radius-xs);
+  background: var(--aera-color-ink-primary);
+  transform: rotate(45deg);
+}
+
+/* THE WHOLE REGION IS THE SCRUBBER.
+
+   The handlers used to sit on each lane individually, so the four
+   lanes scrubbed and everything between and around them — the row
+   gaps, the label column, the strip past the last track — did
+   nothing. Pressing on a timeline and having it ignore you because
+   you landed two pixels into a gap is the sort of thing that reads
+   as the control being broken. One handler on the region, measured
+   against the lane column, and the cursor says so everywhere. */
 .tracks {
   position: relative;
   display: grid;
@@ -126,6 +171,8 @@
   /* more air between tracks — they were cramped */
   gap: var(--aera-space-9) var(--aera-space-8);
   align-items: center;
+  cursor: pointer;
+  touch-action: none;
 }
 
 .trackName {
@@ -139,12 +186,22 @@
   border-radius: var(--aera-radius-sm);
   background: var(--aera-color-surface-level1);
   overflow: hidden;
-  cursor: pointer;
-  touch-action: none;
+  /* the cursor and the pointer handling both live on `.tracks` now —
+     a lane is a drawing, not a control */
 }
 
 .laneOpen {
   overflow: visible;
+  background: transparent;
+}
+
+/* MOTION · POSE STANDS ON NOTHING.
+
+   The phase segments tile the whole lane, so the level1 fill behind
+   them was only ever visible in the hairline seams and under the
+   rounded corners — which read as a texture behind the blocks rather
+   than as a track they sit in. The blocks are the track. */
+.laneFlat {
   background: transparent;
 }
 
@@ -169,16 +226,21 @@
   height: 100%;
 }
 
+/* the pill's height is DECLARED rather than left to its contents:
+   the playhead line above it stops on its top edge, and a stop
+   computed from a height that drifts with the label's leading is a
+   stop that drifts with it */
 .marker {
   position: absolute;
   top: 50%;
   left: var(--x);
   display: flex;
   align-items: center;
+  height: var(--aera-space-11);
   gap: var(--aera-space-4);
   transform: translate(-50%, -50%);
   border-radius: var(--aera-radius-sm);
-  padding: var(--aera-space-3) var(--aera-space-6);
+  padding: 0 var(--aera-space-6);
   background: var(--aera-color-surface-level1);
   color: var(--aera-color-ink-primary);
   white-space: nowrap;
@@ -196,22 +258,32 @@
   color: var(--aera-color-ink-on-inverse);
 }
 
-/* one playhead, laid over the lane column and crossing every track */
+/* one playhead, laid over the lane column and crossing every track.
+
+   The top is pulled up by exactly the timeline's own row gap, so the
+   line starts where the pointer's tip ends rather than 14px below it
+   — that gap is what made the two read as separate objects. */
 .playfield {
   position: absolute;
   left: calc(var(--aera-space-16) + var(--aera-space-8));
   right: 0;
-  top: 0;
+  top: calc(var(--aera-space-7) * -1);
   bottom: 0;
   pointer-events: none;
 }
 
-/* the line runs from the handle above, down through all four tracks
-   and into the active insight chip at the bottom */
+/* THE LINE STOPS ON THE PILL, NOT THROUGH IT.
+
+   It ran the full height of the tracks, which put a 3px black bar
+   straight down the middle of the insight label at the bottom and
+   out the other side. It now ends on the pill's top edge: the
+   insights lane is `--lane-h` tall and the pill is `--marker-h`
+   centred in it, so half of each is the distance from the lane's
+   bottom to the pill's top. Line and pill meet as one shape. */
 .playhead {
   position: absolute;
   top: 0;
-  bottom: 0;
+  bottom: calc(var(--aera-space-14) / 2 + var(--aera-space-11) / 2);
   left: var(--head, var(--x));
   width: 3px;
   margin-left: -1.5px;

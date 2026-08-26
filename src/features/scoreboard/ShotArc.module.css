@@ -53,22 +53,50 @@
   fill: var(--aera-color-ink-tertiary);
 }
 
-/* the ball travels the path once per loop. Subtle by design: the
-   trail is always there and only the brightening moves. */
+/* THE TRAIL DRAWS ITSELF IN, THEN SETTLES INTO ITS LOOP.
+
+   Two animations on one element, and the order matters: where both
+   touch a property the LATER one wins for as long as it is running.
+   `arcIn` is listed second, so it owns the ball's opacity through its
+   own short run and then hands the property back to `ballTravel`,
+   which owns it for the life of the page. Neither fills forwards.
+
+   The trail is sampled release-to-rim, so one stagger step per dot
+   reads as the shot being drawn along its own path.
+
+   The resting opacity is a variable rather than the same literal
+   written in three places — the entrance has to land on exactly the
+   value the loop starts from, or the trail flickers as it hands over. */
 .ball {
-  opacity: 0.28;
-  animation: ballTravel calc(var(--aera-duration-settle) * 4) var(--aera-ease-in-out) infinite;
-  animation-delay: var(--dot-delay);
+  --ball-rest: 0.28;
+  opacity: var(--ball-rest);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation:
+    ballTravel calc(var(--aera-duration-settle) * 4) var(--aera-ease-in-out) infinite,
+    arcIn var(--aera-duration-base) var(--aera-ease-out) backwards;
+  animation-delay: var(--dot-delay), var(--enter-delay, 0ms);
 }
 
 @keyframes ballTravel {
   0%,
   16%,
   100% {
-    opacity: 0.28;
+    opacity: var(--ball-rest);
   }
   6% {
     opacity: 1;
+  }
+}
+
+@keyframes arcIn {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: var(--ball-rest);
+    transform: scale(1);
   }
 }
 
