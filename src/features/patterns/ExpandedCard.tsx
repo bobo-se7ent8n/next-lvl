@@ -2,14 +2,18 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
 import { inkOn, mix, tintOf, vizWell } from '../../lib/color';
+import { Link } from 'react-router-dom';
 import { Card } from '../../components/primitives/Card';
+import { Chip } from '../../components/primitives/Chip';
+import { StatSet } from '../../components/primitives/StatRow';
 import { Counted, Metric } from '../../components/primitives/Metric';
 import { useEnterKey } from '../../lib/enterContext';
-import { duration } from '../../tokens';
+import { duration, iconStroke } from '../../tokens';
 import { Display, Label, Text } from '../../components/primitives/Text';
 import { PatternChart } from './PatternChart';
 import { buildLadder, historyLabel } from './fitPlan';
 import { STATE_LABEL } from '../../data/patterns';
+import { patternSource } from './patternSource';
 import type { Pattern } from '../../data/types';
 import styles from './ExpandedCard.module.css';
 
@@ -110,6 +114,10 @@ export function ExpandedCard({
   /* the recalc's own trigger — the fan re-scopes this 140ms into the
      flight, and everything that animates in here reads it */
   const enterKey = useEnterKey();
+  /* where this pattern came from — a session, a scoreboard block or
+     the library. One resolver so the chip, the name, the button and
+     the route can never say different things. */
+  const source = patternSource(pattern);
 
   return (
     <Card
@@ -131,6 +139,28 @@ export function ExpandedCard({
           which is why a 1440×1080 screen was being served the compact
           layout. Pinned, the fit is decided once, against the box the
           popup is actually going to occupy. */}
+      {/* THE CLOSE CONTROL. It replaces a line of helper text that
+          told you the whole panel was a dismiss target — which was
+          true, and is still true, but a sentence explaining an
+          affordance is a sentence admitting the affordance is not
+          visible. An X in the corner is the affordance. */}
+      {/* THE ONLY CONTROL. The "..." that sat beside this opened
+          nothing and did nothing — an affordance promising an action
+          that did not exist. */}
+      <button
+        type="button"
+        className={styles.close}
+        aria-label="Close"
+        onClick={(e) => {
+          e.stopPropagation();
+          onDismiss?.();
+        }}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={iconStroke.base} strokeLinecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+
       <div
         ref={inner}
         className={styles.inner}
@@ -150,7 +180,7 @@ export function ExpandedCard({
             {pattern.name}
           </Display>
           <Text variant="bodySM" tone="inherit" className={styles.context}>
-            {pattern.context}
+            {pattern.trend}
           </Text>
         </div>
 
@@ -181,13 +211,51 @@ export function ExpandedCard({
             countOver={duration.countQuick}
           />
 
-          <div className={cx(styles.cellMeasured, styles.measured)}>
+          {/* WHERE THE PATTERN CAME FROM.
+
+              A pattern is a claim about your own sessions, and until
+              this block existed the panel made the claim without
+              showing its source. The tinted recess holds the session
+              it was measured on, what that session was, and a way to
+              go and look at it. */}
+          <div className={cx(styles.cellMeasured, styles.linked)}>
+            {/* THE SOURCE, WHATEVER KIND IT IS.
+
+                One block, one order, four facts that cannot disagree:
+                the chip's words and colour, the name under it, the
+                button's words and where it goes all come from the
+                same resolver. See patternSource.ts. */}
+            <Chip tone={source.tone} className={styles.sourceTag}>{source.label}</Chip>
+
             <Label tone="inherit" className={styles.quiet}>
-              What was measured
+              {source.date ? `${source.date} · ${source.name}` : source.name}
             </Label>
+
             <Text variant="bodySM" tone="inherit">
               {pattern.measured}
             </Text>
+
+            {/* omitted when the source carries no readings — the
+                order of the block never changes, only what is in it */}
+            {source.stats ? (
+              <StatSet inherit className={styles.linkedStats} stats={source.stats} />
+            ) : null}
+
+            <Link
+              to={source.to}
+              className={styles.openSource}
+              aria-label={`${source.action}: ${source.name}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {source.action}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={iconStroke.base} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M7 17L17 7M9 7h8v8" />
+              </svg>
+            </Link>
+
+            <Label tone="inherit" className={styles.quiet}>
+              {source.caption}
+            </Label>
           </div>
 
           <Text variant="bodySM" tone="inherit" className={cx(styles.cellBody, styles.body)}>
@@ -201,7 +269,7 @@ export function ExpandedCard({
             {/* THE SAME CHART THE CARD IN THE HAND DRAWS, at the
                 height the fit plan has budgeted and with its
                 annotations on */}
-            <PatternChart pattern={pattern} color={mark} height={plan.vizHeight} inherit />
+            <PatternChart pattern={pattern} color={mark} height={plan.vizHeight} inherit area />
           </div>
 
           <div className={styles.cellHistory}>
@@ -261,10 +329,7 @@ export function ExpandedCard({
           </div>
         </div>
 
-        {/* the same mono caps every other small label wears */}
-        <Label tone="inherit" className={styles.note}>
-          Click anywhere to put it back.
-        </Label>
+
       </div>
     </Card>
   );

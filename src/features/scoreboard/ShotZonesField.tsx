@@ -182,14 +182,14 @@ export function ShotZonesField({ className }: ShotZonesFieldProps) {
       <div className={styles.top}>
         {reading ? (
           <>
-            <Metric value={reading.pct} unit="% FG" size="md" static />
+            <Metric value={reading.pct} unit="% FG" size="lg" static />
             <Label tone="secondary" className={styles.readout}>
               {reading.label} · {reading.makes}/{reading.attempts} · {reading.comparison}
             </Label>
           </>
         ) : (
           <>
-            <Metric value={String(overall)} unit="% FG" size="md" />
+            <Metric value={String(overall)} unit="% FG" size="lg" />
             <Text variant="bodySM" tone="tertiary" numeric>
               {data.totals.makes} / {data.totals.attempts} on this window
             </Text>

@@ -70,7 +70,11 @@ export function SessionCard({ session, index = 0, onClick, className }: SessionC
         <Display size="md" as="h3">
           {session.title}
         </Display>
-        <StatSet compact stats={shown.map((s) => ({ label: s.label, value: s.value }))} />
+        {/* NOT `compact`. The compact form is `metricSM` (16px) and
+            the same readings on the Scoreboard are `metricMD` (22px)
+            — the session card is where you actually read them, so it
+            had the smaller of the two sizes for no reason. */}
+        <StatSet stats={shown.map((s) => ({ label: s.label, value: s.value }))} />
       </div>
 
       {/* The description and the candidate block are ALTERNATIVES,

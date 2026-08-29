@@ -8,8 +8,20 @@
    ============================================================ */
 .main {
   position: relative;
-  z-index: 10;
+  z-index: var(--aera-z-content);
   width: 100%;
+  /* THE PAGE SCROLLS AGAIN, AND THAT IS THE POINT.
+
+     The shell used to own the viewport and hand each screen exactly
+     one screen's worth of room, which made every section fit — by
+     clipping whatever did not. A library of eight cards lost the
+     bottom of its first row that way.
+
+     Content now renders at its full height and the document scrolls
+     when there is more of it than fits. Nothing is compressed and
+     nothing is cut. The scrollbar is never drawn (see global.css),
+     so the cost of this is a page that moves under the wheel, not a
+     track down the side of it. */
   /* the bottom reserve is the nav's band. The nav is fixed and out of
      the flow, so it cannot push anything out of its way — the page has
      to leave it the room. */
@@ -44,7 +56,7 @@
 @keyframes settleIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(var(--aera-space-4));
   }
   to {
     opacity: 1;

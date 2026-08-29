@@ -13,6 +13,14 @@
    density steps below are the spacing half of that plan.
    ============================================================ */
 .panel {
+  /* THE CORNER COMES FROM THE PANEL AND HAS TO SURVIVE THE STACK.
+
+     The flight owns the radius and animates it; this Card is drawn
+     `bare` on top of it and was declaring `radius: none`, so it
+     painted a square face over a rounded box and the expanded card
+     showed sharp corners. Inheriting means the surface carries
+     whatever the panel's corner is at that instant. */
+  border-radius: inherit;
   width: 100%;
   height: 100%;
   padding: 0;
@@ -20,12 +28,89 @@
   text-align: left;
 }
 
+/* NO WHITE RING ROUND THE OPENED CARD.
+
+   `Card` picks one of two treatments from its `interactive` prop:
+   a shadow for something you can pick up, a 2px `surface.level1`
+   stroke for a region of the page. This panel is dismissed by
+   clicking it but cannot BE a button — it has buttons and a link
+   inside it, and a button inside a button is not markup — so it
+   takes the non-clickable branch and wore the stroke. On a
+   saturated card face that near-white ring reads as an outline
+   drawn round the card.
+
+   Only the stroke goes. `--card-shadow` is whatever elevation the
+   component asked for, so the drop shadow survives; in the flight
+   the panel is `bare` and the shadow lives on the flight itself.
+
+   Doubled class for specificity: this and `.stroked` are both one
+   class, and which stylesheet lands last in the bundle is not
+   something to leave to chance. */
+.panel.panel {
+  box-shadow: var(--card-shadow, none);
+}
+
+/* THE CLOSE CONTROL — top right, above the content, on every
+   expanded pattern. It sits on the panel rather than inside the
+   scrolling inner box so it cannot drift with the content, and it
+   carries the tap floor like every other control. */
+.close {
+  position: absolute;
+  top: var(--aera-space-8);
+  right: var(--aera-space-8);
+  z-index: var(--aera-z-menu);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--aera-min-target-tap);
+  min-height: var(--aera-min-target-tap);
+  border-radius: var(--aera-radius-pill);
+  color: inherit;
+  opacity: 0.62;
+  background: var(--aera-color-on-face-wash);
+  transition:
+    opacity var(--aera-duration-fast) var(--aera-ease-out),
+    background var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.close:hover {
+  opacity: 1;
+  background: var(--aera-color-on-face-wash-strong);
+}
+
+.close svg {
+  width: var(--aera-icon-base);
+  height: var(--aera-icon-base);
+}
+
 .inner {
-  /* the FINAL box, not the animating one — see ExpandedCard.tsx */
-  height: var(--fit-h, 100%);
-  width: var(--fit-w, 100%);
-  /* deliberately NOT auto: a popup that scrolls inside itself is the
-     bug this file exists to prevent */
+  /* THE BOX IT IS ACTUALLY IN, NOT THE ONE IT WILL BE IN.
+
+     This was pinned to the popup's FINAL geometry and clipped to it,
+     which is what made the flight look like a window sliding over a
+     finished layout: the content was already full size and the box
+     was just uncovering it. Following the panel's current size means
+     the content relays out as the panel grows — the graphic holds
+     the top and the rest comes in under it.
+
+     At rest the panel IS its final geometry, so the settled card is
+     pixel-identical to what it was. */
+  height: 100%;
+  width: 100%;
+  /* THE CARD HOLDS ITS OWN CONTENT.
+
+     This is the card's own box, not an ancestor of it — nothing
+     above the flight clips, which is what used to cut the card off
+     mid-air. What it does do is keep the reflow inside the card:
+     at the moment the panel is still card-sized the expanded layout
+     is taller than it, and unclipped that tail rendered outside the
+     card, across the page and over the nav.
+
+     Clipping HERE is not the old bug. The old bug pinned the content
+     to the final geometry and slid a window over a finished layout.
+     The content is laid out for the box it is in now, so the growing
+     card reveals more of a layout that is relaying itself — the
+     graphic holds the top and the rest comes in underneath it. */
   overflow: hidden;
   padding: var(--pad-y) var(--pad-x);
   display: flex;
@@ -38,20 +123,23 @@
 .inner {
   --pad-y: var(--aera-space-11);
   --pad-x: var(--aera-space-12);
-  --stack-gap: var(--aera-space-9);
-  --column-gap: var(--aera-space-11);
-  --row-gap: var(--aera-space-7);
-  --history-gap: var(--aera-space-6);
+  /* MORE AIR BETWEEN GROUPS. The panel is the one place in the
+     product with room to spare — it opens into a box sized for it —
+     and it was running the same gaps as a card a third its size. */
+  --stack-gap: var(--aera-space-11);
+  --column-gap: var(--aera-space-12);
+  --row-gap: var(--aera-space-9);
+  --history-gap: var(--aera-space-9);
   --measured-pad: var(--aera-space-7) var(--aera-space-8);
 }
 
 .inner[data-density='tight'] {
   --pad-y: var(--aera-space-9);
   --pad-x: var(--aera-space-11);
-  --stack-gap: var(--aera-space-7);
-  --column-gap: var(--aera-space-9);
-  --row-gap: var(--aera-space-6);
-  --history-gap: var(--aera-space-4);
+  --stack-gap: var(--aera-space-9);
+  --column-gap: var(--aera-space-11);
+  --row-gap: var(--aera-space-7);
+  --history-gap: var(--aera-space-7);
   --measured-pad: var(--aera-space-5) var(--aera-space-7);
 }
 
@@ -61,7 +149,7 @@
   --stack-gap: var(--aera-space-5);
   --column-gap: var(--aera-space-8);
   --row-gap: var(--aera-space-4);
-  --history-gap: var(--aera-space-2);
+  --history-gap: var(--aera-space-5);
   --measured-pad: var(--aera-space-4) var(--aera-space-6);
 }
 
@@ -69,18 +157,23 @@
   display: flex;
   flex-direction: column;
   gap: var(--aera-space-4);
+  /* the close control is absolutely placed in this corner, so the
+     heading block reserves its width plus its own inset */
+  padding-right: calc(var(--aera-min-target-tap) + var(--aera-space-8));
 }
 
 .context {
-  opacity: 0.66;
+  opacity: 0.78;
 }
 
+/* the section headers read as headers, not as ghosts — 0.7 over a
+   saturated card face was under 3:1 against the body beside it */
 .quiet {
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 .body {
-  opacity: 0.82;
+  opacity: 0.94;
 }
 
 /* THE SHARED GRID — three rows, and both columns start on them.
@@ -144,6 +237,59 @@
   gap: var(--history-gap);
 }
 
+/* THE LINKED SESSION BLOCK — a recess cut into the panel's face,
+   holding the source of the claim the panel is making. */
+.linked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--aera-space-6);
+  padding: var(--measured-pad);
+  border-radius: var(--aera-radius-md);
+  background: var(--aera-color-on-face-wash);
+}
+
+.linkedStats {
+  padding-block: var(--aera-space-2);
+}
+
+/* the filled pill that goes to the session. It is the one action on
+   the panel, so it is the one filled control on it. */
+.openSource {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--aera-space-4);
+  min-height: var(--aera-min-target-tap);
+  padding: var(--aera-space-4) var(--aera-space-8);
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-surface-inverse);
+  color: var(--aera-color-ink-on-inverse);
+  font-family: var(--aera-text-mono-family);
+  font-size: var(--aera-text-mono-size);
+  font-weight: var(--aera-weight-medium);
+  letter-spacing: var(--aera-tracking-mono);
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    transform var(--aera-duration-press) var(--aera-ease-firm),
+    opacity var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.openSource:hover {
+  opacity: 0.88;
+}
+
+.openSource:active {
+  transform: scale(0.985);
+}
+
+.openSource svg {
+  width: var(--aera-icon-sm);
+  height: var(--aera-icon-sm);
+  flex: 0 0 auto;
+}
+
 .measured {
   padding: var(--measured-pad);
   border-radius: var(--aera-radius-md);
@@ -180,15 +326,15 @@
    the five styles in ExpandedCard.tsx. The label is quieter, and that
    is opacity rather than a sixth size. */
 .historyName {
-  width: 88px;
+  width: var(--aera-control-history-label);
   flex: 0 0 auto;
-  opacity: 0.72;
+  opacity: 0.86;
 }
 
 .historyBar {
   flex: 1 1 auto;
   min-width: 40px;
-  height: 7px;
+  height: var(--aera-control-history-bar);
   border-radius: var(--aera-radius-pill);
   background: var(--aera-color-on-face-track);
   overflow: hidden;
@@ -230,20 +376,10 @@
    recalc, and a proportional numeral in an auto-width slot re-lays
    the whole row on every frame of that count. */
 .historyValue {
-  width: 52px;
+  width: var(--aera-control-history-value);
   flex: 0 0 auto;
   text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-/* THE HINT LINE. Mono caps like every other small label in the
-   panel, on the left column's own left edge, and one spacing token
-   below the grid — which is the `--stack-gap` the inner box already
-   applies to its children. It used to be pushed to the bottom with
-   `margin-top: auto`, a one-off that made the space above it depend
-   on how much content happened to be in the panel. */
-.note {
-  opacity: 0.5;
+  font-variant-numeric: var(--aera-numeric-tabular);
 }
 
 /* THE PROTOTYPE'S OWN BREAKPOINT. It was 860, which the panel can
@@ -275,3 +411,87 @@
     padding: var(--pad-y) var(--pad-x);
   }
 }
+
+/* ============================================================
+   CHIPS IN HERE ARE WHITE
+
+   The chip's palette tone still decides what the block MEANS — the
+   resolver in patternSource.ts sets it, and it drives the label and
+   the destination. Inside the expanded card it does not decide what
+   the chip LOOKS like: on a face that is already a saturated colour,
+   a second saturated colour reads as a second subject. White is the
+   one fill that sits on every face the set can take, so the chip
+   reads as a tag rather than as another coloured thing.
+
+   The ink is the panel's own, which is chosen against that face, so
+   the text stays legible on the white regardless of the card.
+   ============================================================ */
+.sourceTag {
+  background: var(--aera-color-surface-background);
+  color: var(--aera-color-ink-primary);
+}
+
+/* ============================================================
+   THE CLOSE CLEARS THE CARD BEFORE IT MOVES
+
+   Everything used to stay on screen for the whole return, so the
+   card rotated and shrank with a full page of detail still in it —
+   five blocks, a chart and a history list all in motion at once,
+   which reads as noise rather than as dismissal.
+
+   Each group carries its OWN opacity rather than one wrapper
+   fading: a single wrapper is one object leaving, and what should
+   happen is that the card empties. The steps between them are a few
+   milliseconds — enough that they do not clear in lockstep, far too
+   little to read as choreography.
+
+   `contentClear` + four steps is ~94ms against a 260ms collapse, and
+   the collapse curve is deliberately slow off the mark — so the card
+   is empty by the time it is roughly a quarter of the way home and
+   what actually travels is a plain block of colour. The panel's own
+   face is not in here on purpose: it carries through and resolves
+   last.
+   ============================================================ */
+[data-closing] .top,
+[data-closing] .cellHero,
+[data-closing] .linked,
+[data-closing] .cellChart,
+[data-closing] .cellHistory,
+[data-closing] .body,
+[data-closing] .close {
+  opacity: 0;
+  transition: opacity var(--aera-duration-content-clear) var(--aera-ease-collapse);
+}
+
+/* group 1 — the reading: meta, title, subtitle, numeral, CURRENT VALUE */
+[data-closing] .top,
+[data-closing] .cellHero {
+  transition-delay: 0ms;
+}
+
+/* group 2 — the linked source panel */
+[data-closing] .linked {
+  transition-delay: var(--aera-duration-clear-step);
+}
+
+/* group 3 — the chart well and the history rows under it */
+[data-closing] .cellChart,
+[data-closing] .cellHistory {
+  transition-delay: calc(var(--aera-duration-clear-step) * 2);
+}
+
+/* group 4 — the body paragraph */
+[data-closing] .body {
+  transition-delay: calc(var(--aera-duration-clear-step) * 3);
+}
+
+/* group 5 — the close control itself */
+[data-closing] .close {
+  transition-delay: calc(var(--aera-duration-clear-step) * 4);
+}
+
+/* No reduced-motion block here on purpose: global.css already
+   collapses `transition-duration` AND `transition-delay` to
+   `--aera-duration-none` for every element with `!important`, which
+   this could not override anyway. These groups clear instantly
+   there, which is the correct behaviour. */

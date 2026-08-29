@@ -9,8 +9,10 @@
   color: var(--tone);
 }
 
+/* tabular figures, so a number a reader compares down a column
+   cannot shift its neighbours as it changes */
 .numeric {
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: var(--aera-numeric-tabular);
 }
 
 .align-start {

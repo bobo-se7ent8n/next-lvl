@@ -14,6 +14,12 @@
    ============================================================ */
 
 export const duration = {
+  /** NOT ZERO, AND NOT A ROUNDING ERROR. The duration a motion is
+   *  collapsed to under `prefers-reduced-motion`. It has to be a
+   *  real non-zero time so that transitionend/animationend still
+   *  fire and nothing that waits on them hangs — which is why the
+   *  reduced-motion idiom is 0.001ms everywhere rather than 0. */
+  none: '0.001ms',
   instant: '80ms',
   /** a press compressing under the finger */
   press: '110ms',
@@ -63,6 +69,24 @@ export const duration = {
   countQuick: '480ms',
   /** the fan card opening into the expanded state */
   expand: '440ms',
+  /* ---- AND CLOSING, WHICH IS NOT THE SAME MOVE ----
+
+     Opening is the card arriving and being read; it can take its
+     time. Closing is dismissal — the answer is already had, and a
+     440ms exit is 440ms of nothing. These are separate values
+     rather than one shared constant precisely so the two can be
+     tuned against each other. */
+  /** the box travelling back into its slot — well under `expand` */
+  collapse: '260ms',
+  /** one group of card content clearing out. Short, and it starts at
+   *  the top of the close so every group is gone before the geometry
+   *  is halfway home: what rotates and shrinks is a plain block of
+   *  colour, not a page of detail in motion. */
+  contentClear: '70ms',
+  /** the head start one group has over the one before it. Barely
+   *  perceptible on purpose — this is five things leaving at once,
+   *  not a choreographed exit. */
+  clearStep: '6ms',
   /** a long, quiet loop — the dot fields and the shot arc */
   settle: '640ms',
 } as const;
@@ -77,6 +101,19 @@ export const easing = {
    *  fan into the expanded panel. Slightly longer in the tail than
    *  `out`, and still with no overshoot in it. */
   expand: 'cubic-bezier(0.2, 0.9, 0.25, 1)',
+  /** and the curve it comes back on.
+   *
+   *  WEIGHT AT THE START, not only at the end. A hard decelerate —
+   *  which is what `expand` is — covers 98% of the distance in the
+   *  first third of the close, so the card was effectively home
+   *  before its content had finished clearing and there was nothing
+   *  left to watch it do. This one leans in slowly and then commits:
+   *  the card is emptied while it is still leaving, which is the
+   *  whole point of clearing it first.
+   *
+   *  Both control points sit inside the unit square, so there is no
+   *  overshoot in it and nothing to bounce back from. */
+  collapse: 'cubic-bezier(0.55, 0.05, 0.25, 1)',
   linear: 'linear',
 } as const;
 

@@ -44,6 +44,9 @@ export interface PatternChartProps {
   compact?: boolean;
   /** take the surrounding ink for any annotation that does show */
   inherit?: boolean;
+  /** flood the region under a line. The opened panel asks for it —
+   *  at that size a bare stroke reads as thin. */
+  area?: boolean;
   className?: string;
   style?: CSSProperties;
 }
@@ -54,6 +57,7 @@ export function PatternChart({
   height,
   compact,
   inherit,
+  area,
   className,
   style,
 }: PatternChartProps) {
@@ -93,6 +97,7 @@ export function PatternChart({
       color={color}
       height={height}
       weight={3}
+      area={area}
       ariaLabel={label}
       className={className}
       style={style}

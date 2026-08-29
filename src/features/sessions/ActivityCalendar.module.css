@@ -41,6 +41,9 @@
 }
 
 .page {
+  /* the tablet scale step takes this under the tap floor */
+  min-width: var(--aera-min-target-tap);
+  min-height: var(--aera-min-target-tap);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -69,8 +72,8 @@
 }
 
 .page svg {
-  width: 13px;
-  height: 13px;
+  width: var(--aera-icon-base);
+  height: var(--aera-icon-base);
 }
 
 .weekdays {

@@ -78,7 +78,7 @@
 }
 
 .view:focus-visible {
-  outline: 2px solid var(--aera-color-utility-focus);
+  outline: var(--aera-border-base) solid var(--aera-color-utility-focus);
   outline-offset: 4px;
   border-radius: var(--aera-radius-sm);
 }

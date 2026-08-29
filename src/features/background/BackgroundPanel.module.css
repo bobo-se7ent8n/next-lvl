@@ -2,7 +2,7 @@
   position: fixed;
   right: var(--aera-space-9);
   bottom: var(--aera-space-9);
-  z-index: 940;
+  z-index: var(--aera-z-panel);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -10,6 +10,16 @@
 }
 
 .body {
+  /* THE GAP NEEDS A FLEX BOX TO LAND ON.
+
+     This class is applied to a `Card`, which already declares
+     `display: flex` — so the gap below does work. But it worked by
+     inheritance from another stylesheet, which meant reading this
+     rule on its own told you nothing, and the override only beat
+     Card's own gap because of CSS-module source order. Declared
+     here, both facts are local and neither depends on bundling. */
+  display: flex;
+  flex-direction: column;
   width: 312px;
   max-height: min(72vh, 660px);
   overflow: auto;
@@ -36,8 +46,8 @@
 }
 
 .toggleButton svg {
-  width: 19px;
-  height: 19px;
+  width: var(--aera-icon-xl);
+  height: var(--aera-icon-xl);
 }
 
 .group {

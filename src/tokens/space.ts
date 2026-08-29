@@ -14,7 +14,7 @@ export const space = {
   '5': '10px',
   '6': '12px',
   '7': '14px',
-  '8': '18px',
+  '8': '16px',
   '9': '22px',
   '10': '26px',
   '11': '32px',
@@ -59,7 +59,7 @@ export const layout = {
    *  scoreboard bento all split into columns, and they used to do it
    *  at two different sizes — 32 on two screens and 40 on a third —
    *  which made the same layout read as three layouts. */
-  splitGap: '32px',
+  splitGap: '48px',
   /** the widest an insight bubble gets before its text wraps */
   insightBubble: '500px',
 
@@ -91,6 +91,8 @@ export const layout = {
   insightBubbleH: '96px',
   /** the clearance under a full-height bubble */
   insightFoot: '16px',
+  /** how far the figma-style name tag hangs below a hovered card */
+  tagDrop: '24px',
   /** the width every nav item reserves, so the current one cannot
    *  reflow its neighbours */
   navItem: '104px',
@@ -114,5 +116,16 @@ export const layout = {
   /** and how tall it stands once parked: the header band and one page
    *  gutter subtracted from the viewport, so a screen is a header and
    *  a column and nothing below them */
-  columnHeight: `calc(100svh - ${HEADER_BLOCK} - ${NAV_HEIGHT} - ${space['12']})`,
+  /* THE ONLY LAYOUT TOKEN THAT REFERENCES ITS OWN SIBLINGS.
+   *
+   *  It has to. Every other length here is projected through
+   *  `--aera-scale`, but this one mixes `100svh` — which must NOT
+   *  scale, it is the window — with three lengths that must. Written
+   *  as literals it would be wrapped whole and the viewport would
+   *  shrink with the type. Written as `var()` references it composes
+   *  from the already-scaled values, and the projection leaves it
+   *  alone because there is no bare px in it. */
+  columnHeight:
+    'calc(100svh - var(--aera-layout-header-block)' +
+    ' - var(--aera-layout-nav-height) - var(--aera-space-12))',
 } as const;

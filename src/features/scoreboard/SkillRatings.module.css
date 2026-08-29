@@ -37,18 +37,73 @@
 /* the centre column is narrow, so the two groups stack rather than
    sitting side by side the way the old full-width panel did */
 /* both groups, in full. Nothing here shrinks and nothing is cut. */
+/* ONE COLUMN: Shooting, then Handling & movement, stacked.
+
+   They were briefly side by side to buy column height. They read as
+   one list top to bottom — a rating and the rating under it — and
+   two columns of five turned that into a comparison nobody asked
+   for. The height it bought is bought by the scale instead. */
+/* AND THE GAP BETWEEN GROUPS HAS TO BEAT THE GAP INSIDE ONE.
+
+   With the rows opened up, a flat `card-gap` between the two groups
+   was TIGHTER than the space between two rows, which inverts the
+   hierarchy — the list stops reading as two groups. Composed from
+   both tokens so it stays the larger of the two however the row
+   rhythm is tuned. */
 .groups {
   display: flex;
   flex-direction: column;
-  gap: var(--aera-card-gap);
+  gap: calc(var(--aera-card-gap) + var(--aera-card-row-padding));
 }
 
+/* ROW TO ROW IS ONE TOKEN, AND IT IS SMALL.
+
+   Tying the row rhythm to the row PADDING meant every step was paid
+   three times over — the gap, plus the padding on the bottom of one
+   row and the top of the next — so 12 read as 36 and the list came
+   apart. The rows carry no padding of their own inside a group now
+   and the gap alone spaces them.
+
+   The heading keeps the separation it already had. That was the gap
+   plus one row's padding; with the gap down to `space-4` the
+   difference is made up on the heading itself, so heading-to-row is
+   unchanged while row-to-row is not. */
 .group {
   display: flex;
   flex-direction: column;
+  gap: var(--aera-space-4);
 }
 
-/* ---- where to work next: its OWN card now ---- */
+.group > :first-child {
+  margin-bottom: calc(var(--aera-card-row-padding) * 2 - var(--aera-space-4));
+}
+
+/* scoped to `.group` on purpose: "where to work next" uses the same
+   row component and keeps its own padding untouched */
+.group .ratingRow {
+  padding-block: 0;
+}
+
+/* ---- where to work next: its OWN card now ----
+
+   THE CARD MAY STRETCH. ITS CONTENTS MAY NOT.
+
+   This card is the last one in the ratings column, so the column
+   hands it whatever height the tallest of the three columns has
+   spare — that stretch is what keeps the three bottom edges on one
+   line and it stays.
+
+   What came out is the stretch being passed DOWN. `flex: 1 1 auto`
+   plus `space-between` made the two entries absorb that height
+   between them, which is invisible when the spare height is twenty
+   pixels and absurd when it is three hundred: at 2560x1329 the two
+   entries were pinned to the top and bottom edges of the card with a
+   canyon in between.
+
+   The entries hold one fixed gap and sit at the top. Leftover height
+   stays where it belongs — empty, at the bottom of the card. Note
+   this is a flex column, not a block: `gap` on a block box is a
+   silent no-op, which is its own bug in this codebase. */
 .entries {
   display: flex;
   flex-direction: column;

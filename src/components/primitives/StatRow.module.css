@@ -7,7 +7,7 @@
 }
 
 .row + .row {
-  border-top: 1px solid var(--aera-color-utility-hairline);
+  border-top: var(--aera-border-hairline) solid var(--aera-color-utility-hairline);
 }
 
 .label {

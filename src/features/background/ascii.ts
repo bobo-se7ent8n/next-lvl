@@ -2,6 +2,8 @@
    symbols, laid out on smooth value noise so it resolves into a
    large-scale image at a distance instead of reading as static */
 
+import { fontFamily } from '../../tokens';
+
 const RAMP = ' .,:;-~+=*1379#%8&@';
 
 function cellHash(x: number, y: number, seed: number): number {
@@ -45,6 +47,17 @@ function makeNoise(seed: number) {
   };
 }
 
+/** the mono family token, resolved. Falls back to the token's own
+ *  value when there is no document to read from — a canvas painted
+ *  before the token block is on `:root`, or a test environment. */
+function monoFamily(): string {
+  if (typeof document === 'undefined') return fontFamily.mono;
+  const v = getComputedStyle(document.documentElement)
+    .getPropertyValue('--aera-font-mono')
+    .trim();
+  return v || fontFamily.mono;
+}
+
 export interface AsciiPaintOptions {
   cell: number;
   fontSize: number;
@@ -68,7 +81,11 @@ export function paintAscii(canvas: HTMLCanvasElement, opts: AsciiPaintOptions): 
   const size = Math.max(4, opts.cell);
   const cols = Math.ceil(w / size) + 1;
   const rows = Math.ceil(h / size) + 1;
-  ctx.font = `${opts.fontSize}px "IBM Plex Mono", ui-monospace, monospace`;
+  /* the family comes from the token, not from a string written here.
+     `ctx.font` needs a resolved value rather than a `var()`, so the
+     custom property is read off the root — the same value every
+     stylesheet in the product gets. */
+  ctx.font = `${opts.fontSize}px ${monoFamily()}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = opts.ink;

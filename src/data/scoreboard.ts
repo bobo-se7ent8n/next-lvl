@@ -105,8 +105,16 @@ export const SKILLS = {
     { label: 'Ball handling', value: 69 },
     { label: 'Agility', value: 76 },
     { label: 'First step', value: 74 },
-    { label: 'Balance', value: 58 },
+    /* 55, not 58. Every rating on the board is this baseline plus a
+       stable per-window shift, so what the card SHOWS is a few
+       points off what is written here: at 58 Balance rendered 59 in
+       three of the four windows, which is the same number
+       Three-point renders — two identical readings side by side in
+       one card, and the same pair again in "where to work next".
+       55 renders 56 and the collision is gone. */
+    { label: 'Balance', value: 55 },
   ],
+
 };
 
 export const SKILL_AVERAGE = 70;
@@ -123,6 +131,14 @@ export const SKILL_SOURCE = 'on-device pose, ball and inertial data · sessions 
    and given a sentence — the sentence says what the number does,
    never what to do about it. Nothing here is an instruction and
    nothing is ranked against anybody.
+
+   NOT WIRED TO ANYTHING. The card on screen does not read this: it
+   reads `derive()` in period.ts, which sorts the ten rated skills
+   and takes the two lowest for the window, with the sentences from
+   WORK_NOTE. This array is the shape that pre-dated that, kept in
+   step with SKILLS by hand. If you are changing a rating, the one
+   that matters is SKILLS above — this one follows it so the two
+   never disagree, and nothing renders if it drifts.
    ------------------------------------------------------------ */
 export interface WorkNextEntry {
   label: string;
@@ -133,7 +149,7 @@ export interface WorkNextEntry {
 export const WHERE_NEXT: WorkNextEntry[] = [
   {
     label: 'Balance',
-    value: 58,
+    value: 55,
     note: 'The lowest movement rating. It moves with late-session fatigue, not with anything technical.',
   },
   {
@@ -155,13 +171,16 @@ export const WHERE_NEXT: WorkNextEntry[] = [
 export const SHOT_TREND = {
   meta: 'Apr 12 · Tuesday scrimmage · 62 min',
   heading: 'Arc is tightening',
-  /* TWO readings, not three. Consistency was the third, and it is
-     already the last row of Shot Mechanics directly underneath —
-     printing it twice made this block taller than its column. */
+  /* A READING IS A NUMBER AND ITS UNIT, and nothing else.
+     The `label` on each of these used to print a small-caps line
+     under the number — ARC ANGLE, RELEASE TIME — saying in six
+     letters what the unit beside the number already said in three.
+     The trailing `note` sentence went with them: the heading names
+     the trend and the numbers carry it, so a sentence restating
+     both was the third telling. Figma node 464:8762 has neither. */
   readings: [
-    { value: '+3', unit: 'arc', degree: true, label: 'arc angle' },
-    { value: '-0.06', unit: 's', label: 'release time' },
+    { id: 'arc', value: '+3', unit: 'arc', degree: true },
+    { id: 'release', value: '-0.06', unit: 's' },
   ],
-  note: 'Earlier and steeper across the last six sessions.',
 };
 

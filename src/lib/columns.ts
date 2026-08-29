@@ -35,6 +35,14 @@ export function columnize<T>(items: T[], count: number): T[][] {
  *  are the ones the two grids already used. */
 export function columnCountFor(width: number): number {
   if (width <= 720) return 1;
-  if (width <= 1280) return 2;
+  /* THREE COLUMNS DOWN THROUGH THE 13" AIR.
+
+     The threshold was 1280, which is exactly the width a MacBook
+     Air 13" reports at its default scaled resolution — so the
+     library dropped to two columns on the machine it most needed
+     three on, and got taller for it. The card gets narrower instead,
+     which is what the layout scale is for: reflowing the grid is a
+     change of layout, and this is a change of size. */
+  if (width <= 1023) return 2;
   return 3;
 }

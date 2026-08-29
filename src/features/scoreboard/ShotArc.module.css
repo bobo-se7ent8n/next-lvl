@@ -25,9 +25,18 @@
 /* the chart's own container is a Well — the one inner treatment.
    It carries the diagram's own aspect rather than taking whatever a
    stretched card had left, which is what collapsed it to a sliver. */
+/* THE WELL TAKES WHAT THE CARD LEAVES — same decision as the court.
+
+   `aspect-ratio: 5/3` made the well's height a function of the
+   column's width, so on a wide-but-short window the mechanics card
+   became the tallest thing in the bento: 450px of well in a 540px
+   column. The diagram is `xMidYMid meet`, so it holds its own
+   proportions in whatever box it is given and letterboxes the rest.
+   The ratio survives as a floor so it cannot collapse to a sliver. */
 .arcWell {
   width: 100%;
-  aspect-ratio: 5 / 3;
+  flex: 1 1 auto;
+  min-height: var(--aera-well-floor-arc);
 }
 
 .arc {
@@ -108,6 +117,19 @@
   flex: 0 0 auto;
 }
 
+/* THE LAST ROW ENDS ON ITS TEXT, NOT ON ITS PADDING.
+
+   `.row` pads symmetrically, which is right between two rows and
+   wrong under the last one: it left this column's final reading
+   sitting ~12px higher than the last line in either of the other
+   two columns, so the three columns read as ending on different
+   lines even though their card edges are pixel-identical. The
+   height that comes back is taken by `.arcWell`, which flexes —
+   the arc gets bigger, nothing is padded with dead space. */
+.rows > *:last-child {
+  padding-bottom: 0;
+}
+
 .source {
   flex: 0 0 auto;
 }
@@ -115,8 +137,8 @@
 /* a degree tight to its number, raised — never a baseline glyph
    sitting behind the unit slot's gap */
 .degree {
-  font-size: 0.55em;
-  line-height: 1;
+  font-size: var(--aera-font-scale-superscript);
+  line-height: var(--aera-leading-none);
   vertical-align: super;
   letter-spacing: 0;
 }

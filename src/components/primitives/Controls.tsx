@@ -149,7 +149,7 @@ export function ProgressBar({
       aria-label={ariaLabel ?? `${value} of 100`}
       style={
         {
-          '--bar-h': size === 'sm' ? '6px' : '8px',
+          '--bar-h': size === 'sm' ? 'var(--aera-space-3)' : 'var(--aera-space-4)',
           '--bar-w': `${Math.max(0, Math.min(100, value))}%`,
           '--bar-color': color,
           '--bar-delay': `calc(var(--aera-duration-stagger) * ${index})`,

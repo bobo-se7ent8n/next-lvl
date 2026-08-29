@@ -6,20 +6,23 @@
   font-size: var(--aera-text-mono-size);
   font-weight: var(--aera-weight-medium);
   text-transform: uppercase;
-  letter-spacing: 0.09em;
-  line-height: 1;
+  letter-spacing: var(--aera-tracking-chip);
+  line-height: var(--aera-leading-none);
   padding: var(--aera-space-3) var(--aera-space-5);
   background: var(--chip-bg);
   color: var(--chip-ink);
 }
 
-/* a tag shrinks and ellipsizes rather than pushing its row apart */
+/* A TAG NEVER CUTS ITS OWN TEXT.
+
+   It used to shrink and ellipsize so its row could stay one line,
+   which meant "rushing under pressure" became "rushing under pre..."
+   on any narrow card — the interface deciding a pattern's name was
+   optional. The row wraps instead: the words are the content and the
+   layout is what gives. */
 .tag {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
   display: inline-block;
-  white-space: nowrap;
   border-radius: var(--aera-radius-pill);
   padding: var(--aera-space-3) var(--aera-space-6);
   background: var(--aera-color-surface-level1);
@@ -28,8 +31,8 @@
   font-size: var(--aera-text-mono-size);
   font-weight: var(--aera-weight-medium);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  line-height: 1;
+  letter-spacing: var(--aera-tracking-mono);
+  line-height: var(--aera-leading-none);
 }
 
 .tagQuiet {

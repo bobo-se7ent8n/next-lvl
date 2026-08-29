@@ -31,6 +31,9 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-height: 0;
   gap: var(--aera-space-9);
   /* nothing on the way down to the fan clips it */
   overflow: visible;
@@ -44,13 +47,31 @@
    height is a calc off the card, so it can never be shorter than
    what it holds. */
 .stage {
-  --card-w: clamp(190px, 21vw, 320px);
-  --card-h: clamp(330px, 29vw, 460px);
+  /* ONE DRIVER, ONE RATIO.
+
+     The card used to be two independent clamps — a width off `vw`
+     and a height off `vw` and `svh` — which meant whichever bound
+     first decided that dimension on its own. At 1512x850 the width
+     clamped on `vw` and the height on `svh`, and the card came out
+     at 0.86 where every other viewport gave 0.745: the same card,
+     visibly squarer on one screen.
+
+     The WIDTH is the single driver now and the height is derived
+     from it, so the ratio is a constant by construction. The width
+     itself still answers to both axes — `min()` of a `vw` and an
+     `svh` term — so a short window shrinks the whole card rather
+     than squashing it. */
+  --card-ratio: 0.72;
+  --card-w: clamp(190px, min(21vw, 32svh), 320px);
+  --card-h: calc(var(--card-w) / var(--card-ratio));
   /* THE ARC'S OWN CEILING, plus the wobble. The quadratic drop is
      capped at 96px and a card's own nudge reaches another 8, so 104
      is the furthest below the centre line anything ever gets — this
      is measured off the geometry rather than guessed at. */
-  --fan-reach: 104px;
+  /* scaled with everything else — the arc cap and the card's own
+     nudge that this reserves room for are both scaled in
+     fanGeometry.ts, so the reservation has to move with them */
+  --fan-reach: calc(104px * var(--aera-scale, 1));
   position: relative;
   width: 100%;
   height: calc(var(--card-h) + var(--fan-reach) * 2);
@@ -104,15 +125,22 @@
   height: 100%;
 }
 
-/* HOVER.
+/* HOVER, AND IT NO LONGER JUMPS THE STACK.
 
-   The z-index needs `!important` and it is not a shortcut: the
-   layout pass writes a z-index inline on the slot every frame, and
-   an inline declaration beats a class. This is the one place in the
-   stylesheet allowed to win that argument. */
-.hov {
-  z-index: 700 !important;
-}
+   The hovered card used to be lifted to the top with
+   `z-index: 700 !important`, which is exactly what made the
+   highlight lag the cursor: once a card was hovered it painted over
+   its neighbour along the whole overlap, so the neighbour could not
+   become the topmost element until the pointer had cleared a full
+   card width. The hover appeared to stick to the card you had just
+   left, because it genuinely was still the card under the cursor.
+
+   The natural fan order already puts the card nearest the hand's
+   position in front, and that order does not change as the pointer
+   moves — so which card is on top is stable, and the hover tracks
+   it exactly. The card still answers the pointer: it straightens
+   and swells, which is the response that was always doing the work.
+   It just does not reorder the hand to do it. */
 
 .hov .card {
   --drot: -3.4deg;
@@ -125,8 +153,13 @@
    Every card simply steps back and stops answering the pointer, so
    the opened panel is the only live thing on the screen. */
 .dimmed .card {
+  /* THE NEIGHBOURS DO NOT MOVE.
+
+     This also scaled them to 0.94, so opening a card nudged every
+     other card in the hand — the set flinched. They hold their
+     places exactly and simply fall behind the flight in stacking
+     order as it comes forward; only their weight changes. */
   opacity: 0.16;
-  --dsc: 0.94;
   pointer-events: none;
   box-shadow: none;
 }
@@ -175,34 +208,115 @@
    The corner travels on `ease-out` while the four box values travel
    on `ease-expand` — a hard decelerate that leaves fast and settles
    with no overshoot in it at all. That is the tactility. */
+/* THE PLANT IS NOT A MOVE.
+
+   The panel is first put exactly where the card is. That placement
+   must not animate — it is the starting position, not a journey to
+   it — and while the box values were safe (the element had no
+   previous geometry to travel from) the angle was not: the element
+   mounts upright, so setting the card's lean on it started a 440ms
+   transition INTO the lean, which the next frame's straightening
+   immediately reversed. The card never left zero. Transitions are
+   off for the plant and switched on for the frame after it. */
+.planting {
+  transition: none !important;
+}
+
+/* THE RETURN IS QUICKER, AND THE FACE OUTLASTS THE CONTENT.
+
+   Nothing here touches the panel's own opacity or its background:
+   the colour is the last thing on screen and it does not fade with
+   what it was holding — it simply travels home and stops being
+   there. Only the blocks INSIDE clear, and they clear early (see
+   ExpandedCard's `[data-closing]` rules). */
+.flight[data-closing] {
+  --flight-dur: var(--aera-duration-collapse);
+  --flight-ease: var(--aera-ease-collapse);
+}
+
 .flight {
   position: fixed;
-  z-index: 970;
-  overflow: hidden;
+  z-index: var(--aera-z-flight);
+  /* NOT `overflow: hidden`. The content reflows into the box as the
+     box grows; a clip on it cut that reflow away mid-flight, which
+     is the card emptying out on the way home. Nothing here clips. */
+  overflow: visible;
+  /* THE LEAN THE CARD LEFT WITH.
+
+     The flight used to start square-on while the card it grew out of
+     was leaning several degrees, so the first frame was a rotation
+     pop. It is planted at the card's own angle now and straightens
+     to zero along the same curve the box travels on — the card turns
+     upright as it comes forward, which is one movement rather than a
+     jump followed by a movement. */
+  transform: rotate(var(--flight-rot, 0deg));
+  /* THE CORNER IS DECLARED, NOT ONLY WRITTEN.
+
+     `place()` writes the radius inline, but for the one frame between
+     this element mounting and that write landing it had no radius at
+     all — the flight began as a square. Declaring it here means the
+     corner exists from the first painted frame and the inline value
+     only ever animates it. */
+  border-radius: var(--aera-radius-card);
+  /* THE PANEL IS OPAQUE BEFORE ANYTHING IS INSIDE IT.
+
+     THIS is the ghosting. The panel had no background of its own and
+     its contents fade in on a 100ms delay, so for the first tenth of
+     a second of the flight it was a transparent box — and what you
+     saw through it was the hand behind, receded to 16%. Not a
+     duplicate of the card: the whole dimmed fan, showing through the
+     thing that was supposed to be covering it.
+
+     The face is written onto the element by the component, so the
+     box is filled from the first frame and there is nothing to see
+     through at any point in the journey. */
+  background: var(--flight-face, var(--aera-color-surface-background));
   box-shadow: var(--aera-elevation-overlay);
+  /* OPEN AND CLOSE ARE NOT THE SAME LENGTH.
+
+     Both journeys are the same five values travelling; only the pace
+     and the curve differ, so the pace and the curve are variables
+     and the transition is written once. `data-closing` swaps them —
+     see requestClose. */
+  --flight-dur: var(--aera-duration-expand);
+  --flight-ease: var(--aera-ease-expand);
   transition:
-    left var(--aera-duration-expand) var(--aera-ease-expand),
-    top var(--aera-duration-expand) var(--aera-ease-expand),
-    width var(--aera-duration-expand) var(--aera-ease-expand),
-    height var(--aera-duration-expand) var(--aera-ease-expand),
-    border-radius var(--aera-duration-expand) var(--aera-ease-out);
+    left var(--flight-dur) var(--flight-ease),
+    top var(--flight-dur) var(--flight-ease),
+    width var(--flight-dur) var(--flight-ease),
+    height var(--flight-dur) var(--flight-ease),
+    transform var(--flight-dur) var(--flight-ease),
+    border-radius var(--flight-dur) var(--aera-ease-out);
 }
 
-/* THE CONTENTS ARRIVE SEPARATELY, AND LATE.
+/* THE CONTENTS ARE THERE THE WHOLE WAY.
 
-   The box travels first and its contents fade in behind the start of
-   that journey. Fading them with the box would put type at the wrong
-   size on screen for the whole flight; holding them back until it
-   lands would make the panel look empty. */
+   They used to fade in on a delay, so for the first fifth of the
+   flight the panel was a coloured rectangle with nothing in it —
+   and on the way back it emptied before it arrived, which is the
+   collapse-into-a-blank-slab this replaced.
+
+   A morph has one object in it. The panel carries its content from
+   the first frame to the last and only its geometry moves, so what
+   travels between the hand and the middle of the screen is the card
+   itself rather than a box that fills in once it lands. */
+/* THE CONTENT REFLOWS INTO THE BOX; IT IS NOT A PICTURE OF ITSELF.
+
+   This briefly scaled the whole block down into the slot, which made
+   the card read as a shrinking screenshot — type getting smaller
+   rather than a card getting smaller. There is no transform here now.
+   The block is sized to the panel's CURRENT box, so as the box grows
+   the content relays out inside it at full size the whole way.
+
+   `border-radius: inherit` all the way down: the panel's corner
+   animates, and every surface stacked on top of it has to take that
+   same corner or it paints square over it — which is exactly how the
+   expanded card ended up with sharp corners. */
 .poIn {
+  width: 100%;
   height: 100%;
-  opacity: 0;
-  transition: opacity var(--aera-duration-reveal) var(--aera-ease-out)
-    var(--aera-duration-reveal-delay);
-}
-
-.open .poIn {
   opacity: 1;
+  border-radius: inherit;
 }
 
 /* THE ACTIVE MARKER — AND IT POINTS UP.

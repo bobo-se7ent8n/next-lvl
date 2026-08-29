@@ -98,7 +98,12 @@
   gap: var(--aera-space-4);
 }
 
+/* a suggestion chip is a button, so it carries the tap floor — its
+   padding scales down to 31.7px tall at the tablet step otherwise */
 .seed {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--aera-min-target-tap);
   border-radius: var(--aera-radius-pill);
   padding: var(--aera-space-4) var(--aera-space-6);
   background: transparent;

@@ -83,8 +83,8 @@
 
 .legendSwatch {
   display: block;
-  width: 8px;
-  height: 8px;
+  width: var(--aera-space-4);
+  height: var(--aera-space-4);
   flex: 0 0 auto;
   border-radius: var(--aera-radius-pill);
   background: var(--swatch);
@@ -93,7 +93,7 @@
 /* ---------- Ruler ---------- */
 .ruler {
   position: relative;
-  height: 46px;
+  height: var(--aera-control-ruler-height);
   width: min(760px, 92vw);
   margin: 0 auto;
   overflow: hidden;
@@ -110,29 +110,29 @@
 
 .tick {
   position: absolute;
-  top: 4px;
-  width: 1px;
+  top: var(--aera-space-2);
+  width: var(--aera-border-hairline);
   background: var(--aera-color-ink-primary);
 }
 
 .tickLabel {
   position: absolute;
-  top: 17px;
+  top: var(--aera-control-ruler-label-top);
   transform: translateX(-50%);
   font-family: var(--aera-text-mono-family);
   font-size: var(--aera-text-mono-size);
   font-weight: var(--aera-text-mono-weight);
   line-height: var(--aera-text-mono-leading);
   color: var(--aera-color-ink-tertiary);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: var(--aera-numeric-tabular);
 }
 
 .caret {
   position: absolute;
   left: 50%;
   top: 0;
-  width: 2px;
-  height: 13px;
+  width: var(--aera-border-base);
+  height: var(--aera-control-ruler-caret);
   border-radius: var(--aera-radius-pill);
   background: var(--aera-color-ink-primary);
   transform: translateX(-50%);

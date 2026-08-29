@@ -73,8 +73,8 @@
 
 .chevron {
   display: none;
-  width: 11px;
-  height: 11px;
+  width: var(--aera-icon-xs);
+  height: var(--aera-icon-xs);
   flex: 0 0 auto;
 }
 

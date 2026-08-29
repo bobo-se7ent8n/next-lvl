@@ -67,6 +67,69 @@ legacy/prototype.html         the original single-file prototype, kept for diffi
 Every screen and sub-page is a real route with a real URL, wrapped in
 `AnimatePresence`.
 
+## Token tweak panel
+
+A Tweakpane panel, **dev only**, bound to every `--aera-*` custom
+property in the product. Move a control and the whole app answers
+immediately; press Save and the change is written back to the token
+source on disk.
+
+**Open it with the backtick key** (`` ` ``). The same key closes it.
+It starts hidden-free — the panel mounts open with every folder
+collapsed — and while hidden it is `display: none`, so it cannot sit
+over the app swallowing clicks.
+
+Three buttons at the top:
+
+- **Save** — POSTs the changed tokens to a dev-server endpoint that
+  edits `src/tokens/*.ts` in place. **This is a real file edit.**
+  It survives reload, it shows up in `git diff`, and it will be
+  committed with everything else unless you revert it — so review it
+  before you commit, the same as any other change.
+- **Revert** — drops the inline overrides and puts the controls back
+  to what the token files actually say. It does not undo a Save;
+  that is what `git checkout` is for.
+- **Copy CSS** — the changed tokens as `--name: value;` lines, for
+  pasting somewhere else.
+
+The panel title carries an asterisk — `AERA tokens *` — whenever
+there are unsaved changes, and reports the result of a Save in the
+same place.
+
+### It is dev-only, and that is enforced twice
+
+It is mounted behind `import.meta.env.DEV` through a dynamic
+`import()`, so the panel and Tweakpane are dropped from a production
+build rather than merely hidden in one. The writer plugin carries
+Vite's `apply: 'serve'`, so the `/__tokens/save` endpoint does not
+exist in a build at all. `npm run build` output contains no
+reference to `tweakpane`.
+
+### Why it writes TypeScript, not CSS
+
+This project has no token CSS file. `src/tokens/*.ts` is the source
+of truth and `src/tokens/cssVars.ts` projects it onto `:root` at
+runtime, so the panel's Save has to edit the TypeScript or it would
+be creating a second source of truth the app never reads.
+
+The edit is surgical: each token is found by its own key inside its
+own `export const` block and only the value is replaced. Comments,
+ordering, blank lines and indentation are never touched, because the
+file is never reformatted or round-tripped through a parser. A token
+the panel sends that is not in the file yet is appended to the block
+its name belongs to rather than dropped silently; the response says
+which tokens were updated and which were appended.
+
+### It is deliberately not styled with AERA tokens
+
+Tweakpane's default theme, untouched. A dev tool wearing the
+product's own type and colour is a dev tool that ends up in a
+screenshot being mistaken for product UI — and this one edits the
+design system, so it needs to look like a different kind of object
+entirely. The literal values in `src/dev/` are the only ones in the
+codebase exempt from the token rule, along with the token
+definitions themselves.
+
 ## Visual system
 
 ### Neutrals

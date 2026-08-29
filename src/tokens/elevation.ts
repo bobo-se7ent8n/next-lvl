@@ -13,6 +13,9 @@
    that is what produced the dark wedge at the card corners.
    ============================================================ */
 
+import { borderWidth } from './border';
+import { colorUtility } from './color';
+
 export const elevation = {
   none: 'none',
   /** a record resting on the page */
@@ -24,7 +27,7 @@ export const elevation = {
   /** the opened pattern, above the dim */
   overlay: '0 50px 96px -34px rgba(40,36,28,0.58), 0 6px 14px -6px rgba(40,36,28,0.16)',
   /** the figma-style hover ring — a spread shadow, so it follows the radius */
-  selectRing: '0 0 0 1.5px #0D99FF',
+  selectRing: `0 0 0 ${borderWidth.ring} ${colorUtility.select}`,
 } as const;
 
 export type ElevationLevel = keyof typeof elevation;

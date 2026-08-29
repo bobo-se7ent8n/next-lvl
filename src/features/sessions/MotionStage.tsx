@@ -16,7 +16,7 @@ import {
   type PointGroup,
   type VolumePoint,
 } from '../../lib/pose';
-import { colorData, colorInk } from '../../tokens';
+import { colorData, colorInk, iconStroke } from '../../tokens';
 import styles from './MotionStage.module.css';
 
 /** the three groups are told apart by the AERA palette and nothing else */
@@ -39,7 +39,7 @@ const Glyph = ({ d, filled }: { d: string; filled?: boolean }) => (
     viewBox="0 0 24 24"
     fill={filled ? 'currentColor' : 'none'}
     stroke={filled ? 'none' : 'currentColor'}
-    strokeWidth="2.2"
+    strokeWidth={iconStroke.base}
     strokeLinecap="round"
     strokeLinejoin="round"
   >

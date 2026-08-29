@@ -46,6 +46,10 @@
   justify-content: center;
   width: 100%;
   height: var(--aera-space-11);
+  /* wide and short is the shape, but not below the tap floor: the
+     scale takes `space-11` from 32px to 26px at the tablet step,
+     and a transport control has to stay hittable */
+  min-height: var(--aera-min-target-tap);
   border-radius: var(--aera-radius-md);
   background: var(--aera-color-surface-inverse);
   color: var(--aera-color-ink-on-inverse);
@@ -56,12 +60,12 @@
 }
 
 .play svg {
-  width: 16px;
-  height: 16px;
+  width: var(--aera-icon-lg);
+  height: var(--aera-icon-lg);
 }
 
 .play:hover {
-  transform: translateY(-2px);
+  transform: translateY(calc(var(--aera-space-1) * -1));
 }
 
 .play:active {
@@ -70,7 +74,7 @@
 }
 
 .play:focus-visible {
-  outline: 2px solid var(--aera-color-utility-focus);
+  outline: var(--aera-border-base) solid var(--aera-color-utility-focus);
   outline-offset: 3px;
 }
 
@@ -96,7 +100,7 @@
 }
 
 .tick {
-  width: 1px;
+  width: var(--aera-border-hairline);
   height: 40%;
   background: var(--aera-color-ink-tertiary);
   opacity: 0.45;
@@ -165,6 +169,14 @@
    as the control being broken. One handler on the region, measured
    against the lane column, and the cursor says so everywhere. */
 .tracks {
+  /* THE INSIGHT PILL'S HEIGHT, DECLARED ONCE ON THE SHARED PARENT.
+
+     Two rules need it: the pill itself, and the playhead line whose
+     bottom stop is "half a lane less half a pill". It carries the tap
+     floor, so at the tablet scale step the pill stops shrinking at
+     32px — and because the line reads the SAME expression, the stop
+     follows it instead of drifting off the pill's edge. */
+  --marker-h: max(var(--aera-min-target-tap), var(--aera-space-11));
   position: relative;
   display: grid;
   grid-template-columns: var(--aera-space-16) minmax(0, 1fr);
@@ -236,7 +248,8 @@
   left: var(--x);
   display: flex;
   align-items: center;
-  height: var(--aera-space-11);
+  height: var(--marker-h);
+  min-height: var(--aera-min-target-tap);
   gap: var(--aera-space-4);
   transform: translate(-50%, -50%);
   border-radius: var(--aera-radius-sm);
@@ -283,10 +296,10 @@
 .playhead {
   position: absolute;
   top: 0;
-  bottom: calc(var(--aera-space-14) / 2 + var(--aera-space-11) / 2);
+  bottom: calc(var(--aera-space-14) / 2 + var(--marker-h) / 2);
   left: var(--head, var(--x));
-  width: 3px;
-  margin-left: -1.5px;
+  width: var(--aera-border-thick);
+  margin-left: calc(var(--aera-border-thick) / -2);
   border-radius: var(--aera-radius-pill);
   background: var(--aera-color-ink-primary);
 }

@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { cx } from '../../lib/css';
 import { Label } from '../../components/primitives/Text';
@@ -7,6 +14,7 @@ import { EnterContext } from '../../lib/enterContext';
 import { ExpandedCard } from './ExpandedCard';
 import {
   EASE_FACTOR,
+  layoutScale,
   SETTLE_EPSILON,
   WHEEL_PER_CARD,
   clampIndex,
@@ -77,21 +85,53 @@ function expandedRect(head: Element | null): Rect {
   return { left: (window.innerWidth - width) / 2, top, width, height };
 }
 
-const rectOf = (el: Element): Rect => {
-  const r = el.getBoundingClientRect();
-  return { left: r.left, top: r.top, width: r.width, height: r.height };
-};
-
 /** plant the panel on a rect. Written straight to the element rather
  *  than through React: the whole point of the transition is that the
  *  browser sees one box replaced by another between two frames, and a
  *  render pass in the middle of that is a render pass too many. */
-function place(el: HTMLElement, r: Rect, radius: string) {
+function place(el: HTMLElement, r: Rect, radius: string, rot: number) {
   el.style.left = `${r.left}px`;
   el.style.top = `${r.top}px`;
   el.style.width = `${r.width}px`;
   el.style.height = `${r.height}px`;
   el.style.borderRadius = radius;
+  el.style.setProperty('--flight-rot', `${rot}deg`);
+}
+
+/**
+ * THE CARD WHERE IT ACTUALLY STANDS, AND HOW FAR OVER IT LEANS.
+ *
+ * `getBoundingClientRect` on a rotated card returns the axis-aligned
+ * box AROUND the lean, which is wider and shorter than the card
+ * itself — planting the flight on that rect starts the journey on a
+ * box the card never occupied. The untransformed size comes from
+ * `offsetWidth/Height` and is centred on the rect's own centre, so
+ * the flight begins exactly congruent with the card it leaves.
+ *
+ * The lean is the sum of the two layers that carry it: the slot
+ * places the card in the arc, the card adds its own pointer nudge.
+ */
+function poseOf(card: HTMLElement): { rect: Rect; rot: number } {
+  const b = card.getBoundingClientRect();
+  const w = card.offsetWidth;
+  const h = card.offsetHeight;
+  /* THE ANGLE AS PAINTED, NOT AS DECLARED.
+
+     The lean is spread over two elements and the variables that carry
+     it sit on different ancestors, so adding `--rot` and `--drot` up
+     by hand read 0 from whichever element did not happen to own them.
+     Composing the actual matrices from the card up to the stage
+     returns the angle on screen, whatever produced it. */
+  let m = new DOMMatrixReadOnly();
+  for (let e: HTMLElement | null = card; e && !e.classList.contains(styles.stage); e = e.parentElement) {
+    const t = getComputedStyle(e).transform;
+    if (t && t !== 'none') m = new DOMMatrixReadOnly(t).multiply(m);
+  }
+  const rot = (Math.atan2(m.b, m.a) * 180) / Math.PI;
+  return {
+    rect: { left: b.left + b.width / 2 - w / 2, top: b.top + b.height / 2 - h / 2, width: w, height: h },
+    rot,
+  };
 }
 
 /** the page header this fan sits under — the panel hangs off its
@@ -156,12 +196,33 @@ export function PatternFan({
   const target = useRef(start);
   const raf = useRef(0);
   const step = useRef(0);
+  /* the layout scale, sampled when the stage is measured — the fan's
+     absolute lengths are multiplied by it so the hand scales as one
+     object with everything around it */
+  const scale = useRef(1);
 
   const panel = useRef<HTMLDivElement>(null);
   const closing = useRef(false);
   const openRef = useRef<number | null>(null);
+  /* which slot the flight is currently carrying — read by the layout
+     pass, which runs outside React and cannot see `openIndex` */
+  const flyingIndex = useRef<number | null>(null);
 
-  const [hover, setHover] = useState<number | null>(null);
+  /* THE ACTIVE CARD IS WHERE THE HAND IS PARKED, NOT WHERE THE
+     POINTER IS.
+     
+     On Home the fan is scrolled, not browsed: the triangle under the
+     stage marks one card and that card wears the selection. Pointer
+     movement over the fan produces no state change at all — there is
+     no hover trigger here to lag, to fight the z-order, or to
+     disagree with the marker.
+     
+     It is React state because the selection treatment lives inside
+     PatternCard (the ring and the name chip), but it is written from
+     the layout pass at most once per card the hand crosses — never
+     per frame, and never per pointer move. */
+  const [active, setActive] = useState(Math.round(start));
+  const activeRef = useRef(Math.round(start));
   /* the box the opened popup has to stand inside. State rather than a
      read at render time so the fit plan re-runs on resize. */
   const [openBox, setOpenBox] = useState(() =>
@@ -188,26 +249,45 @@ export function PatternFan({
   const layout = useCallback(() => {
     const p = prog.current;
     const s = step.current;
+    /* whichever card the centre line — and so the marker — is on */
+    const next = Math.max(0, Math.min(total - 1, Math.round(p)));
+    if (next !== activeRef.current) {
+      activeRef.current = next;
+      setActive(next);
+    }
     for (let i = 0; i < slots.current.length; i += 1) {
       const el = slots.current[i];
       if (!el) continue;
-      const shape = slotShape(i, i - p, s);
+      const shape = slotShape(i, i - p, s, scale.current);
       el.style.setProperty('--x', `${shape.x.toFixed(1)}px`);
       el.style.setProperty('--y', `${shape.y.toFixed(1)}px`);
       el.style.setProperty('--rot', `${shape.rot.toFixed(2)}deg`);
       el.style.setProperty('--sc', shape.sc.toFixed(4));
-      el.style.opacity = String(shape.op);
-      el.style.visibility = shape.op ? 'visible' : 'hidden';
+      /* THE CARD THAT IS FLYING IS NOT ALSO IN THE HAND.
+         Without this the source card stays in the fan at the dimmed
+         16% while its panel grows out of the very same rect — which
+         is the semi-transparent second card showing through the
+         opening one, on the way out and again on the way back. */
+      const flying = i === flyingIndex.current;
+      const op = flying ? 0 : shape.op;
+      el.style.opacity = String(op);
+      el.style.visibility = op ? 'visible' : 'hidden';
       el.style.zIndex = String(shape.z);
     }
-  }, []);
+  }, [total]);
 
   /* ---- THE SMOOTHING LOOP ----------------------------------------
      Self-cancelling: it stops the moment the hand arrives and starts
      again on the next input. It must never run unconditionally — a
      rAF loop that is always alive is a rAF loop that is always
      costing something. */
-  const tick = useCallback(() => {
+  /* A NAMED function expression, and the name is load-bearing: the
+     loop has to schedule ITSELF, and `requestAnimationFrame(tick)`
+     reading the outer `const` would be reaching for a binding that
+     is not initialised yet on the first pass. The name below belongs
+     to the expression, is in scope inside its own body, and is
+     exactly what the recursion should point at. */
+  const tick = useCallback(function step() {
     raf.current = 0;
     const d = target.current - prog.current;
     if (Math.abs(d) < SETTLE_EPSILON) {
@@ -217,7 +297,7 @@ export function PatternFan({
     }
     prog.current += d * EASE_FACTOR;
     layout();
-    raf.current = requestAnimationFrame(tick);
+    raf.current = requestAnimationFrame(step);
   }, [layout]);
 
   const fanTo = useCallback(
@@ -240,8 +320,9 @@ export function PatternFan({
     const el = stage.current;
     if (!el) return;
     const measure = () => {
+      scale.current = layoutScale();
       const slot = slots.current.find(Boolean);
-      if (slot) step.current = fanStep(slot.offsetWidth);
+      if (slot) step.current = fanStep(slot.offsetWidth, scale.current);
       const r = expandedRect(headlineOf(stage.current));
       setOpenBox({ width: r.width, height: r.height });
       layout();
@@ -335,18 +416,42 @@ export function PatternFan({
     if (!el || !source) return;
 
     closing.current = false;
-    setHover(null);
+
+    /* MEASURED BEFORE THE HAND IS TOLD ANYTHING.
+
+       `layout()` rewrites every slot's angle once `flyingIndex` is
+       set, so reading the source card after it reported the angle the
+       card was about to have rather than the one it still had — the
+       flight left upright and came back leaning. The pose is taken
+       first, off the card exactly as the user last saw it. */
+    const from = poseOf(source as HTMLElement);
+
+    flyingIndex.current = openIndex;
+    layout();
     stage.current?.classList.add(styles.dimmed);
 
     const cardRadius = tokenValue('--aera-radius-card') || '28px';
-    place(el, rectOf(source), cardRadius);
-    /* forced reflow — required, see above */
+    const target = expandedRect(headlineOf(stage.current));
+    /* planted congruent with the card, leaning exactly as far as the
+       card leans — the straightening is part of the journey, not a
+       jump on the first frame */
+    /* planted with transitions off — see `.planting`. Reading the
+       geometry AND the computed transform flushes both the box and
+       the angle, so the frame after this leaves from the card's real
+       pose rather than from an upright default. */
+    /* a previous close may have left this set; the card is opening,
+       so its content is on again from the first frame */
+    delete el.dataset.closing;
+    el.classList.add(styles.planting);
+    place(el, from.rect, cardRadius, from.rot);
     void el.getBoundingClientRect();
+    void getComputedStyle(el).transform;
+    el.classList.remove(styles.planting);
 
     const frame = requestAnimationFrame(() => {
       if (closing.current) return;
       el.classList.add(styles.open);
-      place(el, expandedRect(headlineOf(stage.current)), cardRadius);
+      place(el, target, cardRadius, 0);
     });
     /* and the contents re-read themselves once the box is under way */
     const load = window.setTimeout(() => setRecalcKey((k) => k + 1), ms(duration.recalc));
@@ -354,7 +459,7 @@ export function PatternFan({
       cancelAnimationFrame(frame);
       window.clearTimeout(load);
     };
-  }, [openIndex]);
+  }, [openIndex, layout]);
 
   /* ---- DISMISSAL: the same five values, travelling back ----------- */
   const requestClose = useCallback(() => {
@@ -364,8 +469,17 @@ export function PatternFan({
     const source = cards.current[openIndex];
     const cardRadius = tokenValue('--aera-radius-card') || '28px';
     if (el && source) {
+      /* THE CONTENT GOES FIRST AND THE BOX FOLLOWS.
+
+         One flag does both: it swaps the flight onto the collapse
+         duration and curve, and it is what ExpandedCard's groups
+         watch to clear themselves. Set BEFORE the geometry moves so
+         the fades and the journey start on the same frame — the
+         card is empty by the time it is really travelling. */
+      el.dataset.closing = 'true';
       el.classList.remove(styles.open);
-      place(el, rectOf(source), cardRadius);
+      const home = poseOf(source as HTMLElement);
+      place(el, home.rect, cardRadius, home.rot);
     }
     /* the hand comes back up while the panel is still travelling, so
        the card lands into a set that is already lit rather than into
@@ -374,9 +488,13 @@ export function PatternFan({
     /* and the parent only hears about it once the card is home again */
     window.setTimeout(() => {
       closing.current = false;
+      /* the card comes back into the hand only once the panel has
+         finished travelling home, so the two are never both drawn */
+      flyingIndex.current = null;
+      layout();
       onOpen(null);
-    }, ms(duration.expand));
-  }, [openIndex, onOpen]);
+    }, ms(duration.collapse));
+  }, [openIndex, onOpen, layout]);
 
   /* escape, or a press anywhere outside the opened card, closes it */
   useEffect(() => {
@@ -399,7 +517,10 @@ export function PatternFan({
 
   return (
     <div className={cx(styles.wrap, className)}>
-      <div ref={stage} className={styles.stage}>
+      <div
+        ref={stage}
+        className={styles.stage}
+      >
         {patterns.map((pattern, i) => (
           <div
             key={pattern.id}
@@ -409,9 +530,7 @@ export function PatternFan({
             /* THE PLACEMENT LAYER. No style prop: everything on this
                element is written imperatively by the layout pass, and
                a style prop from React would fight it every render. */
-            className={cx(styles.slot, hover === i && openIndex == null && styles.hov)}
-            onPointerEnter={() => openIndex == null && setHover(i)}
-            onPointerLeave={() => setHover((h) => (h === i ? null : h))}
+            className={cx(styles.slot, active === i && styles.hov)}
           >
             {/* THE CARD LAYER — the pointer response, and the box the
                 flight measures itself against */}
@@ -423,7 +542,7 @@ export function PatternFan({
             >
               <PatternCard
                 pattern={pattern}
-                hovered={openIndex == null && hover === i}
+                hovered={openIndex == null && active === i}
                 showTag={openIndex == null}
                 onClick={() => onOpen(i)}
               />
@@ -456,7 +575,13 @@ export function PatternFan({
           else. */}
       {open
         ? createPortal(
-            <div ref={panel} className={styles.flight}>
+            <div
+              ref={panel}
+              className={styles.flight}
+              /* the opened pattern's own face, so the box is opaque
+                 from the first frame of the flight */
+              style={{ '--flight-face': open.fill } as CSSProperties}
+            >
               <div className={styles.poIn}>
                 <EnterContext.Provider value={`${open.id}:${recalcKey}`}>
                   <ExpandedCard

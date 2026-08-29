@@ -1,5 +1,4 @@
-import type { CSSProperties } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useId, type CSSProperties } from 'react';
 import { project, smoothPath } from '../../lib/chart';
 import { cx } from '../../lib/css';
 import { useEnterProgress } from '../../lib/enter';
@@ -49,28 +48,28 @@ export function Sparkline({
      Flat fill at a fixed alpha — never a gradient. */
   const areaPath = `${d} L ${W} ${H} L 0 ${H} Z`;
 
-  /* THE LINE DRAWS ITSELF IN, AND THEN THE DASH IS GONE.
+  /* THE LINE DRAWS ITSELF IN — WITH A CLIP, NOT A DASH.
    *
-   *  The dash pattern is measured with `getTotalLength()`, which
-   *  reports USER units — but the stroke is `non-scaling-stroke`, so
-   *  the browser lays the dashes out in SCREEN units. On a chart box
-   *  that is not 100 × 40, those two disagree, and the "one long dash"
-   *  that was supposed to cover the whole line instead repeats across
-   *  it. That is why every trend line in the product rendered as
-   *  disconnected fragments.
+   *  TWO DASH ATTEMPTS FAILED HERE, AND THE MEASUREMENT SAYS WHY.
+   *  The stroke carries `vector-effect: non-scaling-stroke`, which
+   *  makes the browser lay the dash pattern out in SCREEN pixels. So:
    *
-   *  The animation is transient; the resting state is what anybody
-   *  actually reads. So the dash is cleared the moment the draw
-   *  finishes — past that point the path carries no dash pattern at
-   *  all and cannot fragment. */
-  const path = useRef<SVGPathElement>(null);
-  const [length, setLength] = useState(0);
+   *    · `getTotalLength()` gave user units -> the "one long dash"
+   *      repeated across the path.
+   *    · `pathLength="1"` should have renormalised it, but the
+   *      computed value came back `stroke-dasharray: 1px` against a
+   *      97.6-unit path — 97 repeats. `pathLength` does not survive
+   *      a non-scaling stroke.
+   *
+   *  So no dash at all. A clip rectangle sweeps left to right across
+   *  the box and the stroke is simply revealed under it: one
+   *  continuous line growing from its start to its end, immune to
+   *  which unit space the stroke happens to be measured in. The clip
+   *  is in viewBox units, so it stretches with the chart exactly as
+   *  the path does.
+   */
   const progress = useEnterProgress(useEnterKey());
-  const drawing = progress < 1 && length > 0;
-
-  useEffect(() => {
-    if (path.current) setLength(path.current.getTotalLength());
-  }, [d]);
+  const clipId = useId();
 
   return (
     <div
@@ -84,9 +83,16 @@ export function Sparkline({
         role="img"
         aria-label={ariaLabel ?? 'trend'}
       >
+        <defs>
+          <clipPath id={clipId}>
+            {/* one unit past the right edge so the end cap is never
+                shaved by the clip's own boundary */}
+            <rect x="0" y={-H} width={W * progress + 0.001} height={H * 3} />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${clipId})`}>
         {area ? <path d={areaPath} fill={color} opacity={AREA_OPACITY} stroke="none" /> : null}
         <path
-          ref={path}
           d={d}
           fill="none"
           stroke={color}
@@ -94,9 +100,8 @@ export function Sparkline({
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
-          strokeDasharray={drawing ? length : undefined}
-          strokeDashoffset={drawing ? length * (1 - progress) : undefined}
         />
+        </g>
       </svg>
 
       {/* THE END MARKER IS A TRUE CIRCLE.

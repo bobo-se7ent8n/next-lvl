@@ -36,7 +36,7 @@ export function SkillRatings({ className }: SkillRatingsProps) {
       </div>
 
       <div className={styles.top}>
-        <Metric value={String(data.average)} unit="/ 100" size="md" />
+        <Metric value={String(data.average)} unit="/ 100" size="lg" />
         <Legend
           items={[
             { label: 'strong', color: semanticColor(0.9) },

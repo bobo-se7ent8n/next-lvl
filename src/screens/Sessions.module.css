@@ -13,7 +13,7 @@
   display: grid;
   grid-template-columns: var(--aera-layout-left-column) minmax(0, 1fr);
   gap: var(--aera-layout-split-gap);
-  align-items: stretch;
+  align-items: start;
   width: 100%;
 }
 
@@ -46,12 +46,32 @@
    the margin-based stacking that kept swallowing every spacing
    token aimed at this list. Each column is now its own flex column
    with its own `gap`, and the packing is unchanged. */
+/* THE LOG SCROLLS, THE PAGE DOES NOT.
+
+   A session log is an unbounded list — twelve sessions today, forty
+   next month — so no amount of scaling makes it a fixed height. It
+   is bounded to the column it shares with the calendar beside it and
+   scrolls inside that, which is what the calendar has always done by
+   being `position: sticky`. Nothing is cropped; the scrollbar just
+   belongs to the list rather than to the document. */
 .log {
   display: flex;
   align-items: flex-start;
   gap: var(--aera-card-gap);
   min-width: 0;
   width: 100%;
+  /* THE STROKE NEEDS ROOM, AND THE BAR NEEDS TO BE OFF THE CARD.
+
+     A non-clickable card wears its 2px stroke as a spread
+     box-shadow OUTSIDE its own edge, which costs no layout — and is
+     therefore the first thing a scroll container clips. With the
+     pane's padding box flush to the cards, the left and right
+     strokes were being cut off along the whole column.
+
+     The inline padding is the stroke's width, so the shadow has
+     somewhere to land. No gutter is reserved: the bar is never
+     drawn (see global.css), so there is nothing to make room for. */
+  padding: var(--aera-border-base);
 }
 
 .column {
@@ -62,10 +82,26 @@
   min-width: 0;
 }
 
-@media (max-width: 1080px) {
+/* THE SPLIT HOLDS TWO COLUMNS DOWN TO 900px.
+
+   It used to stack at 1080, which put an iPad Mini in landscape —
+   1024 — into a single column with the aside above the list, and the
+   two of them together were half a screen taller than the window.
+   With the layout scale the aside is 377px at that width and the
+   list still has ~580px beside it, which is enough for both.
+
+   A layout breakpoint, not a size one — the scale handles size. */
+@media (max-width: 900px) {
   .split {
     grid-template-columns: minmax(0, 1fr);
+    /* stacked, the aside takes what it needs and the list takes the
+       rest and scrolls — the same division as the two-column case,
+       turned ninety degrees */
+    grid-template-rows: auto minmax(0, 1fr);
     gap: var(--aera-space-10);
+  }
+  .log {
+    min-height: 0;
   }
   .aside {
     position: static;

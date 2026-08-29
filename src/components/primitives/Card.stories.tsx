@@ -13,7 +13,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'The card, and it is a FLEX COLUMN — `gap` is a no-op on a `display: block` box, which is why card spacing failed to land for two rounds no matter which token it was given. It also no longer clips. Two mutually exclusive treatments, decided from the `interactive` prop rather than per-card: a clickable card floats (drop shadow, no stroke, hover lift and press compression), a non-clickable one is flat (2px #F3F2EE stroke, no shadow, and no hover at all — it is a region of the page, not a target).',
+          'The card, and it is a FLEX COLUMN — `gap` is a no-op on a `display: block` box, which is why card spacing failed to land for two rounds no matter which token it was given. It also no longer clips. Two mutually exclusive treatments, decided from the `interactive` prop rather than per-card: a clickable card floats (drop shadow, no stroke, hover lift and press compression), a non-clickable one is flat (a `--aera-border-base` stroke in `--aera-color-surface-level1`, no shadow, and no hover at all — it is a region of the page, not a target).',
       },
     },
   },

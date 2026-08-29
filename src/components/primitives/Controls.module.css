@@ -1,8 +1,8 @@
 /* ---------- Toggle ---------- */
 .toggle {
   position: relative;
-  width: 32px;
-  height: 18px;
+  width: var(--aera-control-switch-width);
+  height: var(--aera-control-switch-height);
   flex: 0 0 auto;
   border-radius: var(--aera-radius-pill);
   background: var(--aera-color-surface-level2);
@@ -12,10 +12,10 @@
 .toggle::after {
   content: '';
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 12px;
-  height: 12px;
+  top: var(--aera-control-switch-inset);
+  left: var(--aera-control-switch-inset);
+  width: var(--aera-control-switch-knob);
+  height: var(--aera-control-switch-knob);
   border-radius: var(--aera-radius-pill);
   background: var(--aera-color-surface-background);
   transition: transform var(--aera-duration-base) var(--aera-ease-out);
@@ -26,7 +26,7 @@
 }
 
 .toggleOn::after {
-  transform: translateX(14px);
+  transform: translateX(var(--aera-control-switch-travel));
 }
 
 .toggleDisabled {
@@ -82,14 +82,14 @@
 }
 
 .sliderName {
-  width: 64px;
+  width: var(--aera-control-slider-label);
   flex: 0 0 auto;
 }
 
 .sliderInput {
   flex: 1 1 auto;
   min-width: 0;
-  height: 4px;
+  height: var(--aera-control-slider-track);
   border-radius: var(--aera-radius-pill);
   background: var(--aera-color-surface-level2);
   outline: none;
@@ -100,16 +100,16 @@
 .sliderInput::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 14px;
-  height: 14px;
+  width: var(--aera-control-slider-thumb);
+  height: var(--aera-control-slider-thumb);
   border-radius: var(--aera-radius-pill);
   background: var(--aera-color-ink-primary);
   cursor: pointer;
 }
 
 .sliderInput::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
+  width: var(--aera-control-slider-thumb);
+  height: var(--aera-control-slider-thumb);
   border: 0;
   border-radius: var(--aera-radius-pill);
   background: var(--aera-color-ink-primary);
@@ -121,7 +121,7 @@
 }
 
 .sliderValue {
-  width: 40px;
+  width: var(--aera-control-slider-value);
   flex: 0 0 auto;
   text-align: right;
 }
@@ -177,12 +177,12 @@
 }
 
 .progressRowName {
-  width: 132px;
+  width: var(--aera-control-rating-label);
   flex: 0 0 auto;
 }
 
 .progressRowValue {
-  width: 36px;
+  width: var(--aera-control-rating-value);
   flex: 0 0 auto;
   text-align: right;
 }

@@ -40,12 +40,22 @@
 
 /* the court is the elastic part of the card: it keeps its aspect as
    a floor and grows into whatever the readings and legends leave */
+/* THE COURT TAKES WHAT THE CARD LEAVES — IT NO LONGER SETS IT.
+
+   `aspect-ratio: 50/47` made the court's HEIGHT a function of the
+   column's width, so on a wide-but-short window the zones card grew
+   past the fold and dragged the whole bento with it: 532px of court
+   in a 702px column. The drawing is `xMidYMid meet`, so it keeps its
+   own proportions whatever box it is given and simply letterboxes —
+   which is why the box does not need to hold the ratio itself.
+
+   The ratio survives as a MINIMUM so the court never collapses to a
+   sliver when the card is short. */
 .court {
   display: block;
   flex: 1 1 auto;
-  min-height: 0;
+  min-height: var(--aera-well-floor-court);
   width: 100%;
-  aspect-ratio: 50 / 47;
   border-radius: var(--aera-radius-lg);
   background: var(--aera-color-surface-level1);
 }
@@ -142,11 +152,10 @@
    reflows to two lines as you move the pointer makes the header
    jump, and the header is the one thing on this card that must not
    move while you are reading the map. */
+/* the zone reading wraps rather than truncating — the numbers in it
+   are the point, and a truncated split is unreadable */
 .readout {
   min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .ramp {

@@ -7,7 +7,7 @@
    ============================================================ */
 .tip {
   position: absolute;
-  z-index: 980;
+  z-index: var(--aera-z-tooltip);
   pointer-events: none;
   opacity: 0;
   transform: translate(-50%, -118%);
@@ -18,7 +18,7 @@
   white-space: nowrap;
   font-family: var(--aera-text-body-family);
   font-size: var(--aera-text-body-sm-size);
-  line-height: 1.45;
+  line-height: var(--aera-leading-snug);
   transition: opacity var(--aera-duration-fast) var(--aera-ease-out);
 }
 

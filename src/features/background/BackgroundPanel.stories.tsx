@@ -23,13 +23,13 @@ const meta = {
   render: function Render(args) {
     const [settings, setSettings] = useState<BackgroundSettings>(args.settings);
     return (
-      <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 'var(--aera-space-11)', alignItems: 'flex-start' }}>
         <BackgroundPanel {...args} settings={settings} onChange={setSettings} />
         <pre
           style={{
             margin: 0,
             fontFamily: 'var(--aera-font-mono)',
-            fontSize: 11,
+            fontSize: 'var(--aera-text-mono-size)',
             color: 'var(--aera-color-ink-secondary)',
           }}
         >

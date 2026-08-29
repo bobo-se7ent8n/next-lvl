@@ -42,7 +42,10 @@
   display: flex;
   align-items: center;
   gap: var(--aera-space-4);
-  flex-wrap: nowrap;
+  /* WRAPS. It was `nowrap` with ellipsizing tags, which is the same
+     decision made twice: keep one line, lose the words. The row is
+     allowed to become two lines and the words all survive. */
+  flex-wrap: wrap;
   margin-top: auto;
   padding-top: var(--aera-space-4);
   min-width: 0;
@@ -60,9 +63,21 @@
 
 /* the graphic well — a Well, so its padding, corner and inset light
    are the one inner-container treatment rather than a copy of it */
+/* ONE WELL, ONE SIZE, ON EVERY CARD.
+
+   The aspect came from the item's own `ratio` — 16/7 on one card,
+   5/4 on the next — so a column of insight cards had graphics
+   ranging from 114px to 200px tall and no two wells lined up. The
+   ratio was describing the SUBJECT, not the frame it should be
+   drawn in.
+
+   One landscape frame for all of them. The dot field is a texture
+   rather than a diagram, so it reads at any proportion; what it
+   cannot do is be a different height on every card and still look
+   like one library. */
 .graphic {
   position: relative;
   align-items: center;
   width: 100%;
-  aspect-ratio: var(--ratio);
+  aspect-ratio: var(--aera-graphic-well);
 }

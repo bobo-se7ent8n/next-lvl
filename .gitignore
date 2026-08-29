@@ -6,3 +6,4 @@ dist
 # local scratch
 .tmp-*
 storybook-static
+.harness/

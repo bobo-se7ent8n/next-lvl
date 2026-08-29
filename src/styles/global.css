@@ -18,6 +18,77 @@ body,
   min-height: 100%;
 }
 
+/* ============================================================
+   THE LAYOUT SCALE — SET HERE, AND NOWHERE ELSE.
+
+   Every length token is projected as
+   `calc(<value> * var(--aera-scale))` (see tokens/cssVars.ts), so
+   these declarations are the entire responsive strategy.
+
+   IT KEYS OFF BOTH AXES. It used to key off width alone, which got
+   a MacBook Air 13" exactly wrong: 1440 CSS px wide — wider than a
+   14" Pro — so it matched the largest step and barely scaled, while
+   having ~100px LESS usable height than the machine it was scaling
+   for. The page "fit" and the content inside the panes was clipped.
+
+   `--aera-scale` is `min()` of a width track and a height track, so
+   whichever dimension is actually tight is the one that drives. Two
+   plain sets of media queries on `:root`, one variable each, and one
+   `min()` to combine them.
+
+   Type does not follow this all the way down: body text floors at
+   12px and the annotation sizes below it do not shrink at all.
+   ============================================================ */
+:root {
+  --aera-scale-w: var(--aera-scale-full);
+  --aera-scale-h: var(--aera-scale-full);
+  --aera-scale: min(var(--aera-scale-w), var(--aera-scale-h));
+}
+
+/* ---- the width track ---- */
+@media (max-width: 1600px) {
+  :root {
+    --aera-scale-w: var(--aera-scale-desktop);
+  }
+}
+@media (max-width: 1400px) {
+  :root {
+    --aera-scale-w: var(--aera-scale-laptop);
+  }
+}
+@media (max-width: 1280px) {
+  :root {
+    --aera-scale-w: var(--aera-scale-air);
+  }
+}
+@media (max-width: 1100px) {
+  :root {
+    --aera-scale-w: var(--aera-scale-tablet);
+  }
+}
+
+/* ---- the height track, and this is the one that was missing ---- */
+@media (max-height: 940px) {
+  :root {
+    --aera-scale-h: var(--aera-scale-desktop);
+  }
+}
+@media (max-height: 860px) {
+  :root {
+    --aera-scale-h: var(--aera-scale-laptop);
+  }
+}
+@media (max-height: 800px) {
+  :root {
+    --aera-scale-h: var(--aera-scale-air);
+  }
+}
+@media (max-height: 740px) {
+  :root {
+    --aera-scale-h: var(--aera-scale-tablet);
+  }
+}
+
 html {
   background: var(--aera-color-surface-background);
   color-scheme: light;
@@ -66,19 +137,22 @@ ul {
   color: var(--aera-color-data-ink-yellow);
 }
 
+/* THE SCROLLBAR IS NEVER DRAWN.
+
+   Scrolling still works everywhere it worked before — this removes
+   the TRACK, not the behaviour. A styled bar sitting against a card
+   edge inside a pane read as an artifact rather than as a control,
+   and reserving a gutter for it just moved the artifact into the
+   layout. Neither: no bar, no reserved space.
+
+   `scrollbar-width: none` covers Firefox and the WebKit rule covers
+   Chrome and Safari. Deliberately NOT `scrollbar-gutter: stable`. */
+* {
+  scrollbar-width: none;
+}
+
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--aera-color-surface-level2);
-  border-radius: var(--aera-radius-pill);
-  border: 3px solid var(--aera-color-surface-background);
+  display: none;
 }
 
 /* THE KEYBOARD ROUTE THROUGH THE PRODUCT IS VISIBLE.
@@ -88,7 +162,7 @@ ul {
    global rather than per-component: a focus style that has to be
    remembered is a focus style that gets forgotten. */
 :focus-visible {
-  outline: 2px solid var(--aera-color-utility-focus);
+  outline: var(--aera-border-base) solid var(--aera-color-utility-focus);
   outline-offset: 3px;
   border-radius: var(--aera-radius-md);
 }
@@ -97,9 +171,9 @@ ul {
   *,
   *::before,
   *::after {
-    animation-duration: 0.001ms !important;
+    animation-duration: var(--aera-duration-none) !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+    transition-duration: var(--aera-duration-none) !important;
     /* THE DELAYS HAVE TO GO TOO.
 
        Collapsing the DURATION alone is not enough for anything
@@ -109,8 +183,8 @@ ul {
        and then snaps in. Which is a worse experience than the
        animation it was meant to spare, and the one case where
        reduced motion has to reach past duration. */
-    animation-delay: 0.001ms !important;
-    transition-delay: 0.001ms !important;
+    animation-delay: var(--aera-duration-none) !important;
+    transition-delay: var(--aera-duration-none) !important;
   }
 }
 

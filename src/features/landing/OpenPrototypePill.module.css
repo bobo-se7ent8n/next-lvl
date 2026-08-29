@@ -11,7 +11,7 @@
   position: fixed;
   right: var(--aera-space-11);
   bottom: var(--aera-space-11);
-  z-index: 950;
+  z-index: var(--aera-z-nav);
   display: flex;
   align-items: center;
   gap: var(--aera-space-5);

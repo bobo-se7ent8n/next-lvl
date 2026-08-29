@@ -35,8 +35,30 @@ export const FAN_STEP_RATIO = 0.66;
 /** the step never closes below this, however narrow the card gets */
 export const MIN_STEP = 72;
 
-export function fanStep(cardWidth: number): number {
-  return Math.max(MIN_STEP, cardWidth * FAN_STEP_RATIO);
+/**
+ * THE LAYOUT SCALE, READ ONCE PER MEASURE.
+ *
+ * The fan is drawn in absolute pixels — a step, a drop, a cap — and
+ * those numbers were fixed while every other length in the product
+ * moved with `--aera-scale`. On a 14" screen the cards shrank (their
+ * width is a `vw` clamp) but the arc they sat on did not, so the
+ * hand spread wider and dropped further relative to the cards it was
+ * made of.
+ *
+ * Everything below that is a length now goes through this. The
+ * ratios — the step as a share of card width, the rotation per
+ * step — are already relative and are left alone.
+ */
+export function layoutScale(): number {
+  if (typeof document === 'undefined') return 1;
+  const v = Number.parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue('--aera-scale'),
+  );
+  return Number.isFinite(v) && v > 0 ? v : 1;
+}
+
+export function fanStep(cardWidth: number, scale = 1): number {
+  return Math.max(MIN_STEP * scale, cardWidth * FAN_STEP_RATIO);
 }
 
 /* ---- the shape of the arc ---------------------------------- */
@@ -120,6 +142,8 @@ export function cardHand(index: number): Wobble {
    Nothing in here reads or touches the DOM.
    ------------------------------------------------------------ */
 
+import { zIndex } from '../../tokens';
+
 export interface SlotShape {
   x: number;
   y: number;
@@ -139,15 +163,18 @@ export interface SlotShape {
  * own wobble rides on top of both, and comes from the INDEX rather
  * than from `d` — it travels with the card, not with the slot.
  */
-export function slotShape(index: number, d: number, step: number): SlotShape {
+export function slotShape(index: number, d: number, step: number, scale = 1): SlotShape {
   const hand = cardHand(index);
   return {
     x: d * step,
-    y: Math.min(ARC_CAP, d * d * ARC_K) + hand.dy,
+    /* the arc's height and the card's own nudge are lengths, so both
+       move with the scale; the quadratic constant is a ratio and
+       does not */
+    y: Math.min(ARC_CAP * scale, d * d * ARC_K * scale) + hand.dy * scale,
     rot: d * ROT_STEP + hand.rot,
     sc: 1 - Math.min(SCALE_CAP, Math.abs(d) * SCALE_STEP),
     op: Math.abs(d) > CUTOFF ? 0 : 1,
-    z: 600 - Math.round(Math.abs(d) * 10),
+    z: zIndex.fan - Math.round(Math.abs(d) * 10),
   };
 }
 

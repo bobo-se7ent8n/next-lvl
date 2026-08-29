@@ -4,9 +4,10 @@ import { Display, Label } from '../../components/primitives/Text';
 import { ROUTES } from '../../app/routes';
 import { CATALOG, GROUPS } from './catalog';
 import styles from './BrowserSidebar.module.css';
+import { iconStroke } from '../../tokens';
 
 const Chevron = () => (
-  <svg className={styles.chevron} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+  <svg className={styles.chevron} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={iconStroke.bold} strokeLinecap="round" strokeLinejoin="round">
     <path d="M9 5l7 7-7 7" />
   </svg>
 );

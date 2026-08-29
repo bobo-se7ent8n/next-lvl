@@ -1,6 +1,8 @@
-import type { CSSProperties } from 'react';
+import { useId, type CSSProperties } from 'react';
 import { project, smoothPath } from '../../lib/chart';
 import { cx } from '../../lib/css';
+import { useEnterProgress } from '../../lib/enter';
+import { useEnterKey } from '../../lib/enterContext';
 import styles from './Charts.module.css';
 
 export interface AreaChartProps {
@@ -35,6 +37,11 @@ export function AreaChart({
   const line = smoothPath(points);
   const body = `${line} L ${(W - pad).toFixed(2)} ${floor.toFixed(2)} L ${pad} ${floor.toFixed(2)} Z`;
 
+  /* the same clip sweep the sparkline uses — see the long note
+     there for why a dash cannot work against a non-scaling stroke */
+  const progress = useEnterProgress(useEnterKey());
+  const clipId = useId();
+
   return (
     <div
       className={cx(styles.chartBox, className)}
@@ -47,6 +54,12 @@ export function AreaChart({
         role="img"
         aria-label={ariaLabel ?? 'trend'}
       >
+        <defs>
+          <clipPath id={clipId}>
+            <rect x="0" y={-H} width={W * progress + 0.001} height={H * 3} />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${clipId})`}>
         <path d={body} fill={color} opacity={fillOpacity} />
         <path
           d={line}
@@ -55,10 +68,9 @@ export function AreaChart({
           strokeWidth={3}
           strokeLinecap="round"
           strokeLinejoin="round"
-          /* no dash pattern here, ever — see Sparkline for why a dash
-             measured in user units fragments a non-scaling stroke */
           vectorEffect="non-scaling-stroke"
         />
+        </g>
       </svg>
     </div>
   );

@@ -20,6 +20,14 @@
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--aera-layout-split-gap);
+  /* the bento takes what the header leaves and scrolls if the sum of
+     its cards is still taller — the cards keep hugging their content,
+     so nothing loses a row the way the old hard cap made it */
+  flex: 1 1 auto;
+  min-height: 0;
+  /* the row is content-sized again; the three columns stretch to
+     the tallest of them, which is what puts their bottoms on one
+     line — see the note on the ratings column's row rhythm */
   /* the three columns end on one line. `start` let each column stop
      wherever its own content ran out, which left the shot field's
      bottom edge floating well above the ratings column beside it. */
@@ -29,12 +37,24 @@
 
 /* the centre column: the ratings, and the conclusion drawn from them
    as its own card underneath */
+/* THE RATINGS COLUMN, AND THE ONE PLACE THE BOARD RUNS LONG.
+
+   Ten ratings and two work-next entries fit the column outright at
+   1440 and above, once the two groups sit side by side. At 1024 the
+   column is ~280px wide — too narrow to carry two rating rows
+   across — so the groups stack and the content is about four rows
+   taller than the screen.
+
+   It scrolls there rather than being cut. Nothing is removed and
+   nothing is hidden: at the one viewport where the full board does
+   not fit, the last rows are still reachable. Flagged rather than
+   solved by deleting ratings. */
 .ratings {
   display: flex;
   flex-direction: column;
   gap: var(--aera-space-8);
   min-width: 0;
-  min-height: 0;
+  min-width: 0;
 }
 
 .stack {
@@ -44,11 +64,42 @@
   min-width: 0;
 }
 
-.stack > * {
+/* THE LAST CARD IN THE STACK TAKES THE SLACK.
+
+   The three bento COLUMNS were ending on one line while the cards
+   inside them were not: this column's two cards hugged their content
+   and left the difference — up to 159px — as a void under the last
+   one. The mechanics card grows into it instead, and because its arc
+   well is the elastic part, what grows is the drawing rather than
+   empty tint.
+
+   THE RATINGS COLUMN NEEDS THE SAME RULE, and not having it is why
+   the bottoms came apart outside DevTools. Only `.stack` had it, so
+   alignment held for exactly as long as the ratings column happened
+   to be the TALLEST of the three — which it is at a tall window and
+   is not at a short one, because `--aera-scale` drops on its height
+   track and re-wraps every column. A real browser window is ~120px
+   shorter than the responsive-mode viewport at the same nominal
+   size, which is precisely what crossed that threshold. */
+.stack > *:last-child,
+.ratings > *:last-child {
+  flex: 1 1 auto;
   min-height: 0;
 }
 
-@media (max-width: 1180px) {
+.stack > *,
+.ratings > * {
+  min-height: 0;
+}
+
+/* THE BENTO HOLDS THREE COLUMNS DOWN TO 900px.
+
+   It used to drop to two at 1180, which put an iPad Mini in
+   landscape — 1024 — into a two-column layout twice the height of
+   the window. With the layout scale the three columns still have
+   ~310px each at 1024, which these cards read fine at. This is a
+   LAYOUT breakpoint, not a size one: the scale handles size. */
+@media (max-width: 900px) {
   .bento {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

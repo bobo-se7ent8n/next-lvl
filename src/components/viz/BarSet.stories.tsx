@@ -58,7 +58,7 @@ export const Variants: Story = {
             padding: 'var(--aera-space-8)',
           }}
         >
-          <div style={{ background: 'rgba(255,255,255,0.42)', borderRadius: 16, padding: 12 }}>
+          <div style={{ background: 'var(--aera-color-on-face-viz-light)', borderRadius: 'var(--aera-radius-md)', padding: 12 }}>
             <BarSet items={ITEMS} height={110} showLabels inherit />
           </div>
         </div>

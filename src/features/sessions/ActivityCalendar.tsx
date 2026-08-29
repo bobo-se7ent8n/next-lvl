@@ -6,7 +6,7 @@ import { Legend } from '../../components/viz/Legend';
 import { Tooltip } from '../../components/viz/Tooltip';
 import { anchorOf } from '../../lib/anchor';
 import { mix } from '../../lib/color';
-import { colorData, colorInk, colorSurface } from '../../tokens';
+import { colorData, colorInk, colorSurface, iconStroke } from '../../tokens';
 import {
   CALENDAR_FIRST,
   CALENDAR_ORIGIN,
@@ -29,7 +29,7 @@ const LEVEL_FILL = [
 ];
 
 const Chevron = ({ back }: { back?: boolean }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={iconStroke.base} strokeLinecap="round" strokeLinejoin="round">
     <path d={back ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'} />
   </svg>
 );

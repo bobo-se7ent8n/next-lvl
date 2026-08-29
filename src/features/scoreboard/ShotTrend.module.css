@@ -1,14 +1,13 @@
 /* ============================================================
    WHERE THE SHOT IS GOING
 
-   Deliberately sparse, and deliberately SHORT. The heading carries
-   the reading, two numbers carry the evidence and one line places
-   it. It was three numbers and a two-sentence paragraph, which made
-   the right column taller than the centre one it is supposed to
-   match.
+   Three rows: a meta line, a heading, and the numerals. Rebuilt
+   from Figma node 464:8762 — a vertical stack at the 16px block
+   gap, with the readings across the bottom at the same 16.
 
-   The meta line and the heading are one block at the tight step;
-   everything else is the 16px block gap.
+   It used to carry a small-caps label under every number and a
+   summarising sentence under the row. Both are gone; see the
+   component for why.
    ============================================================ */
 .card {
   /* gap is a no-op on a block box — this must stay flex */
@@ -18,16 +17,31 @@
   text-align: left;
 }
 
-.intro {
-  display: flex;
-  flex-direction: column;
-  gap: var(--aera-card-tight-gap);
+/* THE NUMERAL ROW, AND IT NEVER WRAPS.
+
+   `grid-auto-flow: column` with `minmax(0, 1fr)` tracks: every
+   reading gets an equal share of the width and the row stays one
+   line at two readings or at five, which is what the reference
+   shows. A flex row with `wrap` did the opposite — at four it broke
+   to a second line and the card grew a row nobody designed.
+
+   `minmax(0, …)` rather than plain `1fr` so a long value can shrink
+   its own track instead of forcing the grid wider than the card.
+
+   The numerals themselves are `metricLG`, whose size is a clamp on
+   the viewport, so five readings on a narrow card scale down
+   together rather than colliding. */
+.readings {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: var(--aera-card-gap);
+  align-items: end;
+  min-width: 0;
 }
 
-/* the numbers run across, 16px between groups. A group's own number
-   and unit sit 2px apart — that pairing is handled by Metric. */
-.readings {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--aera-card-group-gap);
+/* each reading is a Metric — its own number/unit pairing and
+   baseline alignment come from that component */
+.readings > * {
+  min-width: 0;
 }

@@ -42,7 +42,7 @@
   width: 100%;
   max-width: var(--aera-layout-max-content-width);
   margin: 0 auto;
-  border: 1px dashed var(--aera-color-utility-wireframe);
+  border: var(--aera-border-hairline) dashed var(--aera-color-utility-wireframe);
   border-radius: var(--aera-radius-card);
 }
 
@@ -125,7 +125,7 @@
   left: var(--aera-space-6);
   top: 50%;
   transform: translateY(-50%);
-  z-index: 900;
+  z-index: var(--aera-z-wireframe);
   display: flex;
   flex-direction: column;
   gap: var(--aera-space-6);

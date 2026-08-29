@@ -104,6 +104,12 @@
   white-space: nowrap;
 }
 
+/* THE TRANSPORT CONTROLS CARRY THE TAP FLOOR.
+
+   Their sizes are space steps, so the scale takes them with it —
+   `--aera-space-11` is 32px at full size and 26px at the tablet
+   step, which is under the minimum a finger can reliably hit. The
+   floor stops them there; everything above it still scales. */
 .button {
   display: inline-flex;
   align-items: center;
@@ -111,6 +117,8 @@
   flex: 0 0 auto;
   width: var(--aera-space-12);
   height: var(--aera-space-12);
+  min-width: var(--aera-min-target-tap);
+  min-height: var(--aera-min-target-tap);
   border-radius: var(--aera-radius-sm);
   color: inherit;
   transition:
@@ -132,8 +140,8 @@
 }
 
 .button svg {
-  width: 14px;
-  height: 14px;
+  width: var(--aera-icon-md);
+  height: var(--aera-icon-md);
 }
 
 .play {
@@ -150,6 +158,8 @@
 .small {
   width: var(--aera-space-11);
   height: var(--aera-space-11);
+  min-width: var(--aera-min-target-tap);
+  min-height: var(--aera-min-target-tap);
 }
 
 .clock {
@@ -172,7 +182,7 @@
   position: absolute;
   top: 50%;
   left: 0;
-  height: 3px;
+  height: var(--aera-border-thick);
   transform: translateY(-50%);
   border-radius: var(--aera-radius-pill);
 }
@@ -212,6 +222,13 @@
 .select {
   display: flex;
   align-items: center;
+  justify-content: center;
+  /* BOTH dimensions. Below 1100px `.selectName` is hidden, so this
+     collapses to a chevron plus padding — about 30px wide — and the
+     height floor alone would leave the narrow side under the
+     minimum. */
+  min-height: var(--aera-min-target-tap);
+  min-width: var(--aera-min-target-tap);
   gap: var(--aera-space-5);
   max-width: var(--aera-space-16);
   padding: var(--aera-space-4) var(--aera-space-6);
@@ -226,8 +243,8 @@
 }
 
 .select svg {
-  width: 12px;
-  height: 12px;
+  width: var(--aera-icon-sm);
+  height: var(--aera-icon-sm);
   flex: 0 0 auto;
 }
 
@@ -239,7 +256,7 @@
   position: absolute;
   right: 0;
   bottom: calc(100% + var(--aera-space-4));
-  z-index: 20;
+  z-index: var(--aera-z-menu);
   display: flex;
   flex-direction: column;
   gap: var(--aera-space-1);
@@ -290,8 +307,6 @@
     font-family: var(--aera-text-body-family);
     font-size: var(--aera-text-body-sm-size);
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
   .select {
     max-width: calc(var(--aera-space-16) * 3);

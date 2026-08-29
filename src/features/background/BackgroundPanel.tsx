@@ -5,6 +5,7 @@ import { Slider, Toggle } from '../../components/primitives/Controls';
 import { Label } from '../../components/primitives/Text';
 import type { BackgroundSettings } from './settings';
 import styles from './BackgroundPanel.module.css';
+import { iconStroke } from '../../tokens';
 
 export interface BackgroundPanelProps {
   settings: BackgroundSettings;
@@ -152,7 +153,7 @@ export function BackgroundPanel({ settings, onChange, inline, className }: Backg
         aria-label="Display settings"
         onClick={() => setOpen((v) => !v)}
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={iconStroke.thin} strokeLinecap="round">
           <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
           <circle cx="16" cy="7" r="2" />
           <circle cx="10" cy="17" r="2" />

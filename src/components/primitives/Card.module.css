@@ -91,7 +91,7 @@
 
 /* hover: a small, flat lift — no growth, no colour change */
 .interactive:hover {
-  transform: translateY(-2px);
+  transform: translateY(calc(var(--aera-space-1) * -1));
 }
 
 /* pressed: compress, immediately, and let go without a rebound */
@@ -102,7 +102,7 @@
 
 /* the keyboard route through the product is visible */
 .card:focus-visible {
-  outline: 2px solid var(--aera-color-utility-focus);
+  outline: var(--aera-border-base) solid var(--aera-color-utility-focus);
   outline-offset: 3px;
 }
 

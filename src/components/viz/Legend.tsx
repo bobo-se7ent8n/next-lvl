@@ -31,7 +31,7 @@ export function Legend({ items, inherit, justify = 'start', className }: LegendP
             as="span"
             variant="bodySM"
             tone={inherit ? 'inherit' : 'tertiary'}
-            style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}
+            style={{ textTransform: 'uppercase', letterSpacing: 'var(--aera-tracking-display-wide)' }}
           >
             {item.label}
             {item.value ? (

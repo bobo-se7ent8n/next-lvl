@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
 import { Card } from '../primitives/Card';
 import { Chip, Tag } from '../primitives/Chip';
@@ -8,6 +7,7 @@ import { DotMatrix } from '../graphics/DotMatrix';
 import type { DataTone } from '../../tokens';
 import type { Insight } from '../../data/types';
 import styles from './InsightCard.module.css';
+import { graphicWell } from '../../tokens';
 
 const KIND_TONE: Record<Insight['kind'], DataTone> = {
   DRILL: 'mint',
@@ -18,15 +18,11 @@ const KIND_TONE: Record<Insight['kind'], DataTone> = {
 /** how many beats wide every library field is */
 const COLUMNS = 26;
 
-/** The well is reserved at the item's own aspect, so the field is cut
- *  to match it: the grid pitch is the invariant and the number of rows
- *  is what follows. A fixed row count left a band of empty tint above
- *  the dots in every card with a tall well. */
-function rowsFor(ratio: string): number {
-  const [w, h] = ratio.split('/').map((part) => Number(part.trim()));
-  if (!w || !h) return 6;
-  return Math.max(3, Math.round((COLUMNS * h) / w));
-}
+/** Every well is the same landscape frame now, so the field is the
+ *  same grid in all of them — the row count follows the frame's own
+ *  ratio rather than the item's, which is what kept the dots square
+ *  and the wells ragged. */
+const GRAPHIC_ROWS = Math.max(3, Math.round((COLUMNS * graphicWell.h) / graphicWell.w));
 
 export interface InsightCardProps {
   insight: Insight;
@@ -66,10 +62,10 @@ export function InsightCard({ insight, onClick, id, className }: InsightCardProp
 
       {/* the one illustration language, never a per-card style: the
           pattern is chosen to match what the item is about */}
-      <Well radius="lg" className={styles.graphic} style={{ '--ratio': insight.ratio } as CSSProperties}>
+      <Well radius="lg" className={styles.graphic}>
         <DotMatrix
           pattern={insight.graphic}
-          rows={rowsFor(insight.ratio)}
+          rows={GRAPHIC_ROWS}
           columns={COLUMNS}
           accent={KIND_TONE[insight.kind]}
           fill

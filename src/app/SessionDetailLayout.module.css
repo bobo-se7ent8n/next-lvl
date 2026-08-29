@@ -29,6 +29,9 @@
 .back {
   display: inline-flex;
   align-items: center;
+  /* its height is padding plus a line box, both of which scale — the
+     floor catches it at the laptop step */
+  min-height: var(--aera-min-target-tap);
   gap: var(--aera-space-5);
   border-radius: var(--aera-radius-md);
   padding: var(--aera-space-5) var(--aera-space-8);
@@ -50,8 +53,8 @@
 }
 
 .back svg {
-  width: 13px;
-  height: 13px;
+  width: var(--aera-icon-base);
+  height: var(--aera-icon-base);
 }
 
 .body {

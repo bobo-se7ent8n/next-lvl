@@ -24,6 +24,7 @@
    ============================================================ */
 
 import { colorSurface } from './color';
+import { borderWidth } from './border';
 
 export const cardSpec = {
   /** padding on every card face, all four sides */
@@ -43,8 +44,24 @@ export const cardSpec = {
   unitGap: '4px',
   /** the gap between the tight rows of a card head */
   tightGap: '4px',
-  /** vertical padding on one rating row */
-  rowPadding: '8px',
+  /** Vertical padding on one rating row, and the gap between a group
+   *  heading and its rows.
+   *
+   *  12, and the leverage is the point: there are twelve rating rows
+   *  on the Scoreboard and the padding is paid twice on each, so this
+   *  one number is worth ~190px of column height. It was 4 when the
+   *  ratings column was the tallest of the three and every pixel had
+   *  to come out of it. It is not any more — the column now runs
+   *  SHORT of the other two, and the height that used to be scarce
+   *  was being handed to "where to work next" to stretch into, which
+   *  pushed its two entries to opposite edges of the card.
+   *
+   *  Spending it here instead puts it where it reads as breathing
+   *  room in a list rather than as a void in a card. Projected
+   *  through `--aera-scale` like every other length, so the rhythm
+   *  steps down with the rest of the page and is not tuned to one
+   *  window. */
+  rowPadding: '12px',
 } as const;
 
 export const innerSpec = {
@@ -64,7 +81,7 @@ export const innerSpec = {
    ------------------------------------------------------------ */
 export const surfaceEffect = {
   /** what a non-clickable card wears INSTEAD of a drop shadow */
-  stroke: `0 0 0 2px ${colorSurface.level1}`,
+  stroke: `0 0 0 ${borderWidth.base} ${colorSurface.level1}`,
   /** the white light around the inside edge of a recess. Four
    *  stacked insets, one per edge, so the recess reads as pressed
    *  in from every side rather than lit from one direction. */

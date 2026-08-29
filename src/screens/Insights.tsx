@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { PageHeader } from '../components/chrome/PageHeader';
 import { ChatPanel, type ChatMessage } from '../components/composed/ChatPanel';
 import { InsightCard } from '../components/composed/InsightCard';
-import { columnize, columnCountFor } from '../lib/columns';
 import { askAera } from '../features/insights/askAera';
 import { ASK_SEEDS, INSIGHTS } from '../data';
+import { columnize, columnCountFor } from '../lib/columns';
 import styles from './Insights.module.css';
 
 const OPENING: ChatMessage = {
@@ -16,7 +16,7 @@ const OPENING: ChatMessage = {
 /** the library, unfiltered, beside the assistant. Everything here is
  *  pulled: nothing is pushed, ranked or marked urgent. */
 export function Insights() {
-  /* real flex columns, not CSS multi-column — see lib/columns.ts */
+  /* three columns at 1024 and above, two below — see lib/columns.ts */
   const [columns, setColumns] = useState(() =>
     columnCountFor(typeof window === 'undefined' ? 1440 : window.innerWidth),
   );
@@ -49,6 +49,13 @@ export function Insights() {
           <ChatPanel messages={messages} suggestions={ASK_SEEDS} onSend={send} />
         </div>
 
+        {/* THREE PACKED COLUMNS, EACH CARD ITS OWN HEIGHT.
+
+            Round-robin into independent flex stacks: a short card is
+            followed immediately by the next card in its column
+            rather than waiting for the tallest card in a grid row.
+            That is what lets a card hug its content — see the note
+            in the stylesheet. */}
         <div className={styles.grid}>
           {columnize(INSIGHTS, columns).map((column, i) => (
             <div key={i} className={styles.column}>

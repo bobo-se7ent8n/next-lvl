@@ -45,12 +45,30 @@
 /* REAL COLUMNS, REAL GAPS — see Sessions for the full note. A
    multi-column box has no flex gap, so the space between stacked
    cards could only ever be a margin on the card itself. */
+/* THE LIBRARY PACKS, IT DOES NOT TILE.
+
+   Three columns, each an independent flex stack, and every card is
+   exactly as tall as what is in it. A uniform grid row made every
+   card the height of the tallest one in its row, which left short
+   cards with a band of empty tint under their content — the cards
+   were being stretched to serve the grid rather than the other way
+   round.
+
+   Insights is explicitly exempt from bottom-edge alignment: the
+   columns end where their content ends. The Scoreboard bento is the
+   one that aligns, and it still does.
+
+   The library scrolls when it is taller than the pane. Nothing is
+   clipped and no bar is drawn — see global.css. */
 .grid {
   display: flex;
   align-items: flex-start;
   gap: var(--aera-card-gap);
-  min-width: 0;
   width: 100%;
+  min-width: 0;
+  /* no pane scroll and no clip: the library renders at its full
+     height and the PAGE scrolls if there is more of it than fits */
+  padding: var(--aera-border-base);
 }
 
 .column {
@@ -61,12 +79,17 @@
   min-width: 0;
 }
 
-
-
-@media (max-width: 1080px) {
+@media (max-width: 900px) {
   .split {
     grid-template-columns: minmax(0, 1fr);
+    /* stacked, the aside takes what it needs and the list takes the
+       rest and scrolls — the same division as the two-column case,
+       turned ninety degrees */
+    grid-template-rows: auto minmax(0, 1fr);
     gap: var(--aera-space-10);
+  }
+  .grid {
+    min-height: 0;
   }
   .aside {
     position: static;

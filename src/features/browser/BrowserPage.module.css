@@ -50,7 +50,7 @@
   border-radius: var(--swatch-radius, var(--aera-radius-md));
   background: var(--swatch-bg);
   box-shadow: var(--swatch-shadow, none);
-  outline: 1px solid var(--aera-color-utility-hairline);
+  outline: var(--aera-border-hairline) solid var(--aera-color-utility-hairline);
   outline-offset: -1px;
 }
 

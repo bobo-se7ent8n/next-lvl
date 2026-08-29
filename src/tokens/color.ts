@@ -110,10 +110,39 @@ export const colorSemantic = {
    palette but not on this axis, so they are not on this ramp.
    Highest first — mint is the accurate end.
    ------------------------------------------------------------ */
+/* ------------------------------------------------------------
+   SHOT ZONES — THE EXCEPTION, MADE EXPLICIT.
+
+   This ramp is the shot field's and nothing else's. It has its own
+   names so that the semantic rule — green good, orange bad — can
+   never be "restored" over the top of it by someone tidying up:
+   on a shot chart the colour is answering a different question, so
+   it gets its own tokens and its own note rather than borrowing
+   `colorSemantic` and hoping nobody notices.
+
+   A NOTE ON THE BASKETBALL CONVENTION. The familiar NBA shot chart
+   runs blue (cold) → orange (hot). This product deliberately does
+   NOT: blue does not sit on an ordered axis with mint and orange,
+   so a three-stop ramp through it cannot be read in order by
+   anyone who has not been told the key. The stops below are the
+   semantic hues, in accuracy order, which is what the field is
+   currently drawn with.
+
+   Switching to blue → orange is a real design decision and a
+   visible change. It is not a refactor and it is not done here.
+   ------------------------------------------------------------ */
+export const colorShotZone = {
+  /** the accurate end of the ramp */
+  hot: colorSemantic.positive,
+  holding: colorSemantic.neutral,
+  /** the cold end */
+  cold: colorSemantic.negative,
+} as const;
+
 export const accuracyRamp = [
-  { name: 'accurate', color: colorSemantic.positive, min: 0.42 },
-  { name: 'holding', color: colorSemantic.neutral, min: 0.33 },
-  { name: 'cold', color: colorSemantic.negative, min: 0 },
+  { name: 'accurate', color: colorShotZone.hot, min: 0.42 },
+  { name: 'holding', color: colorShotZone.holding, min: 0.33 },
+  { name: 'cold', color: colorShotZone.cold, min: 0 },
 ] as const;
 
 /* ------------------------------------------------------------
@@ -161,6 +190,7 @@ export const color = {
   face: colorFace,
   dataInk: colorDataInk,
   semantic: colorSemantic,
+  shotZone: colorShotZone,
   onFace: colorOnFace,
   utility: colorUtility,
 } as const;

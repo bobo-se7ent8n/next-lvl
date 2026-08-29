@@ -10,7 +10,7 @@
   flex-direction: column;
   gap: var(--aera-space-2);
   padding-bottom: var(--aera-space-4);
-  border-bottom: 1px solid var(--aera-color-utility-hairline);
+  border-bottom: var(--aera-border-hairline) solid var(--aera-color-utility-hairline);
 }
 
 .frameBody {
@@ -28,7 +28,7 @@
 }
 
 .variant + .variant {
-  border-top: 1px solid var(--aera-color-utility-hairline);
+  border-top: var(--aera-border-hairline) solid var(--aera-color-utility-hairline);
 }
 
 .variantName {
