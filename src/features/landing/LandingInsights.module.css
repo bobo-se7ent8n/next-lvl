@@ -144,11 +144,23 @@
 }
 
 /* ---- THE TRAVELLING DOT ----------------------------------------
-   A round-capped dash of almost no length walking the same outline
-   on a continuous loop, so the border always has one live point on
-   it while the bubble is the thing on screen. `linear`, because a
-   dot going round a closed path on an eased curve visibly hesitates
-   at the seam.
+   A round-capped dash of almost no length walking the same outline,
+   so the border always has one live point on it while the bubble is
+   the thing on screen.
+
+   IT IS DRIVEN BY THE SCROLL, AND ONLY BY THE SCROLL. This used to
+   be a CSS keyframe loop on its own clock, which meant the one live
+   point in the section was the one thing in it the reader was not
+   moving: it circled while the page was still and it kept circling
+   at the same rate however fast the page was travelling. The
+   offset is written from the section's own progress now — nought at
+   the start of the path, one at the end — by the same rAF loop that
+   types the prompt and draws the border. There is no animation and
+   no second clock in here at all.
+
+   The pathLength is 1, set on the element, so the offset the loop
+   writes is a plain fraction of the outline rather than a length
+   that would have to be recomputed every time the bubble resized.
 
    It stops with the bubble: once the group is leaving there is
    nothing for it to be circling.
@@ -156,25 +168,15 @@
 .runner {
   fill: none;
   stroke: var(--aera-color-data-lilac);
-  stroke-width: var(--aera-border-thick);
+  /* the diameter, not a line weight — see `traceDot` in the tokens */
+  stroke-width: var(--aera-border-trace-dot);
   stroke-linecap: round;
   stroke-dasharray: 0.0001 1;
-  animation: runner calc(var(--aera-duration-settle) * 6) linear infinite;
   opacity: calc(1 - var(--exit));
-}
-
-@keyframes runner {
-  from {
-    stroke-dashoffset: 0;
-  }
-  to {
-    stroke-dashoffset: -1;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .runner {
-    animation: none;
     opacity: 0;
   }
 }

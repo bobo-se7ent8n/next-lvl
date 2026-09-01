@@ -79,6 +79,22 @@ export function LandingInsights() {
   /* the note reads its own fill off this node, exactly the way the
      Sessions read-through does — one property write per frame */
   const note = useRef<HTMLParagraphElement>(null);
+  /* THE TRAVELLING DOT, and it has no clock of its own.
+
+     It was a CSS keyframe loop, which made the one live point in the
+     section the one thing in it the reader was not moving: it
+     circled while the page was still and circled at the same rate
+     however fast the page was travelling. Its position is the
+     section's progress now — 0 at the start of the path, 1 at the
+     end — written on the same frames as everything else here.
+
+     The smoothing is already done and is not repeated: the value
+     `useSectionProgress` hands over has been eased toward the scroll
+     position by `EASE` a frame in the page's one shared loop (see
+     scroll.ts), which is exactly the `prog += delta * 0.22` this
+     needs. A second loop here would be a second clock — the thing
+     the keyframes were. */
+  const runner = useRef<SVGRectElement>(null);
 
   const [typed, setTyped] = useState(0);
   /* the last value handed to React, so a frame that would set the
@@ -128,6 +144,12 @@ export function LandingInsights() {
          the same progress value — it used to fade in whole, which
          made it the one thing in the section that simply appeared. */
       note.current?.style.setProperty('--fill', span(fill, NOTE_AT, 1).toFixed(4));
+
+      /* and the dot walks the outline with it. `pathLength` is 1 on
+         the element, so the offset is a plain fraction of the path
+         and none of this has to know how big the bubble is. Negative
+         because a positive offset walks the dash backwards. */
+      runner.current?.setAttribute('stroke-dashoffset', (-p).toFixed(5));
 
       const chars = Math.round(ASK_PROMPT.length * fill);
       if (chars !== shown.current) {
@@ -208,15 +230,19 @@ export function LandingInsights() {
 
                   {/* THE TRAVELLING DOT.
 
-                      A round-capped dash of almost no length, run
-                      round the same outline on a CSS loop. It is a
+                      A round-capped dash of almost no length, walked
+                      round the same outline BY THE SCROLL. It is a
                       dot made out of a stroke rather than a circle
                       moving along a path: `animateMotion` is SMIL and
                       `offset-path` would need the path duplicated in
                       a second syntax, where this needs neither — the
                       rect is already the shape, and the browser
-                      already knows how to walk a dash around it. */}
+                      already knows how to walk a dash around it.
+
+                      Its offset is written by the progress loop
+                      above; there is no animation on it. */}
                   <rect
+                    ref={runner}
                     className={styles.runner}
                     x={0}
                     y={0}
