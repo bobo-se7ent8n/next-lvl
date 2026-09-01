@@ -17,11 +17,6 @@
   justify-content: center;
   align-items: flex-start;
   width: 100%;
-  /* perspective belongs on the ancestor the tilted layers share, so
-     all five cards lean into the same vanishing point rather than
-     each into one of its own. A token, so it scales with the cards
-     it is applied to — see `fanPerspective`. */
-  perspective: var(--aera-landing-fan-perspective);
 }
 
 /* ---- THE STAGE, IN CARD UNITS ----------------------------------
@@ -36,7 +31,6 @@
   position: relative;
   width: calc(var(--aera-landing-fan-card-w) * var(--row-w));
   height: calc(var(--aera-landing-fan-card-h) * var(--row-h));
-  transform-style: preserve-3d;
 }
 
 .slot {
@@ -49,7 +43,13 @@
   /* below the card, so the tilt swings its bottom edge less than its
      top — a hand pivots at the grip, not at its middle */
   transform-origin: 50% 115%;
-  transform-style: preserve-3d;
+  /* THE ORDER COMES THROUGH A CUSTOM PROPERTY, NOT AN INLINE
+     `z-index`. The table's own value used to be written straight onto
+     the node as a style prop, which no stylesheet rule can outrank —
+     so the hover rule below was dead code and a lifted card stayed
+     underneath the neighbour it had just come forward of, with its
+     selection ring sliced in half by it. */
+  z-index: var(--z);
 }
 
 /* ---- the card, and the pointer ---------------------------------
@@ -70,7 +70,26 @@
   --tilt-y: 0deg;
   width: 100%;
   height: 100%;
-  transform-style: preserve-3d;
+  /* THE VANISHING POINT LIVES HERE, ON THE TILTED LAYER'S OWN
+     PARENT — not on the hand the five cards share.
+
+     A shared perspective needs `transform-style: preserve-3d` on
+     every box between it and the leaning layer, and that flattening
+     chain cost two things that matter more than one common vanishing
+     point. Coplanar siblings in a 3D context are sorted PER PIXEL
+     rather than by `z-index`, so the hovered card and its neighbour
+     interpenetrated: a card was sliced along the diagonal where the
+     two planes crossed, cutting the neighbour's title in half. And
+     hit-testing inside a preserve-3d subtree resolved to this box
+     rather than to the button inside it, so the fan stopped opening
+     on a real click at all — only a scripted `.click()` still worked.
+
+     Per-card perspective costs a vanishing point that is each card's
+     own centre instead of the hand's. That is a difference of a
+     degree or two on a seven-degree lean, and it buys back both the
+     stacking order and the click. Still a token, so it scales with
+     the cards — see `fanPerspective`. */
+  perspective: var(--aera-landing-fan-perspective);
   transition:
     transform var(--aera-duration-fan-card) var(--aera-ease-firm),
     opacity var(--aera-duration-fast) var(--aera-ease-out);
@@ -119,6 +138,10 @@
    ---------------------------------------------------------------- */
 .dimmed .card {
   opacity: 0.16;
+  /* and it stops being a target, exactly as the app's own hand does
+     behind an opened panel — a receded card that still answers a
+     click is a card you can open from behind the one that is open */
+  pointer-events: none;
 }
 
 .dimmed .slot:hover .card,

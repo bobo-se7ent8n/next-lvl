@@ -217,6 +217,20 @@ export function LandingPatterns() {
   const closing = useRef(false);
 
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  /* WHICH CARD WEARS THE SELECTION RING.
+
+     The app's fan does not use the pointer for this — on Home the
+     hand is parked and the card the marker points at is the selected
+     one — but the treatment it drives is the same one, and it comes
+     from the same place: `PatternCard`'s `hovered` prop, which turns
+     on `Card`'s `outlined` and with it the figma ring
+     (`--aera-elevation-select-ring`: 1.5px of `#0D99FF`, spread, no
+     offset). Nothing about the ring is restated here.
+
+     State rather than a class written onto the node, because the
+     ring lives inside PatternCard and only React can reach it. It
+     changes once per card the pointer crosses — never per move. */
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [openBox, setOpenBox] = useState(PANEL_FALLBACK);
   /* re-scoping this is what makes the opened panel's numbers count
      up, its bars grow and its line draw itself */
@@ -335,6 +349,7 @@ export function LandingPatterns() {
 
   /** back to flat, on the same resistance curve it leant on */
   const rest = useCallback((i: number) => {
+    setHoverIndex((current) => (current === i ? null : current));
     const el = cards.current[i];
     if (!el) return;
     el.style.setProperty('--tilt-x', '0deg');
@@ -349,6 +364,12 @@ export function LandingPatterns() {
       body="Nothing is pushed at you. A pattern sits in the hand until you pull it out — and it only gets there once it has repeated across enough sessions to mean something."
       centred
       fit
+      /* TWO LINES, AND THE MEASURE IS WHAT DECIDES IT. On the
+         readable measure this sentence broke onto three, and three
+         centred lines under a one-word heading read as an uncut
+         paragraph rather than as the line introducing the fan. See
+         `sectionBodyW`, and `.bodyWide` in the section stylesheet. */
+      wideBody
     >
       <div ref={stage} className={styles.hand}>
         <div
@@ -369,7 +390,9 @@ export function LandingPatterns() {
                     '--x': at.x,
                     '--y': at.y,
                     '--rot': `${slot.rot}deg`,
-                    zIndex: slot.z,
+                    /* through a variable so the stylesheet's hover
+                       rule can outrank it — see `.slot` */
+                    '--z': slot.z,
                   } as CSSProperties
                 }
               >
@@ -378,6 +401,7 @@ export function LandingPatterns() {
                     cards.current[i] = el;
                   }}
                   className={styles.card}
+                  onPointerEnter={() => setHoverIndex(i)}
                   onPointerMove={(e) => tilt(i, e)}
                   onPointerLeave={() => rest(i)}
                   /* the flying card is not also in the hand — without
@@ -396,6 +420,11 @@ export function LandingPatterns() {
                   <div className={styles.tilt}>
                     <PatternCard
                       pattern={pattern}
+                      /* the app's own selection treatment, on the
+                         app's own prop — and off entirely while a
+                         card is open, exactly as the app turns it
+                         off behind an opened panel */
+                      hovered={openIndex == null && hoverIndex === i}
                       showTag={false}
                       onClick={() => {
                         rest(i);
