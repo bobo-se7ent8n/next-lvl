@@ -36,6 +36,14 @@
   min-height: 0;
   padding-top: var(--aera-space-4);
   padding-bottom: var(--aera-space-11);
+  /* AND IT NEVER SHRINKS. A flex item defaults to `flex-shrink: 1`,
+     so when the content below wanted more room than the plate had,
+     the header was the thing that gave — it was squeezed nine pixels
+     shorter than its own contents and, with the plate clipping,
+     the subhead was left painting on top of the first row of cards.
+     The reserve below the header is a spacing token; it is not
+     negotiable room for whatever is under it. */
+  flex: none;
 }
 
 /* The two-column screens — Sessions and Insights share one shape.
@@ -57,30 +65,74 @@
 }
 
 .aside {
+  /* HUGS, RATHER THAN FILLING THE ROW. The Ask panel is one card and
+     it is as tall as what is in it; stretched to the row's height it
+     reserved several hundred pixels of empty column under itself.
+     `start` is what the app's own Insights screen aligns it to, for
+     the same reason. */
+  align-self: start;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
 }
 
-/* An honest clip: the library is an unbounded list, so whatever does
-   not fit the plate is cut at its edge rather than being scaled down
-   until it does. A landing page shows the top of the list; the
-   product shows all of it. */
+/* ---- THE LIBRARY, TILED RATHER THAN PACKED --------------------
+   The same restatement the vitals grid below is: the app's own
+   layout, with the part that measured the WINDOW replaced.
+
+   In the app the library is three independent flex columns, every
+   card exactly as tall as its own content, and the PAGE scrolls when
+   there is more of it than fits. On a plate there is no page to
+   scroll: a packed column simply ran past the bottom edge and was
+   cut there — 1260px of cards inside a 745px box, with the last row
+   sheared off halfway through its dot field.
+
+   So the rows are fractions of the room the header leaves, exactly
+   as the vitals are. Every card gets the same height, the columns
+   end level, and nothing is clipped at any layout scale. What gives
+   inside a card is the dot well: the field is an SVG drawn to a
+   viewBox, so it scales UNIFORMLY inside whatever box it is handed
+   and the dots stay square and evenly spaced however tall the well
+   ends up. The card's own radius, stroke, padding and gaps are the
+   shipped component's and are not touched.
+
+   The column count is the app's own — `columnCountFor`, asked about
+   the plate's logical width rather than about a window that is not
+   there. See `LIBRARY_COLUMNS` in screens.tsx.
+   ---------------------------------------------------------------- */
 .grid {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: repeat(var(--library-columns), minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
   gap: var(--aera-card-gap);
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
 }
 
-.column {
-  display: flex;
-  flex: 1 1 0;
-  flex-direction: column;
-  gap: var(--aera-card-gap);
-  min-width: 0;
+.grid > * {
+  min-height: 0;
+}
+
+/* THE WELL IS THE PART THAT GIVES.
+
+   A card is three blocks — the heading group, the dot well, the meta
+   row — and only the middle one may be re-proportioned: the other
+   two are type, and type that is squeezed is type that is clipped.
+   `nth-child(2)` rather than a class because the card's classes
+   belong to another CSS module and are hashed, which is the same
+   reason the header rule above is an element selector. */
+.grid > * > *:nth-child(2) {
+  /* it may be shorter than its own 16:9 when the row is tight … */
+  min-height: 0;
+  /* … and it takes the slack when the row is generous, rather than
+     holding its ratio and leaving a band of empty card between
+     itself and the meta row. `margin-top: auto` on that row keeps
+     the row pinned to the bottom either way, so what changes is only
+     how much of the card the well occupies. The field inside is an
+     SVG drawn to a viewBox: it scales uniformly and centres in
+     whatever box it is given, so the dots stay square and evenly
+     spaced at every height. */
+  flex: 1 1 auto;
 }
 
 /* ---- home ------------------------------------------------------ */

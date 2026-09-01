@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { PageHeader } from '../../components/chrome/PageHeader';
 import { ChatPanel, type ChatMessage } from '../../components/composed/ChatPanel';
 import { InsightCard } from '../../components/composed/InsightCard';
@@ -10,8 +10,9 @@ import { ShotZonesField } from '../scoreboard/ShotZonesField';
 import { SkillRatings, WhereToWorkNext } from '../scoreboard/SkillRatings';
 import { PeriodContext } from '../scoreboard/periodContext';
 import { askAera } from '../insights/askAera';
-import { columnize } from '../../lib/columns';
+import { columnCountFor } from '../../lib/columns';
 import { ASK_SEEDS, INSIGHTS, VITALS } from '../../data';
+import { landing } from '../../tokens';
 import styles from './screens.module.css';
 
 /* ============================================================
@@ -111,6 +112,19 @@ const OPENING: ChatMessage = {
   text: 'Ask for something to work on. I read your own sessions and patterns — nothing leaves the device.',
 };
 
+/* HOW MANY COLUMNS THE LIBRARY RUNS AT ON A PLATE.
+
+   The app decides this from the WINDOW width; a plate has no window,
+   so it asks the same function about the plate's own logical width
+   instead of being told a number. At 1440 that is three — which is
+   what the app renders on any laptop — and it was hard-coded to two,
+   so the landing page was showing a library layout the product does
+   not have. Two columns also made every card half the plate wide,
+   and a 16:9 well at that width is 240px tall: six of them stacked
+   three deep came to 1260px inside an 745px box, and the bottom row
+   was cut off by the plate's own clip. */
+const LIBRARY_COLUMNS = columnCountFor(Number.parseFloat(landing.shotWidth));
+
 export function InsightsShot() {
   const [messages, setMessages] = useState<ChatMessage[]>([OPENING]);
 
@@ -133,13 +147,17 @@ export function InsightsShot() {
         <div className={styles.aside}>
           <ChatPanel messages={messages} suggestions={ASK_SEEDS} onSend={send} />
         </div>
-        <div className={styles.grid}>
-          {columnize(INSIGHTS.slice(0, 6), 2).map((column, i) => (
-            <div key={i} className={styles.column}>
-              {column.map((insight) => (
-                <InsightCard key={insight.id} insight={insight} id={`landing-${insight.id}`} />
-              ))}
-            </div>
+        {/* TWO ROWS OF THE LIBRARY, TILED — see the note in the
+            stylesheet. The app packs its columns and lets the page
+            scroll; a plate has no page to scroll, so the rows are
+            fractions of the room the header leaves and every card
+            comes out the same height. */}
+        <div
+          className={styles.grid}
+          style={{ '--library-columns': LIBRARY_COLUMNS } as CSSProperties}
+        >
+          {INSIGHTS.slice(0, LIBRARY_COLUMNS * 2).map((insight) => (
+            <InsightCard key={insight.id} insight={insight} id={`landing-${insight.id}`} />
           ))}
         </div>
       </div>
