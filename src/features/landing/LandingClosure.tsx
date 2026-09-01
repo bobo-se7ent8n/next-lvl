@@ -62,13 +62,19 @@ export function LandingClosure() {
         <DotCanvas />
 
         <div className={styles.content}>
-          <Display size="xl" as="p" className={styles.line}>
-            Built to be outgrown.
-          </Display>
+          {/* THE LINE AND THE WAY IN, as one group: they take the
+              block and centre in whatever the footer leaves. The
+              footer is the block's other group and stands on its
+              bottom padding — see the stylesheet. */}
+          <div className={styles.lead}>
+            <Display size="xl" as="p" className={styles.line}>
+              Built to be outgrown.
+            </Display>
 
-          <Link to={ROUTES.home} className={styles.cta}>
-            <Label tone="inherit">Open the prototype</Label>
-          </Link>
+            <Link to={ROUTES.home} className={styles.cta}>
+              <Label tone="inherit">Open the prototype</Label>
+            </Link>
+          </div>
 
           {/* THE FOOTER, INSIDE THE BLOCK.
 

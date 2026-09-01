@@ -21,6 +21,8 @@
    TypeScript the way `dotMatrix` and `inkVariation` are.
    ============================================================ */
 
+import { duration } from './motion';
+
 export const landing = {
   /* ---- THE PAGE FRAME ----------------------------------------
      One margin, at the top and down both sides, and every section
@@ -169,6 +171,20 @@ export const landing = {
   /** the closing block — a floating window like the nav, and short:
    *  it holds a line and a button, not a section */
   closeBlockH: '54dvh',
+
+  /** HOW FAR THE POINTER REACHES ACROSS THE CLOSING BLOCK'S FIELD.
+   *
+   *  Twice what it was — the reach used to be 150 typed into
+   *  `dotCanvas` below, which lit a circle about the size of the
+   *  button and read as a torch rather than as the surface noticing
+   *  a hand. At 300 the disturbance is wide enough that moving
+   *  across the block feels like moving across a material.
+   *
+   *  A LENGTH IN THE LANDING SCALE, so it is projected as
+   *  `--aera-landing-footer-cursor-radius` and steps down with the
+   *  block it acts on; the canvas reads it off `:root` rather than
+   *  carrying a second copy of the number. */
+  footerCursorRadius: '300px',
 } as const;
 
 /* ------------------------------------------------------------
@@ -257,7 +273,12 @@ export const dotCanvas = {
   /** a dot at rest, and the most the pointer can grow it to */
   size: 3,
   grow: 3.4,
-  /** how far the pointer's influence reaches */
+  /** HOW FAR THE POINTER'S INFLUENCE REACHES — the fallback only.
+   *
+   *  The live value is `landing.footerCursorRadius`, read off `:root`
+   *  so it arrives already scaled. This is what the field uses in the
+   *  one frame before the token block has been injected, and in a
+   *  test with no document to read from. */
   radius: 150,
   /** how far a dot is pushed away from the pointer at the centre */
   push: 13,
@@ -273,6 +294,33 @@ export const dotCanvas = {
    *  of being a thing you look at until the pointer is on it. */
   alpha: 0.5,
   alphaLift: 0.45,
+
+  /* ---- THE COLOUR THE POINTER PUTS INTO THE FIELD -------------
+     Dots inside the reach take one of the five palette hues, picked
+     from the dot's own index so the same patch of field always comes
+     up the same colours — a hue drawn fresh each frame would make
+     the block flicker, and a hue drawn fresh on each pass would make
+     the same corner a different colour every time you went back to
+     it.
+     -------------------------------------------------------------- */
+  /** HOW LONG THE COLOUR TAKES TO DRAIN BACK OUT, as a real duration
+   *  token. A canvas value cannot take a CSS transition, so
+   *  `--aera-ease-firm` cannot drive it — but the shape that curve
+   *  describes can, and an exponential approach is exactly it: fast
+   *  off the mark, settling, and with no overshoot anywhere in it.
+   *  The loop converts this into a share-of-remaining-distance per
+   *  frame; see `COLOUR_STEP` in DotCanvas. */
+  colorFade: duration.base,
+  /** what a fully-lit dot is drawn at. The resting field is a
+   *  texture and is deliberately faint; a coloured dot is the field
+   *  answering a hand and has to be seen, so the alpha travels with
+   *  the colour rather than staying at the texture's floor. */
+  colorAlpha: 0.92,
+  /** how many steps the base → hue ramp is built at, once, at mount.
+   *  Blending per dot per frame is two thousand colour strings a
+   *  frame; a ramp is eighty strings for the life of the block, and
+   *  at this many steps the quantisation is invisible. */
+  colorSteps: 24,
 } as const;
 
 export type LandingSpec = keyof typeof landing;

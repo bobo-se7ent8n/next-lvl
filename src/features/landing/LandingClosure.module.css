@@ -28,7 +28,12 @@
 .block {
   position: relative;
   display: flex;
-  align-items: center;
+  /* STRETCH, so the content column is as tall as the block and can
+     divide it — see `.content`. It used to be `center`, which sized
+     the column to its own contents and left the footer hanging
+     directly under the button with the whole lower half of the block
+     empty beneath it. */
+  align-items: stretch;
   justify-content: center;
   flex: 1 1 auto;
   min-height: var(--aera-landing-close-block-h);
@@ -60,14 +65,38 @@
    The canvas is under the content and would never see a pointermove
    that landed on the type, so the content is transparent to the
    pointer and only the link opts back in. */
+/* ---- TWO GROUPS, AND THE BLOCK IS DIVIDED BETWEEN THEM ---------
+   The line and the button take the room, centred in whatever the
+   footer leaves; the footer itself sits on the block's bottom
+   padding. They used to be one stack centred as a whole, so the four
+   links and the build line hung immediately under the button with
+   the entire lower half of the block empty under them — a footer
+   floating in the middle of the thing it is the foot of.
+
+   The bottom edge is the block's own padding, not zero: the footer
+   stands on the same inset the heading stands in.
+   ---------------------------------------------------------------- */
 .content {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   gap: var(--aera-space-12);
+  width: 100%;
   max-width: var(--aera-layout-max-prose-width);
   pointer-events: none;
+}
+
+/* the line and the way in, centred in everything the footer leaves */
+.lead {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--aera-space-12);
+  min-height: 0;
 }
 
 /* ---- the footer row -------------------------------------------
@@ -77,6 +106,7 @@
    ---------------------------------------------------------------- */
 .footer {
   display: flex;
+  flex: none;
   flex-direction: column;
   align-items: center;
   gap: var(--aera-space-6);

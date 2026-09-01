@@ -7,4 +7,21 @@
   display: block;
   width: 100%;
   height: 100%;
+  /* THE POINTER'S REACH, PUT SOMEWHERE SCRIPT CAN READ IT.
+
+     `getComputedStyle().getPropertyValue()` on a CUSTOM property
+     hands back the value as written — `calc(300px * min(0.94,
+     0.88))` — because an unregistered custom property has no
+     syntax and therefore nothing to compute against. There is no
+     number in that string for the canvas to parse.
+
+     Assigned to a REAL property it is resolved to absolute pixels
+     like any other length, and `outline-offset` is the one that
+     costs nothing here: `outline-style` is `none` by default, a
+     canvas is not focusable, and so nothing on the page can ever
+     see it. The field reads the reach off this — see `readRadius`.
+
+     The token itself is `--aera-landing-footer-cursor-radius`; this
+     line is only the conversion. */
+  outline-offset: var(--aera-landing-footer-cursor-radius);
 }
