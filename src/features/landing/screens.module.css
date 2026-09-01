@@ -46,15 +46,11 @@
   flex: none;
 }
 
-/* The two-column screens — Sessions and Insights share one shape.
+/* The split: the Ask panel down the left, the library to the right.
 
-   STRETCH, NOT START. On the app's own screens the left column is
-   `position: sticky` against the window and sizes itself from
-   `100svh`; on a plate there is no window to pin to, so the column
-   takes the height the row gives it instead. That only works if the
-   row hands it one — `align-items: start` would size both items to
-   their content and a percentage height inside them would have
-   nothing to resolve against. */
+   The ROW is what has a height — it takes everything the header
+   leaves — and the library grid inside it is measured against that.
+   The panel does not need it and does not take it; see `.aside`. */
 .split {
   display: grid;
   grid-template-columns: var(--aera-layout-left-column) minmax(0, 1fr);
