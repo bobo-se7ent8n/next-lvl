@@ -1,0 +1,151 @@
+/* ============================================================
+   THE HAND
+
+   Five absolutely-placed slots inside one row box. Absolute rather
+   than a flex row with negative margins: the layout is a table of
+   per-card constants (see the component), and a slot placed by
+   `left` and `top` is that table read literally, where a negative
+   margin is the same information expressed as a chain of
+   dependencies between neighbours.
+
+   Every offset is in CARD UNITS — a fraction of the card's own
+   width or height — so the hand keeps its shape at every step of
+   the layout scale rather than only at the one it was drawn at.
+   ============================================================ */
+.hand {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  /* perspective belongs on the ancestor the tilted layers share, so
+     all five cards lean into the same vanishing point rather than
+     each into one of its own. A token, so it scales with the cards
+     it is applied to — see `fanPerspective`. */
+  perspective: var(--aera-landing-fan-perspective);
+}
+
+/* ---- THE STAGE, IN CARD UNITS ----------------------------------
+   Both numbers are written by the component from the slot table
+   itself: the axis-aligned box the five ROTATED cards occupy, in
+   card widths and card heights. They used to be 3.68 and 1.2 typed
+   in here — the table read by eye, which had the row narrower than
+   the hand standing in it and left the whole fan sitting left of
+   the heading it belongs under. See the note in the component.
+   ---------------------------------------------------------------- */
+.row {
+  position: relative;
+  width: calc(var(--aera-landing-fan-card-w) * var(--row-w));
+  height: calc(var(--aera-landing-fan-card-h) * var(--row-h));
+  transform-style: preserve-3d;
+}
+
+.slot {
+  position: absolute;
+  left: calc(var(--aera-landing-fan-card-w) * var(--x));
+  top: calc(var(--aera-landing-fan-card-h) * var(--y));
+  width: var(--aera-landing-fan-card-w);
+  height: var(--aera-landing-fan-card-h);
+  transform: rotate(var(--rot));
+  /* below the card, so the tilt swings its bottom edge less than its
+     top — a hand pivots at the grip, not at its middle */
+  transform-origin: 50% 115%;
+  transform-style: preserve-3d;
+}
+
+/* ---- the card, and the pointer ---------------------------------
+   THE LIFT AND THE TILT ARE TWO LAYERS, and they have to be.
+
+   `poseOf` — the opening flight's measurement — walks up from THIS
+   box composing transforms to work out how far the card leans, so
+   whatever sits on this element ends up in the angle the panel
+   plants itself at. A three-dimensional hover tilt composed into
+   that would make a card leave the hand leaning a direction it
+   never leaned. The lift and the scale are safe here, because they
+   are the card's real pose and the flight should honour them; the
+   tilt goes on the layer inside, where a child's transform cannot
+   reach its parent's rect.
+   ---------------------------------------------------------------- */
+.card {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition:
+    transform var(--aera-duration-fan-card) var(--aera-ease-firm),
+    opacity var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.tilt {
+  width: 100%;
+  height: 100%;
+  transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  /* RESISTANCE, NOT A SPRING. The lean settles on the firm curve
+     with no overshoot in it anywhere. It is short, because a tilt
+     that lags the pointer stops reading as the card answering the
+     hand and starts reading as the card catching up. */
+  transition: transform var(--aera-duration-base) var(--aera-ease-firm);
+}
+
+.tilt > * {
+  width: 100%;
+  height: 100%;
+}
+
+/* the lift, and the card coming clear of its neighbours.
+
+   `:focus-within` as well as `:hover`: the card underneath is a
+   button, so it is on the keyboard route through the page, and a
+   card that lifted for a pointer but not for a tab would leave a
+   keyboard user reading a stack with no indication of where they
+   are in it. */
+.slot:hover,
+.slot:focus-within {
+  z-index: var(--aera-z-fan-lift);
+}
+
+.slot:hover .card,
+.slot:focus-within .card {
+  transform: translateY(calc(var(--aera-space-9) * -1)) scale(1.035);
+}
+
+/* ---- THE HAND RECEDING BEHIND AN OPENED CARD -------------------
+   THERE IS NO SCRIM. The card grows out of the hand and the hand
+   itself recedes — every card fades back in place, on its own
+   transition. Nothing moves, no overlay is painted, and the page
+   behind stays fully visible and fully readable. A blackout would
+   have been a second object competing with the one thing the click
+   was about.
+   ---------------------------------------------------------------- */
+.dimmed .card {
+  opacity: 0.16;
+}
+
+.dimmed .slot:hover .card,
+.dimmed .slot:focus-within .card {
+  transform: none;
+}
+
+/* ---- narrow windows -------------------------------------------
+   The hand is one object and a fan that wraps is not a fan, so it
+   scales down whole rather than reflowing. The row keeps its
+   proportions; only its size gives.
+   ---------------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .row {
+    transform: scale(0.82);
+    transform-origin: 50% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .tilt {
+    transition: none;
+  }
+
+  .slot:hover .card,
+  .slot:focus-within .card {
+    transform: none;
+  }
+}

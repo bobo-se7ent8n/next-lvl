@@ -36,6 +36,11 @@ export const zIndex = {
   nav: 950,
   flight: 970,
   tooltip: 980,
+  /* THE ENTRY OVERLAY, and it is the only thing above the tooltip.
+     It covers the whole window before the page exists, so it has to
+     sit over every layer under it including the ones that normally
+     explain the others. */
+  entry: 1000,
 } as const;
 
 export type ZIndexLayer = keyof typeof zIndex;

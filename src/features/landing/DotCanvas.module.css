@@ -1,0 +1,10 @@
+/* The canvas fills its block and takes the pointer itself — the
+   content sitting on top of it opts back out, so the field reacts
+   everywhere except under the words. */
+.canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}

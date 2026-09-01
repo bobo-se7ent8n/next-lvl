@@ -1,4 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { cx } from '../lib/css';
+import { iconStroke } from '../tokens';
+import styles from './TweakPanel.module.css';
 
 /* ============================================================
    THE TOKEN TWEAK PANEL — dev only.
@@ -9,11 +12,19 @@ import { useEffect, useRef } from 'react';
    the changed set to the dev server, which edits the token
    SOURCE on disk (see vite-plugins/token-writer.js).
 
-   IT IS DELIBERATELY NOT STYLED WITH AERA TOKENS. Tweakpane's own
-   theme, untouched. A dev tool that borrowed the product's type
-   and colour would sooner or later be mistaken for product UI in
-   a screenshot, and this one edits the design system — it needs
-   to look like a different thing entirely.
+   IT IS CLOSED BY DEFAULT AND IT LIVES BEHIND A BUTTON.
+
+   It used to mount open, pinned to the top-right corner, over
+   whatever was being looked at — which made every screenshot of
+   this product a screenshot of a debug panel. It is now the same
+   affordance the display settings are: one small button on the
+   bottom edge, and a panel that exists only while it is asked
+   for. Backtick still shows and hides it, so the keyboard route
+   is unchanged.
+
+   THE PANEL ITSELF IS DELIBERATELY NOT STYLED WITH AERA TOKENS —
+   it is Tweakpane's own light theme, and the stylesheet says why.
+   The BUTTON is: it sits on the page, so it is the product's.
 
    Everything here is loaded through a dynamic import behind
    `import.meta.env.DEV`, so neither this module nor Tweakpane
@@ -50,21 +61,11 @@ interface TpFolder {
   dispose(): void;
 }
 
-/** the panel's own chrome. Raw values on purpose — see the note above. */
-const HOST_STYLE: Partial<CSSStyleDeclaration> = {
-  position: 'fixed',
-  top: '12px',
-  right: '12px',
-  width: '320px',
-  maxHeight: 'calc(100vh - 24px)',
-  overflowY: 'auto',
-  zIndex: '2147483000',
-};
-
 const TITLE = 'AERA tokens';
 
 export function TweakPanel() {
   const host = useRef<HTMLDivElement | null>(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     let disposed = false;
@@ -78,10 +79,8 @@ export function TweakPanel() {
       ]);
       if (disposed) return;
 
-      const container = document.createElement('div');
-      Object.assign(container.style, HOST_STYLE);
-      document.body.appendChild(container);
-      host.current = container;
+      const container = host.current;
+      if (!container) return;
 
       const root = document.documentElement;
       const schema = buildTokenSchema();
@@ -211,16 +210,20 @@ export function TweakPanel() {
         }
       }
 
-      /* ---- backtick shows and hides it ---- */
+      /* ---- backtick shows and hides it ----
+
+         It toggles the SAME state the button does rather than
+         reaching for the node's `display`, so the two routes cannot
+         disagree about whether the panel is open — which they did:
+         the key hid the node and left the button reading "expanded",
+         and the next click then hid it a second time. */
       const onKey = (e: KeyboardEvent) => {
         if (e.key !== '`' || e.metaKey || e.ctrlKey || e.altKey) return;
         /* never steal the key from a field — including this panel's own */
         const t = e.target as HTMLElement | null;
         if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
         e.preventDefault();
-        /* `display: none` rather than opacity: a hidden panel must not
-           sit over the app swallowing clicks */
-        container.style.display = container.style.display === 'none' ? '' : 'none';
+        setOpen((v) => !v);
       };
       window.addEventListener('keydown', onKey);
       detachKey = () => window.removeEventListener('keydown', onKey);
@@ -230,12 +233,39 @@ export function TweakPanel() {
       disposed = true;
       detachKey?.();
       pane?.dispose();
-      host.current?.remove();
-      host.current = null;
     };
   }, []);
 
-  return null;
+  return (
+    <div className={styles.dock}>
+      {/* THE PANE IS BUILT ONCE AND STAYS BUILT. Closing it hides the
+          host; it does not tear Tweakpane down, because doing so
+          would drop every folder's expanded state and — worse —
+          every unsaved edit sitting in `dirty`. */}
+      <div ref={host} className={cx(styles.pane, !open && styles.paneOff)} />
+
+      <button
+        type="button"
+        className={styles.toggleButton}
+        aria-expanded={open}
+        aria-label="Token panel"
+        onClick={() => setOpen((v) => !v)}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={iconStroke.thin}
+          strokeLinecap="round"
+        >
+          <path d="M5 6h6M15 6h4M5 12h10M19 12h0M5 18h3M12 18h7" />
+          <circle cx="13" cy="6" r="2" />
+          <circle cx="17" cy="12" r="2" />
+          <circle cx="10" cy="18" r="2" />
+        </svg>
+      </button>
+    </div>
+  );
 }
 
 export default TweakPanel;

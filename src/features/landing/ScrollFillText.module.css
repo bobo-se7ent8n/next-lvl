@@ -1,0 +1,63 @@
+/* ============================================================
+   THE READ-THROUGH PARAGRAPH
+
+   Set in the body token, at the display measure. The type is
+   larger than running body copy because this paragraph IS the
+   section — there is nothing else in the right-hand column.
+
+   Every word reads `--fill` off the paragraph and works out its own
+   state; see the note in the component. `--fill` has a default here
+   so the paragraph is legible in a Storybook story, in a test, and
+   in the frame before the first animation frame lands.
+   ============================================================ */
+.copy {
+  --fill: 0;
+  max-width: var(--aera-layout-max-read-width);
+  margin: 0;
+  /* one step above body: this paragraph IS the section's content,
+     not support under a heading — see `bodyLG` in the type tokens */
+  font-family: var(--aera-text-body-lg-family);
+  font-size: var(--aera-text-body-lg-size);
+  line-height: var(--aera-leading-snug);
+  color: var(--aera-color-ink-primary);
+}
+
+/* ---- QUIET ------------------------------------------------------
+   Body size, secondary ink. The paragraph above is the content of
+   its section and is set a step up for it; this variant is for copy
+   that sits UNDER something — the line beneath the Ask AERA bubble —
+   where the same treatment would have it competing with the thing it
+   is explaining.
+   ---------------------------------------------------------------- */
+.quiet {
+  font-family: var(--aera-text-body-family);
+  font-size: var(--aera-text-body-size);
+  color: var(--aera-color-ink-secondary);
+}
+
+.word {
+  /* clamp(0, front − index, 1): nothing until the fill reaches this
+     word, a ramp across it, and full behind it */
+  opacity: calc(0.24 + 0.76 * clamp(0, (var(--fill) * var(--count)) - var(--i), 1));
+}
+
+/* ---- the accent ------------------------------------------------
+   One word, flat, in the orange that is dark enough to be read as
+   type — and it is the only colour in the paragraph. The rest of
+   the copy used to be set in a lilac text gradient; there are no
+   gradients in this product, and an emphasis has to have something
+   plain to be an emphasis against.
+   ---------------------------------------------------------------- */
+.accent {
+  font-weight: var(--aera-text-body-strong-weight);
+  color: var(--aera-color-accent-orange);
+}
+
+/* Under reduced motion the paragraph is simply readable. The fill
+   is a reading aid rather than information, and a paragraph a
+   quarter lit is a paragraph somebody has to scroll to finish. */
+@media (prefers-reduced-motion: reduce) {
+  .word {
+    opacity: 1;
+  }
+}

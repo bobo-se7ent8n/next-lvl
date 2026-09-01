@@ -89,6 +89,22 @@ export const duration = {
   clearStep: '6ms',
   /** a long, quiet loop — the dot fields and the shot arc */
   settle: '640ms',
+
+  /* ---- THE ENTRY SEQUENCE ------------------------------------
+     The dark state is not a spinner and must not read as one: it
+     is held long enough to be read and then it opens. Three
+     numbers, and they are deliberately the longest in this file —
+     they are the only motion in the product that runs before the
+     visitor has done anything, which is exactly why they are
+     written down where the register is documented rather than
+     typed into the component.
+     ------------------------------------------------------------ */
+  /** how long the dark state stands still before it opens */
+  entryHold: '1150ms',
+  /** the white card filling the window */
+  entryExpand: '1250ms',
+  /** the headline coming out of its blur behind the white */
+  entryFocus: '900ms',
 } as const;
 
 export const easing = {

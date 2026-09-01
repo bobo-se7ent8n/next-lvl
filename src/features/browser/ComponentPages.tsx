@@ -39,14 +39,12 @@ import { ShotArc } from '../../features/scoreboard/ShotArc';
 import { FocusPanel } from '../../features/home/FocusPanel';
 import { VitalCard } from '../../features/home/VitalCard';
 import {
-  LandingAudience,
-  LandingBlock,
   LandingClosure,
   LandingFuture,
   LandingHero,
-  LandingNotice,
-  LandingPrinciples,
-  OpenPrototypePill,
+  LandingNav,
+  LandingPatterns,
+  LandingWorking,
   WireBox,
   WireSection,
   WireSlot,
@@ -640,7 +638,7 @@ export function VitalCardPage() {
 export function LandingPage() {
   return (
     <>
-      <BrowserSection title="Wireframe primitives — the scaffolding every section is built from">
+      <BrowserSection title="Wireframe primitives — the scaffolding the two placeholder sections are still built from">
         <WireSection
           number="00"
           name="Example"
@@ -655,29 +653,33 @@ export function LandingPage() {
           <WireSlot label="Media slot" behaviour="says what goes here and how it behaves" ratio="16 / 9" />
         </WireSection>
       </BrowserSection>
-      <BrowserSection title="Every section, in order">
+
+      <BrowserSection title="The sticky bar — landing page only, never inside the product">
+        <Note>
+          Three groups. The centre capsule traces total page scroll as a stroke on its own outline
+          with a lit dot at the head of it, and morphs into “To top” once the page is past its last
+          section. Here it is shown at rest.
+        </Note>
+        <Demo>
+          <LandingNav atEnd={false} />
+        </Demo>
+      </BrowserSection>
+
+      <BrowserSection title="The sections that hold real product">
+        <Note>
+          The four scroll-driven sections — sessions, insights and the entry sequence — are not
+          shown here: they measure themselves against the window and pin to it, so a section
+          rendered inside a scrolling browser pane would be reading the wrong box. Open “/” to see
+          them.
+        </Note>
         <LandingHero />
-        <LandingNotice />
-        <LandingAudience />
-        <LandingBlock
-          number="05"
-          name="Patterns"
-          intent="shows the pull, not the push"
-          heading="Patterns"
-          body="Nothing is pushed at you. You pull a card toward you when you want it."
-          slot="Home — card fan"
-          behaviour="still frame of the hand at rest"
-        />
-        <LandingPrinciples />
+        <LandingWorking />
+        <LandingPatterns />
+      </BrowserSection>
+
+      <BrowserSection title="The section that is still a placeholder, and the close">
         <LandingFuture />
         <LandingClosure />
-      </BrowserSection>
-      <BrowserSection title="Sticky pill — landing page only, never inside the product">
-        <Demo>
-          <div style={{ position: 'relative', minHeight: 'var(--aera-space-16)' }}>
-            <OpenPrototypePill visible />
-          </div>
-        </Demo>
       </BrowserSection>
     </>
   );

@@ -10,6 +10,7 @@ const SAMPLE: Record<TextStyleName, string> = {
   metricLG: '0.42',
   metricMD: '18',
   metricSM: '41',
+  bodyLG: 'Every session lands on your device and stays there.',
   body: 'A pattern is a behaviour your sessions keep repeating.',
   bodySM: 'Release time under a closeout has moved toward your baseline.',
   bodyStrong: 'Handling & movement',

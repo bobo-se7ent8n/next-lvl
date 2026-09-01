@@ -20,6 +20,14 @@ export const radius = {
   lg: '24px',
   /** every card, panel and object shell in the product */
   card: '28px',
+  /* THE FLOATING WINDOW, and it is a step above `card` on purpose.
+
+     Two things on the landing page are not objects resting on the
+     paper but windows floating over it — the sticky bar and the
+     closing block. A window reads as further forward than a card,
+     and the corner is the cheapest way to say so; at `card` they sat
+     at the same depth as the pattern cards behind them. */
+  window: '36px',
   pill: '999px',
 } as const;
 

@@ -1,26 +1,148 @@
-.line {
-  text-align: center;
+/* ============================================================
+   THE CLOSING BLOCK
+
+   A window, treated like the bar at the top of the page: inset
+   from both sides on top of the page's own gutter, cut at the
+   window radius. It is deliberately SHORT — it holds one line and
+   one button, and a full-height canvas under two pieces of type
+   was a lot of empty surface pretending to be a section.
+
+   THE PAGE ENDS AT ITS BOTTOM EDGE. There is no footer strip and
+   no trailing padding: the section's own bottom padding is the
+   frame margin and nothing follows it, so the last thing the reader
+   scrolls to is the block itself rather than a band of nothing
+   under it. The footer lives INSIDE the block, under the call to
+   action.
+   ============================================================ */
+.section {
+  display: flex;
+  flex-direction: column;
+  /* one window, like every other section — the block takes what the
+     clearance and the frame margin leave, and the page stops at its
+     bottom edge */
+  height: 100dvh;
+  padding-block: var(--aera-landing-nav-clear) var(--aera-landing-frame);
+  scroll-snap-align: start;
 }
 
-/* the footer link — quiet, mono, and the only thing after the closing
-   line on the whole page */
+.block {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-height: var(--aera-landing-close-block-h);
+  padding: var(--aera-space-13) var(--aera-layout-gutter);
+  /* THE PAGE'S OWN FRAME, and no more. The block used to take a
+     second inset of its own on top of it, which put the closing
+     block on a different left edge from every section above it. */
+  margin-inline: 0;
+  border-radius: var(--aera-radius-window);
+  overflow: hidden;
+  background: var(--aera-color-surface-level1);
+  /* THE OPENING REVEAL. Up from just under full size on the firm
+     curve: resistance, and no overshoot anywhere in it. Scale only —
+     the block's own layout box never moves, so nothing below it
+     reflows while it is arriving. */
+  transform: scale(0.94);
+  opacity: 0;
+  transition:
+    transform var(--aera-duration-slow) var(--aera-ease-firm),
+    opacity var(--aera-duration-base) var(--aera-ease-out);
+}
+
+.open {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* THE FIELD TAKES THE POINTER; THE WORDS GIVE IT BACK.
+   The canvas is under the content and would never see a pointermove
+   that landed on the type, so the content is transparent to the
+   pointer and only the link opts back in. */
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--aera-space-12);
+  max-width: var(--aera-layout-max-prose-width);
+  pointer-events: none;
+}
+
+/* ---- the footer row -------------------------------------------
+   Two lines, both centred, both in the annotation voice: the ways
+   out, and the machine facts. The generous tracking is what tells
+   the reader this is furniture rather than something else to read.
+   ---------------------------------------------------------------- */
 .footer {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--aera-space-6);
+  pointer-events: auto;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  margin-top: var(--aera-space-15);
+  gap: var(--aera-space-11);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  letter-spacing: var(--aera-tracking-mono);
 }
 
 .link {
   color: var(--aera-color-ink-tertiary);
   text-decoration: none;
-  padding: var(--aera-space-5) var(--aera-space-8);
-  border-radius: var(--aera-radius-md);
-  transition:
-    color var(--aera-duration-fast) var(--aera-ease-out),
-    background var(--aera-duration-fast) var(--aera-ease-out);
+  /* colour only. Four links in a row each growing an underline for
+     one pointer is four things answering a gesture aimed at one. */
+  transition: color var(--aera-duration-fast) var(--aera-ease-out);
 }
 
 .link:hover {
   color: var(--aera-color-ink-primary);
-  background: var(--aera-color-surface-level1);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--aera-space-8);
+  margin: 0;
+  color: var(--aera-color-ink-tertiary);
+  letter-spacing: var(--aera-tracking-mono);
+}
+
+.line {
+  text-align: center;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--aera-min-target-tap);
+  padding-inline: var(--aera-space-11);
+  border-radius: var(--aera-radius-pill);
+  color: var(--aera-color-ink-on-inverse);
+  background: var(--aera-color-surface-inverse);
+  text-decoration: none;
+  pointer-events: auto;
+  transition: background-color var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.cta:hover {
+  background: var(--aera-color-ink-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* it is simply there — a block that scales into view is exactly
+     the kind of arrival this asks us not to run */
+  .block {
+    transform: none;
+    opacity: 1;
+    transition: none;
+  }
 }

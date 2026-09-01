@@ -94,6 +94,36 @@ html {
   color-scheme: light;
 }
 
+/* ============================================================
+   SCROLL SNAPPING — THE LANDING PAGE ONLY.
+
+   The public page is a run of full-height sections and reads as a
+   deck: the wheel should land on a section rather than between two
+   of them. The document is the scroll container, so the snap type
+   goes on `html` — but it must not follow the visitor into `/app`,
+   where the screens are ordinary scrolling documents and a snap
+   would fight every list on them. `Landing` puts this class on the
+   root element while it is mounted and takes it off on unmount.
+
+   MANDATORY, AND THE PINNED SECTIONS STILL WORK. Two sections are
+   deliberately three viewports tall and driven by scroll position.
+   A snap area LARGER than the snapport is a defined case: the
+   snapport may rest anywhere inside it, so snapping catches those
+   sections' edges and leaves the travel through them completely
+   free. Nothing had to be excluded.
+   ============================================================ */
+html.aera-snap {
+  scroll-snap-type: y mandatory;
+}
+
+/* A visitor who has asked for less motion has asked not to be moved
+   somewhere they did not scroll to. Snapping is exactly that. */
+@media (prefers-reduced-motion: reduce) {
+  html.aera-snap {
+    scroll-snap-type: none;
+  }
+}
+
 body {
   font-family: var(--aera-text-body-family);
   font-size: var(--aera-text-body-size);

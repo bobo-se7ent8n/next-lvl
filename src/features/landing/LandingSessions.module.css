@@ -1,0 +1,117 @@
+/* ============================================================
+   SESSIONS — THE PINNED PAIR
+
+   A tall track with a one-viewport sticky child inside it. The
+   track's extra height IS the scroll budget: two and a half
+   viewports of travel, of which the middle tenth is the cross-fade
+   and the rest is the two paragraphs filling.
+
+   The section carries no heading: the pane's own label says which
+   screen it is, and the paragraph says what it does.
+
+   THE TWO PANES ARE STACKED, NOT SEQUENCED. Both are in the same
+   grid cell at the same size, so the swap is a pure opacity
+   cross-fade with nothing to reflow and no vertical jump. Their
+   opacities are two custom properties written by one rAF loop —
+   `--a` for the first, `--b` for the second, and they always sum
+   to one.
+   ============================================================ */
+.track {
+  /* every section on the page is a snap point — see global.css */
+  scroll-snap-align: start;
+  position: relative;
+  /* the travel: one viewport pinned, plus the scroll it takes to
+     read two paragraphs and cross-fade between them */
+  height: 280dvh;
+}
+
+.pin {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100dvh;
+  /* the bar floats over the pin, so the clearance comes out of
+     the pin's own content box — see `navClear` in the tokens */
+  padding-block: var(--aera-landing-nav-clear) var(--aera-space-12);
+  overflow: hidden;
+}
+
+/* the stacking cell */
+.panes {
+  --a: 1;
+  --b: 0;
+  position: relative;
+  display: grid;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.pane {
+  grid-area: 1 / 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: var(--aera-layout-split-gap);
+  align-items: center;
+  min-height: 0;
+}
+
+/* Neither pane takes a pointer. Both are pictures: the section's
+   argument is what the scroll does to them, and a laptop you could
+   click into would be inviting a gesture the section cannot answer. */
+.pane {
+  pointer-events: none;
+}
+
+.pane[data-pane='a'] {
+  opacity: var(--a);
+}
+
+.pane[data-pane='b'] {
+  opacity: var(--b);
+}
+
+/* ---- the device, as a render ----------------------------------
+   The frame is part of the image, so there is nothing to draw: the
+   only job here is to stop the render growing past the height the
+   pinned pane leaves. `object-fit: contain` rather than `cover`,
+   because the thing inside the bezel is a screen full of type and
+   cropping it would cut the screenshot rather than the frame.
+   ---------------------------------------------------------------- */
+.device {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.shot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 78dvh;
+  object-fit: contain;
+}
+
+.words {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-9);
+  min-width: 0;
+}
+
+/* ---- narrow windows -------------------------------------------
+   The laptop takes the full width and the paragraph sits under it.
+   The section keeps its pinned behaviour: what changes is the
+   arrangement inside the pin, not the scroll model.
+   ---------------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .pane {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    gap: var(--aera-space-11);
+  }
+}

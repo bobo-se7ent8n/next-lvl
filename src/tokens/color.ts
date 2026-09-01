@@ -162,6 +162,57 @@ export const colorOnFace = {
   vizDark: 'rgba(255,255,255,0.12)',
 } as const;
 
+/* ------------------------------------------------------------
+   THE TAG PALETTE — the landing page's scattered word field.
+
+   Eight soft pastels, and five of them are the AERA palette
+   REFERENCED rather than re-typed: a tag wearing mint is wearing
+   the same mint a chart draws in, and the day that mint moves this
+   moves with it. The three that are new — pink, peach and coral —
+   are the warm end the product's own palette does not have, and
+   they exist because twenty-two tags scattered across a screen need
+   more than five fills before the eye starts reading the repeat
+   instead of the words.
+
+   They are a SEPARATE GROUP from `data` for the same reason
+   `colorFace` is: a `data` entry carries a meaning slot in the
+   charts, and these carry none. A tag is a word on a wall.
+
+   Every one is light enough to take the product's own dark ink, so
+   there is no light-on-dark case anywhere in the field.
+   ------------------------------------------------------------ */
+export const colorTag = {
+  pink: '#FFC9DE',
+  peach: '#FFD9BF',
+  coral: '#FFB3A7',
+  lilac: colorData.lilac,
+  mint: colorData.mint,
+  sky: colorData.blue,
+  butter: colorData.yellow,
+  sand: colorFace.beige,
+} as const;
+
+/* ------------------------------------------------------------
+   ACCENT — colour used as TYPE rather than as a fill.
+
+   The palette is five pastels designed to be filled with, and none
+   of them can carry a word: `#FF9B68` set as running text on
+   `#FFFFFC` is a smear. This is the one place on the landing page
+   where a colour has to be READ rather than looked at, so it is the
+   palette orange taken to text weight and nothing else uses it.
+
+   A NOTE ON WHAT IS NOT HERE. This group briefly carried two lilac
+   stops for a text gradient on the Sessions read-through. There are
+   no gradients in this product: flat fills are the whole visual
+   argument, and one exception is how a rule stops being one. The
+   copy is black body text, and the single orange word is the only
+   colour in it.
+   ------------------------------------------------------------ */
+export const colorAccent = {
+  /** the palette orange, dark enough to set a word in */
+  orange: '#B34D14',
+} as const;
+
 export const colorUtility = {
   /** figma-style selection outline */
   select: '#0D99FF',
@@ -181,6 +232,19 @@ export const colorUtility = {
   press: 'rgba(20,19,16,0.085)',
   /** the keyboard focus ring — never used for hover, only for tab */
   focus: '#111111',
+
+  /* ---- THE DARK ENTRY STATE ---------------------------------
+     The loading screen is the one dark surface a visitor sees, and
+     it needs a line the light system has no equivalent for: a rule
+     drawn ON the near-black. Alpha rather than a sixth near-black,
+     so `surface.inverse` stays the only dark in the product.
+
+     There used to be a paper-coloured twin of it for the white
+     state. There is no grid on the white state any more — it fades
+     out as the card fills the window rather than changing colour
+     under it — so the twin had no callers and is gone. */
+  /** the faint grid rule ruled across the dark entry state */
+  gridDark: 'rgba(255,255,252,0.055)',
 } as const;
 
 export const color = {
@@ -188,6 +252,8 @@ export const color = {
   ink: colorInk,
   data: colorData,
   face: colorFace,
+  tag: colorTag,
+  accent: colorAccent,
   dataInk: colorDataInk,
   semantic: colorSemantic,
   shotZone: colorShotZone,
@@ -196,5 +262,6 @@ export const color = {
 } as const;
 
 export type DataTone = keyof typeof colorData;
+export type TagTone = keyof typeof colorTag;
 export type SemanticTone = keyof typeof colorSemantic;
 export type AccuracyStop = (typeof accuracyRamp)[number]['name'];

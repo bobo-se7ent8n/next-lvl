@@ -1,24 +1,58 @@
-/* type on the left, the visual slot on the right */
-.grid {
+/* ============================================================
+   THE HERO
+
+   One screen, one sentence, centred. The height is `dvh` rather
+   than `vh` deliberately: on a phone or an iPad with a retracting
+   browser chrome, `vh` is the tallest the viewport ever gets, so a
+   `100vh` hero is cut off by the toolbar that is actually there.
+
+   The nav is sticky above it, so the hero's own height is one
+   viewport LESS the bar — otherwise the sentence sits half a bar
+   below centre and the first scroll of the page is a correction.
+   ============================================================ */
+.hero {
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-  gap: var(--aera-space-12);
-  align-items: stretch;
+  place-items: center;
+  /* EVERY SECTION IS A SNAP POINT — and this one's snap position is
+     not its own top edge.
+
+     The bar is IN FLOW above the hero, so the hero's border box
+     starts a frame margin and a bar's band down the page. Snapping
+     to that edge would scroll both of them off the top and leave the
+     hero's bottom hanging a hundred pixels into the next section —
+     the exact bleed this section is supposed to be free of. A
+     positive `scroll-margin-top` outsets the snap area upward by
+     precisely what sits above it, so the snap position is the top of
+     the page, which is where the hero actually begins. */
+  scroll-snap-align: start;
+  scroll-margin-top: var(--aera-landing-nav-clear);
+  /* EXACTLY ONE WINDOW, AND EXACTLY ONE.
+
+     The hero is the one section the bar does NOT float over: the bar
+     is in flow above it, so the hero's own box begins where the bar's
+     band ends. Its height is therefore the window less the frame
+     margin at the top of the page and less that band — no more,
+     because the next section's heading would show under it, and no
+     less, because then the hero would not fill the screen it is
+     supposed to be.
+
+     `height`, not `min-height`, for the same reason every fitted
+     section uses one: a minimum is a promise the content can break. */
+  height: calc(100dvh - var(--aera-landing-frame) - var(--aera-landing-nav-band));
+  overflow: hidden;
 }
 
-.left {
+
+.stack {
   display: flex;
   flex-direction: column;
-  gap: var(--aera-space-10);
-  justify-content: center;
+  align-items: center;
+  gap: var(--aera-space-11);
+  max-width: var(--aera-layout-max-subhead-width);
+  text-align: center;
 }
 
-.slot {
-  height: 100%;
-}
-
-@media (max-width: 900px) {
-  .grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
+.line {
+  max-width: var(--aera-layout-max-subhead-width);
 }

@@ -18,6 +18,7 @@ export * from './border';
 export * from './zIndex';
 export * from './size';
 export * from './scale';
+export * from './landing';
 
 import { color } from './color';
 import { space, layout } from './space';
@@ -40,6 +41,7 @@ import { borderWidth } from './border';
 import { zIndex } from './zIndex';
 import { iconSize, iconStroke, controlSpec, minTarget } from './size';
 import { breakpoint, breakpointHeight, scaleStep } from './scale';
+import { landing, scatter, trail, dotCanvas } from './landing';
 
 export const tokens = {
   color,
@@ -74,6 +76,10 @@ export const tokens = {
   breakpoint,
   breakpointHeight,
   scaleStep,
+  landing,
+  scatter,
+  trail,
+  dotCanvas,
 } as const;
 
 export type Tokens = typeof tokens;

@@ -22,126 +22,22 @@ import {
   slotShape,
 } from './fanGeometry';
 import { duration } from '../../tokens';
+import {
+  expandedRect,
+  headlineOf,
+  ms,
+  PANEL_FALLBACK,
+  place,
+  poseOf,
+  STACK_WIDTH,
+  tokenValue,
+} from './flight';
 import type { Pattern } from '../../data/types';
 import styles from './PatternFan.module.css';
-
-/* below this the opened card's two columns stack — it must match the
-   breakpoint in ExpandedCard.module.css, because the fit plan has to
-   know which layout it is budgeting for */
-const STACK_WIDTH = 720;
-
-/* ---- THE OPENED PANEL'S BOX, all four numbers the prototype's ----
-   It is NOT centred in the viewport: it hangs under the headline, so
-   the page it came from stays legible above it. And it is small —
-   760 at the very most, where this used to open at 1040 and cover
-   most of the screen. */
-/** the widest the panel ever gets */
-const PANEL_MAX_W = 760;
-/** and the gutter it keeps either side at narrow widths */
-const PANEL_GUTTER = 40;
-/** the gap between the headline's baseline box and the panel's top */
-const PANEL_HEAD_GAP = 22;
-/** the least it will ever sit from the top of the window */
-const PANEL_MIN_TOP = 20;
-/** what it leaves below itself */
-const PANEL_FOOT = 84;
-/** the panel's height floor and ceiling */
-const PANEL_MIN_H = 340;
-const PANEL_MAX_H = 640;
-
-/** the box the opened card grows into, in viewport coordinates */
-interface Rect {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-}
-
-const ms = (token: string) => Number.parseFloat(token);
 
 /** how far a touch drag travels relative to the finger */
 const TOUCH_GAIN = 1.4;
 
-/**
- * Where an opened card ends up.
- *
- * ANCHORED UNDER THE HEADLINE, not centred in the window. The screen
- * it opened from is still there and still readable above it, which is
- * the entire reason there is no scrim: a panel that covers the middle
- * of the page needs something to separate it from what it covers, and
- * a panel that hangs politely under the heading does not.
- *
- * `head` is the page header the fan lives under. Without one the top
- * falls back to the prototype's own default.
- */
-function expandedRect(head: Element | null): Rect {
-  const headBottom = head ? head.getBoundingClientRect().bottom : 120;
-  const width = Math.min(PANEL_MAX_W, window.innerWidth - PANEL_GUTTER);
-  const top = Math.max(PANEL_MIN_TOP, headBottom + PANEL_HEAD_GAP);
-  const height = Math.max(
-    PANEL_MIN_H,
-    Math.min(PANEL_MAX_H, window.innerHeight - top - PANEL_FOOT),
-  );
-  return { left: (window.innerWidth - width) / 2, top, width, height };
-}
-
-/** plant the panel on a rect. Written straight to the element rather
- *  than through React: the whole point of the transition is that the
- *  browser sees one box replaced by another between two frames, and a
- *  render pass in the middle of that is a render pass too many. */
-function place(el: HTMLElement, r: Rect, radius: string, rot: number) {
-  el.style.left = `${r.left}px`;
-  el.style.top = `${r.top}px`;
-  el.style.width = `${r.width}px`;
-  el.style.height = `${r.height}px`;
-  el.style.borderRadius = radius;
-  el.style.setProperty('--flight-rot', `${rot}deg`);
-}
-
-/**
- * THE CARD WHERE IT ACTUALLY STANDS, AND HOW FAR OVER IT LEANS.
- *
- * `getBoundingClientRect` on a rotated card returns the axis-aligned
- * box AROUND the lean, which is wider and shorter than the card
- * itself — planting the flight on that rect starts the journey on a
- * box the card never occupied. The untransformed size comes from
- * `offsetWidth/Height` and is centred on the rect's own centre, so
- * the flight begins exactly congruent with the card it leaves.
- *
- * The lean is the sum of the two layers that carry it: the slot
- * places the card in the arc, the card adds its own pointer nudge.
- */
-function poseOf(card: HTMLElement): { rect: Rect; rot: number } {
-  const b = card.getBoundingClientRect();
-  const w = card.offsetWidth;
-  const h = card.offsetHeight;
-  /* THE ANGLE AS PAINTED, NOT AS DECLARED.
-
-     The lean is spread over two elements and the variables that carry
-     it sit on different ancestors, so adding `--rot` and `--drot` up
-     by hand read 0 from whichever element did not happen to own them.
-     Composing the actual matrices from the card up to the stage
-     returns the angle on screen, whatever produced it. */
-  let m = new DOMMatrixReadOnly();
-  for (let e: HTMLElement | null = card; e && !e.classList.contains(styles.stage); e = e.parentElement) {
-    const t = getComputedStyle(e).transform;
-    if (t && t !== 'none') m = new DOMMatrixReadOnly(t).multiply(m);
-  }
-  const rot = (Math.atan2(m.b, m.a) * 180) / Math.PI;
-  return {
-    rect: { left: b.left + b.width / 2 - w / 2, top: b.top + b.height / 2 - h / 2, width: w, height: h },
-    rot,
-  };
-}
-
-/** the page header this fan sits under — the panel hangs off its
- *  bottom edge, so the screen it opened from stays readable */
-function headlineOf(el: Element | null): Element | null {
-  return el?.closest('section')?.querySelector('header') ?? null;
-}
-
-const tokenValue = (name: string) =>
-  getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
 export interface PatternFanProps {
   patterns: Pattern[];
@@ -227,7 +123,7 @@ export function PatternFan({
      read at render time so the fit plan re-runs on resize. */
   const [openBox, setOpenBox] = useState(() =>
     typeof window === 'undefined'
-      ? { width: PANEL_MAX_W, height: PANEL_MAX_H }
+      ? PANEL_FALLBACK
       : expandedRect(null),
   );
   /* THE LOAD-IN. Changing this re-scopes the enter key inside the
@@ -323,8 +219,7 @@ export function PatternFan({
       scale.current = layoutScale();
       const slot = slots.current.find(Boolean);
       if (slot) step.current = fanStep(slot.offsetWidth, scale.current);
-      const r = expandedRect(headlineOf(stage.current));
-      setOpenBox({ width: r.width, height: r.height });
+      setOpenBox(expandedRect(headlineOf(stage.current)));
       layout();
     };
     measure();
@@ -424,7 +319,7 @@ export function PatternFan({
        card was about to have rather than the one it still had — the
        flight left upright and came back leaning. The pose is taken
        first, off the card exactly as the user last saw it. */
-    const from = poseOf(source as HTMLElement);
+    const from = poseOf(source as HTMLElement, stage.current);
 
     flyingIndex.current = openIndex;
     layout();
@@ -478,7 +373,7 @@ export function PatternFan({
          card is empty by the time it is really travelling. */
       el.dataset.closing = 'true';
       el.classList.remove(styles.open);
-      const home = poseOf(source as HTMLElement);
+      const home = poseOf(source as HTMLElement, stage.current);
       place(el, home.rect, cardRadius, home.rot);
     }
     /* the hand comes back up while the panel is still travelling, so

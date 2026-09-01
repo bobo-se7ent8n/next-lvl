@@ -1,0 +1,44 @@
+/* ============================================================
+   THE STANDING FIELD
+
+   One viewport, pinned to the top of the PAGE — not to the hero,
+   which starts below the floating bar. An absolutely positioned box
+   resolves against its ancestor's PADDING box, and the page column's
+   padding box is the full window width, so `left: 0; right: 0` here
+   spans the window exactly. Its percentage coordinate system is
+   therefore the window's, which is what lets it agree with the fixed
+   entry overlay about where every tag is without either of them
+   being tuned against the other.
+
+   It sits BEHIND the headline and takes no pointer: the words are
+   the hero's argument scattered, not twenty things to click.
+   ============================================================ */
+.field {
+  position: absolute;
+  /* out to both window edges, past the page's frame margin: the
+     packer solved these coordinates against the WINDOW, and a field
+     inset by the frame would compress them by a margin's worth on
+     each side and reopen the collisions the packing closed */
+  left: calc(var(--aera-landing-frame) * -1);
+  right: calc(var(--aera-landing-frame) * -1);
+  top: calc(var(--aera-landing-frame) * -1);
+  height: 100dvh;
+  z-index: 0;
+  pointer-events: none;
+  /* a tag seeded near an edge hangs off it by half its width; the
+     page must not grow a scrollbar because of one word */
+  overflow: hidden;
+}
+
+.tag {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--aera-landing-tag-pad-y) var(--aera-landing-tag-pad-x);
+  border-radius: var(--aera-radius-sm);
+  white-space: nowrap;
+  background: var(--fill);
+  color: var(--ink);
+  opacity: var(--tint);
+  transform: translate(-50%, -50%) scale(var(--s)) rotate(var(--r));
+}

@@ -1,0 +1,144 @@
+/* ============================================================
+   THE EMBEDDED SCREENS
+
+   The app's own layouts, restated against the 1280 × 800 plate.
+   Every length is a token; what changes from the app is only what
+   the app measured against the WINDOW — a sticky column, a
+   `100svh` height, a list that scrolls inside itself. On a plate
+   there is no window to measure, so those become plain columns
+   with a real height and an honest clip.
+   ============================================================ */
+.screen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: var(--aera-space-11) var(--aera-layout-gutter);
+  overflow: hidden;
+  background: var(--aera-color-surface-background);
+}
+
+/* THE HEADER'S RESERVE IS RELAXED ON A PLATE, AND ONLY THERE.
+
+   `PageHeader` reserves a fixed band beneath itself — nearly two
+   hundred pixels of it — because in the app it has to clear a fixed
+   nav and hold one shared title baseline across four screens. A
+   plate has neither: there is no nav over it and it shows one
+   screen. Left alone, that band ate a quarter of the plate and the
+   bottom row of vital cards was clipped by the plate's own overflow.
+
+   An element selector rather than a class, because the header's
+   class belongs to another CSS module and is hashed. It relaxes the
+   RESERVE only — the header's own type, spacing and centring are
+   untouched, so what is shown is still the component the app
+   renders. */
+.screen > header {
+  min-height: 0;
+  padding-top: var(--aera-space-4);
+  padding-bottom: var(--aera-space-11);
+}
+
+/* The two-column screens — Sessions and Insights share one shape.
+
+   STRETCH, NOT START. On the app's own screens the left column is
+   `position: sticky` against the window and sizes itself from
+   `100svh`; on a plate there is no window to pin to, so the column
+   takes the height the row gives it instead. That only works if the
+   row hands it one — `align-items: start` would size both items to
+   their content and a percentage height inside them would have
+   nothing to resolve against. */
+.split {
+  display: grid;
+  grid-template-columns: var(--aera-layout-left-column) minmax(0, 1fr);
+  gap: var(--aera-layout-split-gap);
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.aside {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* An honest clip: the library is an unbounded list, so whatever does
+   not fit the plate is cut at its edge rather than being scaled down
+   until it does. A landing page shows the top of the list; the
+   product shows all of it. */
+.grid {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--aera-card-gap);
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.column {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: var(--aera-card-gap);
+  min-width: 0;
+}
+
+/* ---- home ------------------------------------------------------ */
+/* Focus down the left at full column height, the six readings to the
+   right of it — `stretch` rather than `start`, so the Focus card
+   really does span the row and its graphic takes up the slack */
+.homeGrid {
+  display: grid;
+  grid-template-columns: var(--aera-layout-left-column) minmax(0, 1fr);
+  gap: var(--aera-layout-split-gap);
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.homeGrid > * {
+  min-height: 0;
+}
+
+/* three across, two down — the app's own grid, and the reason the
+   plate is 1280 wide: at anything narrower the six readings reflow
+   into a different screen from the one the product renders */
+.vitals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: var(--aera-card-gap);
+  min-width: 0;
+  min-height: 0;
+}
+
+.vitals > * {
+  min-height: 0;
+}
+
+/* ---- scoreboard ------------------------------------------------ */
+.bento {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--aera-layout-split-gap);
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.zones,
+.ratings,
+.mechanics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-8);
+  min-width: 0;
+  min-height: 0;
+}
+
+.zones > *,
+.mechanics > * {
+  min-height: 0;
+}

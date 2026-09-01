@@ -1,0 +1,233 @@
+/* ============================================================
+   THE FLOATING BAR
+
+   Not a band across the top of the page — a window over it. It runs
+   the full width inside the page's frame margin, cut at the window
+   radius and outlined with the one hairline in the system, so the
+   page passes BEHIND it as it scrolls and it reads as a separate
+   object rather than as the page's own edge.
+
+   Three groups on one row. The outer two are laid out with
+   `justify-content: space-between` and the middle one is centred
+   against the BAR rather than against what is left over — the
+   wordmark and the two links are different widths, and a capsule
+   centred in the remainder would sit off-centre by the difference.
+   ============================================================ */
+
+.nav {
+  position: sticky;
+  /* stuck, it sits exactly one frame margin from the top of the
+     window — the same margin it has from both sides */
+  top: var(--aera-landing-frame);
+  z-index: var(--aera-z-nav);
+  /* FULL WIDTH INSIDE THE FRAME. The page column already carries the
+     margin down both sides, so the bar takes no inset of its own and
+     runs the whole width it is given. */
+  margin: 0 0 var(--aera-landing-nav-drop);
+  padding: var(--aera-space-4) var(--aera-space-5);
+  border: var(--aera-border-hairline) solid var(--aera-color-utility-hairline);
+  border-radius: var(--aera-radius-window);
+  background: var(--aera-color-surface-level1);
+  box-shadow: var(--aera-elevation-low);
+  transition: opacity var(--aera-duration-base) var(--aera-ease-out);
+}
+
+.navHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--aera-space-8);
+  min-height: var(--aera-landing-nav-pill);
+}
+
+/* ---- left · the wordmark, right · the two ways out ------------- */
+.brand,
+.action {
+  display: inline-flex;
+  align-items: center;
+  height: var(--aera-landing-nav-pill);
+  padding-inline: var(--aera-space-8);
+  border-radius: var(--aera-radius-pill);
+  color: var(--aera-color-ink-primary);
+  text-decoration: none;
+  background: var(--aera-color-surface-background);
+  transition:
+    background-color var(--aera-duration-fast) var(--aera-ease-out),
+    color var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.brand:hover,
+.action:hover {
+  background: var(--aera-color-surface-inverse);
+  color: var(--aera-color-ink-on-inverse);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-4);
+}
+
+.action {
+  color: var(--aera-color-ink-secondary);
+}
+
+/* ---- centre · the scroll capsule ------------------------------
+   Pinned to the middle of the BAR and taken out of the flex flow,
+   so widening it on the morph cannot push either neighbour. The
+   wrapper is what is pinned; the capsule inside it is what grows,
+   which keeps the growth symmetrical about the centre line.
+   ---------------------------------------------------------------- */
+.centre {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+}
+
+/* SQUARE, AND LIGHT.
+
+   Square because it holds one glyph and nothing else: it was 76px
+   wide for a 14px arrow, which left the glyph adrift in a slot
+   twice the width it needed and read as a button somebody had
+   forgotten to fill.
+
+   LIGHT, because it is the same object as the wordmark and the two
+   links either side of it — paper on the bar's own level1 ground,
+   with the product's ink on top. It spent one revision inverted so
+   that a white progress indicator would read against it; the
+   indicator is an arc around the OUTSIDE of the button now, on the
+   bar's ground rather than on the button's, so the button can go
+   back to being the same thing as its neighbours.
+   ---------------------------------------------------------------- */
+.capsule {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--aera-space-5);
+  width: var(--aera-landing-nav-progress-w);
+  height: var(--aera-landing-nav-pill);
+  padding: 0;
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-surface-background);
+  color: var(--aera-color-ink-primary);
+  cursor: default;
+  /* RESISTANCE, AND NOTHING ELSE. The capsule widens on a firm
+     decelerating curve with no overshoot in it — a pill that sprang
+     open would be the product being pleased with itself. The radius
+     rides the same curve so the corner stays a true semicircle at
+     every width it passes through. */
+  transition: width var(--aera-duration-base) var(--aera-ease-firm);
+}
+
+.capsuleWide {
+  width: var(--aera-landing-nav-to-top-w);
+  padding-inline: var(--aera-space-8);
+  cursor: pointer;
+}
+
+/* ---- the progress arc -----------------------------------------
+   A ring travelling around the OUTSIDE of the button rather than a
+   bar sitting above it: total page scroll is how far round it has
+   got. `--p` is written on every animation frame and nothing here
+   re-renders.
+
+   It is drawn in an SVG whose box is the arc's own diameter,
+   centred on the capsule and pinned there — so it stays concentric
+   while the capsule widens underneath it, and the ring does not
+   stretch into an ellipse as the button becomes a pill.
+
+   WHITE, on the bar's level1 ground. That reads: paper against the
+   step below it is a real edge, and the blurred copy underneath
+   turns that edge into a glow rather than a hairline.
+   ---------------------------------------------------------------- */
+.arc {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--aera-landing-nav-arc) * 2);
+  height: calc(var(--aera-landing-nav-arc) * 2);
+  transform: translate(-50%, -50%);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.arcTrack,
+.arcRun,
+.arcGlow {
+  fill: none;
+  /* the ring starts at twelve o'clock and runs clockwise — an arc
+     that began at three would read as having started late */
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.arcTrack {
+  stroke: var(--aera-color-utility-hairline);
+  stroke-width: var(--aera-border-hairline);
+}
+
+.arcRun {
+  stroke: var(--aera-color-ink-on-inverse);
+  stroke-width: var(--aera-border-base);
+  stroke-linecap: round;
+}
+
+.arcGlow {
+  stroke: var(--aera-color-ink-on-inverse);
+  stroke-width: var(--aera-border-thick);
+  stroke-linecap: round;
+  filter: blur(var(--aera-landing-nav-glow));
+  opacity: 0.85;
+}
+
+/* ---- the glyph and the label ---------------------------------- */
+.glyph {
+  flex: none;
+  width: var(--aera-icon-md);
+  height: var(--aera-icon-md);
+  fill: currentColor;
+}
+
+.toTop {
+  overflow: hidden;
+  max-width: 0;
+  white-space: nowrap;
+  opacity: 0;
+  transition:
+    max-width var(--aera-duration-base) var(--aera-ease-firm),
+    opacity var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.capsuleWide .toTop {
+  max-width: var(--aera-landing-nav-to-top-w);
+  opacity: 1;
+}
+
+/* ---- narrow windows -------------------------------------------
+   The capsule is absolutely centred, so on a narrow window the two
+   outer groups would run under it before anything else broke. The
+   links lose their padding first; the bar stays one row at every
+   width the page targets.
+   ---------------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .action {
+    padding-inline: var(--aera-space-5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .capsule,
+  .toTop {
+    transition: none;
+  }
+}

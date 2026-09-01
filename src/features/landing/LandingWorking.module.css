@@ -1,0 +1,54 @@
+/* ============================================================
+   SEE IT WORKING
+
+   One window, centred, and sized by the HEIGHT it is given rather
+   than by the width of the column. The section is exactly one
+   viewport and must not scroll inside itself, so the frame is
+   capped against what the head leaves and the window's own aspect
+   decides the width from there.
+
+   `aspect-ratio` with a `max-height` is what does that: the plate
+   inside reserves 16:10, the frame is allowed to be as wide as the
+   column, and the height cap pulls it back in whenever the column
+   is wider than the remaining height can carry.
+   ============================================================ */
+/* HEIGHT FIRST, WIDTH FROM THE RATIO.
+
+   The obvious way round — `width: 100%` with a `max-height` — does
+   not work: capping the height of a box that has an `aspect-ratio`
+   does not narrow it, so the window would keep its full width and
+   squash the screen inside it. Driving from the height instead makes
+   the ratio produce the width, and `max-width` then clamps it back
+   on a wide-but-short window with the height following through the
+   same ratio. Either constraint can bind, and the window stays the
+   shape it is meant to be under both. */
+.frame {
+  height: 100%;
+  width: auto;
+  /* the title bar plus a 1440 x 900 plate, as one ratio */
+  aspect-ratio: 1440 / 934;
+  max-width: min(100%, var(--aera-layout-max-content-width));
+  margin-inline: auto;
+}
+
+.frame > * {
+  height: 100%;
+}
+
+/* the arriving screen settles rather than swapping — the same move
+   the app makes on a tab change, for the same reason */
+.settle {
+  animation: settle var(--aera-duration-page) var(--aera-ease-out) backwards;
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settle {
+    animation: none;
+  }
+}

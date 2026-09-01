@@ -1,0 +1,57 @@
+/* ============================================================
+   FIT TO HEIGHT
+
+   The outer box takes whatever room the section gives it and
+   clips nothing; the inner one is laid out at its natural size and
+   scaled down into that room.
+
+   `transform-origin: top center` rather than the middle: a block
+   that shrinks about its centre appears to drift upward as it
+   scales, because its top edge moves. Anchored at the top, the
+   content stays where the layout put it and only gets smaller.
+   ============================================================ */
+.box {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.inner {
+  width: 100%;
+  transform-origin: top center;
+  /* the scale settles rather than snapping when the window is
+     resized — resistance, and nothing else */
+  transition: transform var(--aera-duration-base) var(--aera-ease-firm);
+}
+
+/* ---- centred ---------------------------------------------------
+   THE ORIGIN MOVES WITH THE ALIGNMENT, and it has to.
+
+   The inner block keeps its natural layout height however far down
+   it is scaled, so when it is taller than the room a centred box
+   hangs its top edge ABOVE the box's own. Anchored at `top center`
+   the scale then shrinks it where it stands and leaves it there —
+   the block loses its head and gains an equal band of nothing under
+   its feet. Anchored at the centre, the same overflow contracts
+   symmetrically onto the middle line and the painted block lands
+   exactly inside the room.
+
+   So the pair below is one decision written twice, and there is no
+   way to take half of it: a caller asks for centred and gets both.
+   ---------------------------------------------------------------- */
+.centred {
+  justify-content: center;
+}
+
+.centred .inner {
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inner {
+    transition: none;
+  }
+}

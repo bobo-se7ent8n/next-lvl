@@ -27,9 +27,11 @@
   gap: var(--aera-space-8);
 }
 
+/* the same square the token panel's button is — one number, in
+   size.ts, so the two cannot drift apart */
 .toggleButton {
-  width: 46px;
-  height: 46px;
+  width: var(--aera-control-panel-button);
+  height: var(--aera-control-panel-button);
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;

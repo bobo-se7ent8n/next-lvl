@@ -97,6 +97,28 @@ export const controlSpec = {
   historyLabel: '80px',
   historyBar: '7px',
   historyValue: '52px',
+
+  /* ---- THE TWO CORNER PANELS ------------------------------------
+     The display settings and the token panel are the same
+     affordance twice: one small square button on an edge of the
+     window, and a panel that opens off it. The BUTTON is one object
+     and is now one number, because two components drawing the same
+     46px square from two stylesheets is exactly how two buttons
+     stop being the same button.
+
+     The panel box below belongs to the token panel only. Tweakpane
+     draws its own contents and is deliberately not styled with the
+     product's tokens (see dev/TweakPanel.module.css), but the box it
+     is given is ours, and a length in a stylesheet is a length that
+     belongs here. */
+  /** the square toggle button both corner panels hang off */
+  panelButton: '46px',
+  /** the token panel's host box. The height is a plain length and
+   *  the viewport cap on it lives in the stylesheet: a `min()` with
+   *  a `vh` term in it would be wrapped whole by the layout scale,
+   *  which would scale the VIEWPORT half of the comparison too. */
+  panelWidth: '320px',
+  panelMaxHeight: '660px',
 } as const;
 
 export type IconSize = keyof typeof iconSize;

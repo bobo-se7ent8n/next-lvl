@@ -1,0 +1,108 @@
+/* ============================================================
+   THE TOKEN PANEL'S OWN CHROME — dev only.
+
+   Two halves, and they are styled by two different rulebooks on
+   purpose.
+
+   THE DOCK AND ITS BUTTON are the product's: they sit on the page
+   the visitor is looking at, so they use AERA tokens and they are
+   the same object as the background-settings button — same size,
+   same corner, same shadow, same hover. A dev affordance that
+   looked like a third kind of button would be a third kind of
+   button.
+
+   THE PANEL ITSELF is Tweakpane's. The block at the bottom of this
+   file is Tweakpane 4's documented LIGHT theme, verbatim, and it
+   deliberately borrows nothing from the token layer — this tool
+   EDITS the design system, so it must not be drawn in it. A panel
+   set in Inter on AERA paper is one screenshot away from being
+   mistaken for product UI.
+
+   None of this reaches production: the whole module is behind
+   `import.meta.env.DEV` and a dynamic import (see app/App.tsx).
+   ============================================================ */
+
+.dock {
+  position: fixed;
+  left: var(--aera-space-9);
+  bottom: var(--aera-space-9);
+  z-index: var(--aera-z-panel);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--aera-space-5);
+}
+
+/* the same button as the display-settings one, to the pixel */
+.toggleButton {
+  width: var(--aera-control-panel-button);
+  height: var(--aera-control-panel-button);
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--aera-radius-lg);
+  background: var(--aera-color-surface-background);
+  color: var(--aera-color-ink-secondary);
+  box-shadow: var(--aera-elevation-high);
+  transition: color var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.toggleButton:hover {
+  color: var(--aera-color-ink-primary);
+}
+
+.toggleButton[aria-expanded='true'] {
+  color: var(--aera-color-ink-primary);
+}
+
+.toggleButton svg {
+  width: var(--aera-icon-xl);
+  height: var(--aera-icon-xl);
+}
+
+/* ---- the pane's host -------------------------------------------
+   `display: none` when closed rather than `opacity: 0`: a hidden
+   panel must not sit over the app swallowing clicks. The pane is
+   built into this node once and stays built — tearing Tweakpane
+   down and rebuilding it on every toggle would lose every folder's
+   expanded state and every unsaved edit with it.
+   ---------------------------------------------------------------- */
+.pane {
+  width: var(--aera-control-panel-width);
+  max-height: min(72vh, var(--aera-control-panel-max-height));
+  overflow-y: auto;
+  text-align: left;
+}
+
+.paneOff {
+  display: none;
+}
+
+/* ---- Tweakpane 4, LIGHT theme --------------------------------
+   Their variables, their values, their colour space. Scoped to
+   this host so it cannot leak into anything else on the page.
+   ---------------------------------------------------------------- */
+.pane {
+  --tp-base-background-color: hsla(230, 5%, 90%, 1);
+  --tp-base-shadow-color: hsla(0, 0%, 0%, 0.1);
+  --tp-button-background-color: hsla(230, 7%, 75%, 1);
+  --tp-button-background-color-active: hsla(230, 7%, 60%, 1);
+  --tp-button-background-color-focus: hsla(230, 7%, 65%, 1);
+  --tp-button-background-color-hover: hsla(230, 7%, 70%, 1);
+  --tp-button-foreground-color: hsla(230, 10%, 30%, 1);
+  --tp-container-background-color: hsla(230, 15%, 30%, 0.2);
+  --tp-container-background-color-active: hsla(230, 15%, 30%, 0.32);
+  --tp-container-background-color-focus: hsla(230, 15%, 30%, 0.28);
+  --tp-container-background-color-hover: hsla(230, 15%, 30%, 0.24);
+  --tp-container-foreground-color: hsla(230, 10%, 30%, 1);
+  --tp-groove-foreground-color: hsla(230, 15%, 30%, 0.1);
+  --tp-input-background-color: hsla(230, 15%, 30%, 0.1);
+  --tp-input-background-color-active: hsla(230, 15%, 30%, 0.22);
+  --tp-input-background-color-focus: hsla(230, 15%, 30%, 0.18);
+  --tp-input-background-color-hover: hsla(230, 15%, 30%, 0.14);
+  --tp-input-foreground-color: hsla(230, 10%, 30%, 1);
+  --tp-label-foreground-color: hsla(230, 10%, 30%, 0.7);
+  --tp-monitor-background-color: hsla(230, 15%, 30%, 0.1);
+  --tp-monitor-foreground-color: hsla(230, 10%, 30%, 0.5);
+}

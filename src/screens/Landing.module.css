@@ -1,16 +1,38 @@
-/* The landing wireframe. Full-bleed sections with their content in a
-   centred column. The column-edge guide lines are gone: with a dashed
-   outline already on every section container, a second pair of dashed
-   lines running the page height was noise on top of noise. */
+/* ============================================================
+   THE LANDING PAGE
+
+   A FRAMED SHEET. One margin at the top and down both sides, and
+   everything on the page lives inside it — the bar, every section,
+   the closing block. It is deliberately not the app's page gutter:
+   the app is a full-bleed column and this is a framed one, and the
+   two were sharing a number that meant two different things.
+
+   Nothing here draws anything: the page is a stack of sections and
+   every one of them owns its own surface.
+
+   `display: flex` rather than `block`, because the sections are
+   separated by their own padding and the column has to be a real
+   flex box for the sticky bar's containing block to be the page
+   rather than whichever section it happens to be over.
+   ============================================================ */
 .landing {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding-inline: var(--aera-layout-gutter);
+  padding: var(--aera-landing-frame) var(--aera-landing-frame) 0;
 }
 
 .sections {
   position: relative;
   display: flex;
   flex-direction: column;
+}
+
+/* The sentinel the nav's morph is triggered by, at the foot of the
+   last content section. A hairline rather than zero height: an
+   IntersectionObserver's handling of a zero-AREA target is a special
+   case in the spec, and a target with a real height needs no special
+   case at all. It is one unscaled pixel and draws nothing. */
+.tail {
+  height: var(--aera-border-hairline);
 }

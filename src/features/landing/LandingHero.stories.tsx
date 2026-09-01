@@ -9,7 +9,7 @@ const meta: Meta<typeof LandingHero> = {
     docs: {
       description: {
         component:
-          'Two regions: the headline and sub in dashed text boxes on the left, a tall media slot on the right. The headline is Oswald with the per-letter weight variation the display token defines.',
+          'One screen, one sentence, centred. It is the same headline the entry overlay unblurs as the white fills the window \u2014 both read it from one constant, so the seam between the two states cannot drift. The cursor gathers word tags while this section is in view; that is off here, because it is off wherever there is no fine pointer.',
       },
     },
   },

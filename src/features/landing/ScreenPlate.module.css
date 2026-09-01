@@ -1,0 +1,33 @@
+/* ============================================================
+   THE SCALED SCREEN
+
+   The outer box holds the aspect and clips; the plate inside it is
+   always the logical screen size and is scaled to fit. The aspect is
+   set inline from the same two tokens, as a ratio rather than a
+   height, so the box reserves the right space before the plate has
+   measured itself and nothing reflows on the first frame.
+   ============================================================ */
+.box {
+  position: relative;
+  width: 100%;
+  /* the aspect is set inline from the same tokens the plate is sized
+     from — see the note in the component */
+  overflow: hidden;
+  background: var(--aera-color-surface-background);
+}
+
+.plate {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  /* a picture by default: nothing inside a plate takes a click
+     unless the frame around it says the screen is live */
+  pointer-events: none;
+  user-select: none;
+}
+
+.live {
+  pointer-events: auto;
+  user-select: auto;
+}

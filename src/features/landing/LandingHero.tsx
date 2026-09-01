@@ -1,38 +1,46 @@
-import { Display, Text } from '../../components/primitives/Text';
-import { WireBox, WireSection, WireSlot } from './wireframe';
+import { useRef } from 'react';
+import { Display } from '../../components/primitives/Text';
+import { CursorTags } from './CursorTags';
+import { HERO_HEADLINE } from './copy';
 import styles from './LandingHero.module.css';
 
-/** section 01 — primary weight. The first claim, and the only one on
- *  the page that gets the full display size. */
+/**
+ * THE HERO — THE WHITE STATE.
+ *
+ * One sentence, and nothing under it.
+ *
+ * THERE IS NO SUBLINE, AND THAT IS THE SECTION. It used to carry a
+ * line naming the parts — body sensors, a smart basketball, an app
+ * that reads the patterns underneath your game. Those twenty words
+ * are the tags still standing on the screen after the entry
+ * sequence has thinned the field: the same claim, scattered rather
+ * than set. A headline with a paragraph under it and a field of
+ * words around it was saying the same thing twice, and the
+ * paragraph was the half that made the field look decorative.
+ *
+ * The twenty tags standing behind it are NOT rendered here: their
+ * coordinates are fractions of the WINDOW, and this section starts
+ * below the floating bar, so the field hangs off the page itself
+ * (see Landing.tsx) where 42% means the same thing it meant to the
+ * entry overlay.
+ *
+ * This is also where the cursor gathers tags. That behaviour
+ * belongs to the section rather than to the page — the cluster
+ * exists only while the white state is in view — so the section
+ * owns the host node and hands it to the layer.
+ */
 export function LandingHero() {
+  const host = useRef<HTMLElement>(null);
+
   return (
-    <WireSection
-      number="01"
-      name="Hero"
-      weight="primary"
-      intent="the one claim the whole page rests on — a visitor who reads nothing else should read this"
-    >
-      <div className={styles.grid}>
-        <div className={styles.left}>
-          <WireBox plain>
-            <Display size="xl" as="h1">
-              Your jump shot knows something about you.
-            </Display>
-          </WireBox>
-          <WireBox>
-            <Text variant="body" tone="secondary">
-              Body sensors, a smart basketball, and an app that reads the patterns underneath your
-              game.
-            </Text>
-          </WireBox>
-        </div>
-        <WireSlot
-          className={styles.slot}
-          label="Ambient visual / TBD"
-          behaviour="sets the register before a word is read — quiet, never a demo"
-          ratio="3 / 4"
-        />
+    <section ref={host} className={styles.hero} data-section="hero">
+      <div className={styles.stack}>
+        <Display size="xl" as="h1" className={styles.line}>
+          {HERO_HEADLINE}
+        </Display>
       </div>
-    </WireSection>
+
+      <CursorTags hostRef={host} />
+    </section>
   );
 }

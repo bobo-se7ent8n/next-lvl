@@ -56,7 +56,7 @@ export const CATALOG: BrowserEntry[] = [
   { slug: 'shot-arc', name: 'ShotArc', group: 'Components', chip: 'feature', description: 'a solved parabola and a looped dot trail — no shooter' },
   { slug: 'focus-panel', name: 'FocusPanel', group: 'Components', chip: 'feature', description: 'the collapsing interval, filling the height it is given' },
   { slug: 'vital-card', name: 'VitalCard', group: 'Components', chip: 'feature', description: 'a body reading, private to the device' },
-  { slug: 'landing', name: 'Landing sections', group: 'Components', chip: 'landing', description: 'the wireframe primitives and every section built on them' },
+  { slug: 'landing', name: 'Landing sections', group: 'Components', chip: 'landing', description: 'the sticky bar, the sections that hold real product, and the two that are still placeholders' },
 ];
 
 export const GROUPS: BrowserGroup[] = ['Tokens', 'Components'];

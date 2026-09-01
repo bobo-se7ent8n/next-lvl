@@ -10,7 +10,7 @@ const meta: Meta<typeof Landing> = {
     docs: {
       description: {
         component:
-          'Every section composed in order, with the fixed left ruler and the dashed column guides. This is a wireframe and it looks like one: labelled dashed containers for type, flat muted slots for anything that will become a visual, and all annotation in small uppercase mono so the scaffolding never reads as content.',
+          'Every section composed in order, behind the entry sequence that plays over it once per session. Four of the sections pin to the window and are driven by scroll — sessions, insights, the nav\u2019s progress stroke and the loading card\u2019s expansion all measure themselves against the viewport, so this story is only true at `layout: fullscreen` and is best read in its own window rather than in the docs pane.',
       },
     },
   },

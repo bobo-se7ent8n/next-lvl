@@ -1,0 +1,266 @@
+/* ============================================================
+   THE ENTRY SEQUENCE
+
+   One overlay, four layers, and exactly one state class on the
+   root. Every element below reads `.open` off its ancestor rather
+   than carrying its own flag, so the dark state and the white
+   state are two readings of one stylesheet and cannot drift out of
+   step with each other.
+
+   Nothing here animates a layout property except the card's own
+   width and height, and that is deliberate: the four corner
+   squares are pinned to the card's edges, so the card has to
+   genuinely change size rather than be scaled — a transform would
+   take the squares' size with it.
+   ============================================================ */
+
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: var(--aera-z-entry);
+  overflow: hidden;
+  background: var(--aera-color-surface-inverse);
+  transition: background-color var(--aera-duration-entry-expand) var(--aera-ease-firm);
+}
+
+.screen.open {
+  background: var(--aera-color-surface-background);
+}
+
+/* ---- 1 · the ruled ground -------------------------------------
+   Two crossed line layers. The rule is the same spacing as the
+   card's own module, so the card's corners — and the squares on
+   them — always land on an intersection.
+
+   IT LEAVES; IT DOES NOT VANISH. The rule used to change COLOUR on
+   expansion, and a custom property cannot be interpolated, so the
+   grid swapped between two values in a single frame — the one thing
+   on the dark state that moved instantly while everything around it
+   was travelling. It fades out and drifts a little wider instead,
+   on the same duration and the same firm curve as the card that is
+   replacing it.
+   ---------------------------------------------------------------- */
+.ground {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--rule) var(--aera-border-hairline), transparent 0),
+    linear-gradient(to bottom, var(--rule) var(--aera-border-hairline), transparent 0);
+  background-size: var(--aera-landing-load-grid) var(--aera-landing-load-grid);
+  background-position: center center;
+  --rule: var(--aera-color-utility-grid-dark);
+  transform-origin: 50% 50%;
+  transition:
+    opacity var(--aera-duration-entry-expand) var(--aera-ease-firm),
+    transform var(--aera-duration-entry-expand) var(--aera-ease-firm);
+}
+
+.open .ground {
+  opacity: 0;
+  transform: scale(1.08);
+}
+
+/* ---- 2 · the scattered word tags ------------------------------ */
+.field {
+  position: absolute;
+  inset: 0;
+}
+
+.tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--aera-landing-tag-pad-y) var(--aera-landing-tag-pad-x);
+  border-radius: var(--aera-radius-sm);
+  white-space: nowrap;
+  background: var(--fill);
+  color: var(--ink);
+  opacity: var(--tint);
+  /* THE POSITION IS A TRANSFORM, NOT A LEFT AND A TOP.
+
+     Twenty-two elements transitioning `left` and `top` for a second
+     and a quarter is twenty-two layout invalidations a frame. The
+     coordinate is a viewport fraction multiplied into the transform
+     instead, so the whole field moves on the compositor. */
+  transform: translate(calc(var(--x) * 100vw), calc(var(--y) * 100dvh))
+    translate(-50%, -50%) scale(var(--s)) rotate(var(--r));
+  transition:
+    transform var(--aera-duration-entry-expand) var(--aera-ease-firm),
+    opacity var(--aera-duration-entry-expand) var(--aera-ease-out),
+    filter var(--aera-duration-entry-expand) var(--aera-ease-out);
+  animation: tagIn var(--aera-duration-base) var(--aera-ease-out) backwards;
+  animation-delay: var(--enter-delay);
+}
+
+@keyframes tagIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* A SEEDED THIRD OF THE FIELD DOES NOT SURVIVE THE EXPANSION.
+   They collapse toward the middle of the window and blur out on the
+   way, so the light state is a thinner field rather than the same
+   one rearranged. Which tags leave is hashed from the word — see
+   seed.ts — so it is the same third every time. */
+.open .tagExits {
+  transform: translate(50vw, 50dvh) translate(-50%, -50%) scale(0) rotate(var(--r));
+  opacity: 0;
+  filter: blur(var(--aera-landing-tag-exit-blur));
+}
+
+/* ---- 3 · the headline behind the card -------------------------
+   The padding-top is the sticky nav's band. The hero underneath
+   this overlay starts BELOW that band, so its centre is half a band
+   lower than the window's; matching the offset here is what makes
+   the handover invisible. See the note in the component.
+   ---------------------------------------------------------------- */
+.headline {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding-inline: var(--aera-landing-frame);
+  padding-top: var(--aera-landing-nav-band);
+  text-align: center;
+  color: var(--aera-color-ink-primary);
+  opacity: 0;
+  filter: blur(var(--aera-landing-headline-blur));
+  transform: translateY(var(--aera-space-11));
+  transition:
+    opacity var(--aera-duration-entry-focus) var(--aera-ease-out),
+    filter var(--aera-duration-entry-focus) var(--aera-ease-out),
+    transform var(--aera-duration-entry-focus) var(--aera-ease-firm);
+  /* IT ARRIVES WITH THE WHITE, NOT AFTER IT.
+
+     The delay used to be nearly a third of the expansion, so the
+     card finished filling the window and then sat there as a blank
+     white screen while the headline was still waiting to start.
+     Cross-faded instead: the sentence begins rising out of its blur
+     while the panel is still visibly growing, so there is no frame
+     in the sequence where the white state is empty. What delay is
+     left is only enough for the card to read as a card first. */
+  transition-delay: calc(var(--aera-duration-entry-expand) * 0.08);
+}
+
+/* the hero's stack, exactly — same measure, same centring */
+.headStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--aera-space-11);
+  max-width: var(--aera-layout-max-subhead-width);
+}
+
+
+
+.open .headline {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+/* ---- 4 · the card, and the four squares on its corners -------- */
+.card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--aera-landing-load-card-w);
+  height: var(--aera-landing-load-card-h);
+  margin-left: calc(var(--aera-landing-load-card-w) / -2);
+  margin-top: calc(var(--aera-landing-load-card-h) / -2);
+  border-radius: var(--aera-radius-card);
+  background: var(--aera-color-surface-background);
+  transition:
+    width var(--aera-duration-entry-expand) var(--aera-ease-firm),
+    height var(--aera-duration-entry-expand) var(--aera-ease-firm),
+    margin var(--aera-duration-entry-expand) var(--aera-ease-firm),
+    border-radius var(--aera-duration-entry-expand) var(--aera-ease-firm);
+}
+
+.open .card {
+  width: 100vw;
+  height: 100dvh;
+  margin-left: -50vw;
+  margin-top: -50dvh;
+  border-radius: var(--aera-radius-none);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-3);
+  padding: var(--aera-space-11);
+  font-family: var(--aera-text-body-family);
+  font-size: var(--aera-text-body-size);
+  line-height: var(--aera-text-body-leading);
+  color: var(--aera-color-ink-primary);
+  transition: opacity var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.copyLine:last-child {
+  color: var(--aera-color-ink-secondary);
+}
+
+/* the copy is gone before the card is a third of the way out — what
+   grows is a plain white rectangle, not a page of type in motion */
+.open .copy {
+  opacity: 0;
+}
+
+.corner {
+  position: absolute;
+  width: var(--aera-landing-load-corner);
+  height: var(--aera-landing-load-corner);
+  border-radius: var(--aera-radius-xs);
+  /* the four are the first four palette hues, in order — a set the
+     eye reads as one object rather than four unrelated marks */
+  background: var(--aera-color-data-mint);
+}
+
+.cornerTL {
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+}
+
+.cornerTR {
+  right: 0;
+  top: 0;
+  transform: translate(50%, -50%);
+  background: var(--aera-color-data-yellow);
+}
+
+.cornerBL {
+  left: 0;
+  bottom: 0;
+  transform: translate(-50%, 50%);
+  background: var(--aera-color-data-lilac);
+}
+
+.cornerBR {
+  right: 0;
+  bottom: 0;
+  transform: translate(50%, 50%);
+  background: var(--aera-color-data-orange);
+}
+
+/* ---- reduced motion -------------------------------------------
+   The sequence is skipped entirely rather than played fast: the
+   component calls back on its first effect and unmounts, so the
+   visitor lands on the white state having watched nothing. This
+   block only covers the frame before that happens.
+   ---------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .screen,
+  .ground,
+  .tag,
+  .headline,
+  .card,
+  .copy {
+    transition: none;
+    animation: none;
+  }
+}

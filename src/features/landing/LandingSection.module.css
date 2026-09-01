@@ -1,0 +1,88 @@
+/* ============================================================
+   A SECTION BAND
+
+   One vertical rhythm for every real section on the page: the same
+   clearance under the bar, the same drop from the heading to the
+   content. THERE ARE NO SECTION NUMBERS. They were a wireframe
+   habit — a running order printed on a page that has one — and
+   every one of them was a line of type competing with the heading
+   directly under it. `display: flex` rather than `block`, because the gaps
+   between these three rows are the whole layout and `gap` on a
+   block box does nothing at all.
+
+   EVERY SECTION IS A SNAP POINT. The page sets
+   `scroll-snap-type: y mandatory` on the document while the landing
+   is mounted, and each section aligns its own start to it. A section
+   TALLER than the window — the two pinned, scroll-driven ones — is
+   a snap area larger than the snapport, and the spec lets the
+   snapport rest anywhere inside such an area: so snapping catches
+   the edges of those sections and leaves the scroll through them
+   completely free. That is why mandatory snapping and the pinned
+   sections can coexist.
+   ============================================================ */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-12);
+  padding-block: var(--aera-landing-nav-clear) var(--aera-space-12);
+  scroll-snap-align: start;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-6);
+  max-width: var(--aera-layout-max-subhead-width);
+}
+
+.body {
+  max-width: var(--aera-layout-max-read-width);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ---- centred ---------------------------------------------------
+   The head's measure is a max-width, so centring it needs the box
+   itself centred as well as the text inside it — otherwise the
+   lines sit centred inside a block that is still hard left.
+   ---------------------------------------------------------------- */
+.centred .head {
+  align-items: center;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.centred .content {
+  align-items: center;
+}
+
+/* ---- one window, and nothing inside it scrolls -----------------
+   `height`, not `min-height`. A minimum lets the section grow past
+   the window the moment its head runs to two lines, which is the one
+   thing a section whose whole argument is "this fits on a screen"
+   must not do. The content box is what gives, and what is inside it
+   is sized against that box rather than against the section.
+   ---------------------------------------------------------------- */
+.fit {
+  height: 100dvh;
+  /* THE TOP PADDING IS THE BAR'S CLEARANCE, NOT A RHYTHM.
+
+     The bar is sticky, so from the second section on it floats over
+     whatever has just snapped into place; a section whose head
+     started at its own top edge would start underneath it. The
+     clearance comes out of the section's own content box — which is
+     why the height is fixed rather than a minimum: padding must
+     never push the section past one window. */
+  padding-block: var(--aera-landing-nav-clear) var(--aera-space-12);
+  overflow: hidden;
+}
+
+.fit .content {
+  flex: 1 1 auto;
+  justify-content: center;
+  min-height: 0;
+}

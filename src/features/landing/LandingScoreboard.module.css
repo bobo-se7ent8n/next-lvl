@@ -1,0 +1,109 @@
+/* ============================================================
+   SCOREBOARD — THE BOARD
+
+   The app's own bento, at the app's own proportions, under a
+   centred head and a centred tab strip. The three columns are the
+   three panels, and the two that are not current are dimmed rather
+   than hidden: the point of the section is that the whole board is
+   one object and you are choosing which part of it is live.
+   ============================================================ */
+/* centred, like the head above it — the strip is part of the same
+   centred column, not a control rail hard against the left edge */
+/* TIGHTER THAN IT WAS. The section has to hold a heading, a line of
+   copy, this strip and the whole board inside one window, and every
+   step of vertical rhythm above the board is height the board does
+   not get. */
+.tabs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--aera-space-4);
+  padding-bottom: var(--aera-space-9);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--aera-min-target-tap);
+  padding-inline: var(--aera-space-9);
+  border-radius: var(--aera-radius-pill);
+  color: var(--aera-color-ink-secondary);
+  background: var(--aera-color-surface-level1);
+  transition:
+    background-color var(--aera-duration-fast) var(--aera-ease-out),
+    color var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.tab:hover {
+  background: var(--aera-color-surface-level2);
+  color: var(--aera-color-ink-primary);
+}
+
+.tabOn,
+.tabOn:hover {
+  color: var(--aera-color-ink-on-inverse);
+  background: var(--aera-color-surface-inverse);
+}
+
+/* the scaled box takes the room the tabs leave */
+.fit {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--aera-layout-split-gap);
+  align-items: stretch;
+  width: 100%;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-8);
+  min-width: 0;
+  transition: opacity var(--aera-duration-page) var(--aera-ease-out);
+}
+
+.panel > * {
+  min-height: 0;
+}
+
+/* ---- THE THREE COLUMNS END ON ONE LINE ------------------------
+   The zones column is one tall card and the ratings column is two
+   cards that fill; the mechanics column is two SHORT ones, so it
+   ran out of content well above the other two and left its bottom
+   edge floating in the middle of the row.
+
+   `space-between` puts the trend at the top and the arc at the
+   bottom of whatever height the row gives the column, and the arc
+   is allowed to take up the slack — so the three columns end on the
+   same line at every width without any of them being given a fixed
+   height. */
+.spread {
+  justify-content: space-between;
+}
+
+.spread > :last-child {
+  flex: 1 1 auto;
+}
+
+/* DIMMED, AND GENUINELY INERT.
+
+   `pointer-events: none` is not decoration here: the ratings rows
+   and the court zones both answer a pointer, and an inactive panel
+   that still lit up under the cursor would be claiming to be live
+   while reading as switched off. */
+.dim {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+@media (max-width: 1100px) {
+  .board {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--aera-space-12);
+  }
+}

@@ -5,6 +5,21 @@
   width: 100%;
   min-height: 100%;
   background: var(--aera-color-surface-background);
-  /* full-bleed placeholder blocks are measured against the viewport */
-  overflow-x: hidden;
+  /* CLIP, NOT HIDDEN — AND THE PAGE DEPENDS ON THE DIFFERENCE.
+
+     Full-bleed blocks are measured against the viewport and would
+     otherwise push a horizontal scrollbar onto the page, so one axis
+     has to be contained. `overflow-x: hidden` does that by making
+     this element a SCROLL CONTAINER — it forces the other axis to
+     `auto` — and a scroll container is what `position: sticky`
+     resolves against. Every pinned section on this page, and the nav
+     bar above them, would have stuck to this div instead of to the
+     window, which reads as them not sticking at all.
+
+     `clip` on one axis is legal and leaves the other axis genuinely
+     visible, so the document keeps the scroll and sticky keeps the
+     viewport. Same trick, and the same reason, as the app's own
+     content column. */
+  overflow-x: clip;
+  overflow-y: visible;
 }

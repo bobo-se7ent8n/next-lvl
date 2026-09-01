@@ -1,0 +1,71 @@
+/* ============================================================
+   THE WINDOW FRAME
+
+   A title bar and a body, and the two share one radius so the
+   screen inside is clipped by the same corner the frame is drawn
+   with. The bar is a three-column grid — lights, title, tabs — so
+   the title stays centred whatever the tab row weighs.
+   ============================================================ */
+.window {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-radius: var(--aera-radius-card);
+  overflow: hidden;
+  background: var(--aera-color-surface-background);
+  box-shadow: var(--aera-elevation-high);
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--aera-space-8);
+  flex: none;
+  height: var(--aera-landing-window-bar);
+  padding-inline: var(--aera-space-6);
+  background: var(--aera-color-surface-level1);
+}
+
+.lights {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-space-3);
+}
+
+.light {
+  width: var(--aera-landing-window-dot);
+  height: var(--aera-landing-window-dot);
+  border-radius: var(--aera-radius-pill);
+}
+
+/* the palette, not the system colours — see the note on the frame */
+.close {
+  background: var(--aera-color-data-orange);
+}
+
+.min {
+  background: var(--aera-color-data-yellow);
+}
+
+.zoom {
+  background: var(--aera-color-data-mint);
+}
+
+.title {
+  justify-self: center;
+  white-space: nowrap;
+}
+
+.tabs {
+  display: flex;
+  justify-self: end;
+  align-items: center;
+  gap: var(--aera-space-2);
+}
+
+.body {
+  position: relative;
+  min-height: 0;
+  background: var(--aera-color-surface-background);
+}

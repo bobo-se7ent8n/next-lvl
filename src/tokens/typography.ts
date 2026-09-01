@@ -186,6 +186,22 @@ export const textStyle = {
     letterSpacing: '0',
     fontWeight: fontWeight.regular,
   },
+  /* ONE STEP ABOVE BODY, AND IT IS BACK ON PURPOSE.
+
+     An earlier pass folded `bodyLG` into `body` because the two were
+     15 and 14 and nobody could tell them apart. This is not that
+     token: it is 17, a real step, and it exists for the one place on
+     the site where a paragraph IS the content of a section rather
+     than support under a heading — the Sessions read-through, which
+     has a laptop beside it and nothing else in its column. At body
+     size that paragraph read as a caption for the screenshot. */
+  bodyLG: {
+    fontFamily: fontFamily.body,
+    fontSize: '17px',
+    lineHeight: '1.5',
+    letterSpacing: '0',
+    fontWeight: fontWeight.regular,
+  },
   bodySM: {
     fontFamily: fontFamily.body,
     fontSize: '12px',

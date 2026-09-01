@@ -193,6 +193,11 @@ export function buildCssVars(): Record<string, string> {
     vars[`${PREFIX}-numeric-${kebab(name)}`] = value;
   }
 
+  // the landing page's own structural lengths -------------------
+  for (const [name, value] of Object.entries(tokens.landing)) {
+    vars[`${PREFIX}-landing-${kebab(name)}`] = scaleLength(value);
+  }
+
   // breakpoints and the scale steps ----------------------------
   for (const [name, value] of Object.entries(tokens.breakpoint)) {
     vars[`${PREFIX}-breakpoint-${kebab(name)}`] = value;

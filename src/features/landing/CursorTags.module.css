@@ -1,0 +1,45 @@
+/* ============================================================
+   THE CURSOR CLUSTER
+
+   A pointer-transparent fixed layer holding seven stacked tags.
+   The whole thing is invisible until the rAF loop marks it live,
+   so nothing shows on a touch device, under reduced motion, or in
+   the frame before the first pointer event arrives.
+   ============================================================ */
+
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--aera-z-content);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--aera-duration-base) var(--aera-ease-out);
+}
+
+.layer[data-on] {
+  opacity: 1;
+}
+
+.tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--aera-landing-tag-pad-y) var(--aera-landing-tag-pad-x);
+  border-radius: var(--aera-radius-sm);
+  white-space: nowrap;
+  background: var(--fill);
+  color: var(--ink);
+  opacity: var(--fade);
+  /* the deeper into the stack, the softer — the pile reads as depth
+     rather than as seven equally present labels */
+  filter: blur(var(--blur));
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer {
+    display: none;
+  }
+}

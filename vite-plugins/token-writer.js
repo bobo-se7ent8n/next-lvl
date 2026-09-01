@@ -37,6 +37,8 @@ const GROUPS = [
   ['--aera-color-data-ink-', 'color.ts', 'colorDataInk'],
   ['--aera-color-data-', 'color.ts', 'colorData'],
   ['--aera-color-face-', 'color.ts', 'colorFace'],
+  ['--aera-color-tag-', 'color.ts', 'colorTag'],
+  ['--aera-color-accent-', 'color.ts', 'colorAccent'],
   ['--aera-color-semantic-', 'color.ts', 'colorSemantic'],
   ['--aera-color-shot-zone-', 'color.ts', 'colorShotZone'],
   ['--aera-color-on-face-', 'color.ts', 'colorOnFace'],
@@ -63,6 +65,7 @@ const GROUPS = [
   ['--aera-min-target-', 'size.ts', 'minTarget'],
   ['--aera-breakpoint-', 'scale.ts', 'breakpoint'],
   ['--aera-scale-', 'scale.ts', 'scaleStep'],
+  ['--aera-landing-', 'landing.ts', 'landing'],
 ].sort((a, b) => b[0].length - a[0].length);
 
 /* the composed text tokens are nested one level deeper —
