@@ -123,6 +123,14 @@ export const numeric = {
 export const fontScale = {
   /** the raised degree sign on a reading */
   superscript: '0.55em',
+  /** A PHRASE SET IN THE DISPLAY FACE INSIDE A BODY PARAGRAPH.
+   *
+   *  Oswald is a condensed face with a shorter x-height than Inter,
+   *  so set at the paragraph's own size it reads a step SMALLER than
+   *  the words either side of it rather than level with them. This is
+   *  the correction — relative, so the emphasis tracks whatever it is
+   *  set inside and there is no second size to keep in step. */
+  inlineDisplay: '1.12em',
 } as const;
 
 export const textStyle = {

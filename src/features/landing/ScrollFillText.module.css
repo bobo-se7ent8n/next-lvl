@@ -41,16 +41,43 @@
   opacity: calc(0.24 + 0.76 * clamp(0, (var(--fill) * var(--count)) - var(--i), 1));
 }
 
-/* ---- the accent ------------------------------------------------
-   One word, flat, in the orange that is dark enough to be read as
-   type — and it is the only colour in the paragraph. The rest of
-   the copy used to be set in a lilac text gradient; there are no
-   gradients in this product, and an emphasis has to have something
-   plain to be an emphasis against.
+/* ---- THE MARKED PHRASE -----------------------------------------
+   A run of the paragraph set in the DISPLAY face, at the paragraph's
+   own ink. It was one word in the orange accent, which made the
+   emphasis a colour; every other emphasis on this page is a change
+   of voice, and this is that — the same sentence, one phrase spoken
+   in the headline's face.
+
+   SCOPED TO THIS PARAGRAPH, and deliberately not a redefinition of
+   the body token: the paragraph is still body copy and every other
+   word in it must stay exactly what it was.
+
+   THREE RULES, AND EACH OF THEM IS LOAD-BEARING.
+
+   · `font-size` is RELATIVE. Oswald's x-height is shorter than
+     Inter's, so at the paragraph's own size the phrase reads a step
+     smaller than the words either side of it — `inlineDisplay` is
+     that correction, in `em`, so it tracks whatever it is set
+     inside rather than being a second size to keep in step.
+
+   · `line-height` is `none`, and that is what keeps the PARAGRAPH's
+     leading untouched. The paragraph's own leading is a unitless
+     ratio, so a larger inline font-size would inherit the ratio and
+     recompute a taller inline box — one line of the paragraph would
+     silently open up around the emphasis. At a ratio of 1 the
+     phrase's box is 1.12em against the line's 1.45em: comfortably
+     inside it, so the line box never notices.
+
+   · `letter-spacing` is the display face's own. Oswald is drawn to
+     be set with air in it and the body token sets none at all.
    ---------------------------------------------------------------- */
-.accent {
-  font-weight: var(--aera-text-body-strong-weight);
-  color: var(--aera-color-accent-orange);
+.mark {
+  font-family: var(--aera-font-display);
+  font-size: var(--aera-font-scale-inline-display);
+  font-weight: var(--aera-text-display-xl-weight);
+  letter-spacing: var(--aera-tracking-display);
+  line-height: var(--aera-leading-none);
+  color: var(--aera-color-ink-primary);
 }
 
 /* Under reduced motion the paragraph is simply readable. The fill

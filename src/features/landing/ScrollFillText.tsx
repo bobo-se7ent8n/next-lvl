@@ -3,7 +3,8 @@ import { cx } from '../../lib/css';
 import styles from './ScrollFillText.module.css';
 
 export interface ScrollFillTextProps {
-  /** the copy. `**like this**` marks the one word set in the accent. */
+  /** the copy. `**like this**` marks the run set in the display
+   *  face — see `.mark` in the stylesheet. */
   text: string;
   /** the parent writes `--fill` (0 → 1) onto this node every frame */
   hostRef: RefObject<HTMLParagraphElement | null>;
@@ -15,25 +16,48 @@ export interface ScrollFillTextProps {
 
 interface Word {
   text: string;
-  accent: boolean;
+  /** set in the display face rather than the paragraph's own */
+  mark: boolean;
 }
 
-/* `**stays**` → one accented word. Splitting on the delimiter and
-   taking every odd chunk as marked is the whole parser: the copy is
-   ours, it is not user input, and a markdown library for one pair of
-   asterisks would be a dependency to carry forever. */
+/* `**stays there**` → a marked run, one word per span. Splitting on
+   the delimiter and taking every odd chunk as marked is the whole
+   parser: the copy is ours, it is not user input, and a markdown
+   library for one pair of asterisks would be a dependency to carry
+   forever. The run is split into words like everything else, so the
+   fill front crosses it exactly as it crosses the rest. */
+/** punctuation that closes a phrase, with nothing between it and
+ *  the word it closes — never the em dash, which is set with spaces
+ *  either side and is a word of its own in this copy */
+const CLOSER = /^[.,;:!?)\]}»”’…]+/;
+
 function parse(text: string): Word[] {
-  return text
-    .split(/(\*\*[^*]+\*\*)/g)
-    .filter(Boolean)
-    .flatMap((chunk) => {
-      const accent = chunk.startsWith('**') && chunk.endsWith('**');
-      const body = accent ? chunk.slice(2, -2) : chunk;
-      return body
-        .split(/\s+/)
-        .filter(Boolean)
-        .map((word) => ({ text: word, accent }));
-    });
+  const words: Word[] = [];
+  let previousMarked = false;
+
+  for (const chunk of text.split(/(\*\*[^*]+\*\*)/g).filter(Boolean)) {
+    const mark = chunk.startsWith('**') && chunk.endsWith('**');
+    let body = mark ? chunk.slice(2, -2) : chunk;
+
+    /* A CHUNK BOUNDARY IS NOT A WORD BOUNDARY. `**stays there**.`
+       splits into a marked "there" and an unmarked "." — two spans
+       with a space printed between them, so the sentence read
+       "stays there ." The closing punctuation is folded back onto the
+       word it belongs to, and takes that word's face with it. */
+    if (!mark && previousMarked && words.length > 0) {
+      const closer = CLOSER.exec(body);
+      if (closer) {
+        const last = words[words.length - 1];
+        words[words.length - 1] = { ...last, text: last.text + closer[0] };
+        body = body.slice(closer[0].length);
+      }
+    }
+
+    for (const word of body.split(/\s+/).filter(Boolean)) words.push({ text: word, mark });
+    previousMarked = mark;
+  }
+
+  return words;
 }
 
 /**
@@ -60,6 +84,11 @@ function parse(text: string): Word[] {
  * gradients in this product, and it also fought the fill — the
  * clipped background made every glyph a transparent window, which
  * left the per-word opacity nothing of its own to fade.
+ *
+ * A marked run is set in the DISPLAY face at the same ink as the
+ * rest — see `.mark`. It used to be one word in the orange accent,
+ * which made the emphasis a colour; the page's emphasis everywhere
+ * else is a change of voice.
  */
 export function ScrollFillText({ text, hostRef, quiet, className }: ScrollFillTextProps) {
   const words = useMemo(() => parse(text), [text]);
@@ -73,7 +102,7 @@ export function ScrollFillText({ text, hostRef, quiet, className }: ScrollFillTe
       {words.map((word, i) => (
         <span
           key={`${word.text}-${i}`}
-          className={cx(styles.word, word.accent && styles.accent)}
+          className={cx(styles.word, word.mark && styles.mark)}
           style={{ '--i': i } as CSSProperties}
         >
           {word.text}{' '}

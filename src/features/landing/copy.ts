@@ -94,18 +94,22 @@ export const TAG_WORDS = [...TAG_KEEP, ...TAG_LEAVE] as const;
 
 /* ---- sessions, two scroll-driven tabs ----------------------- */
 
-/* THE ACCENT IS MARKED IN THE COPY, NOT IN THE COMPONENT.
+/* THE EMPHASIS IS MARKED IN THE COPY, NOT IN THE COMPONENT.
 
-   `**stays**` is the one word set in the orange accent. Marking it
-   here rather than passing an index or a word to match keeps the
-   emphasis where the sentence is: an editor rewriting this block
-   moves the emphasis with it and cannot leave the two out of step.
-   `ScrollFillText` is what reads the markers. */
+   `**stays there**` is the one phrase set in the display face.
+   Marking it here rather than passing an index or a word to match
+   keeps the emphasis where the sentence is: an editor rewriting this
+   block moves the emphasis with it and cannot leave the two out of
+   step. `ScrollFillText` is what reads the markers.
+
+   It was one word in the orange accent. It is a phrase in Oswald at
+   the primary ink now — a change of VOICE rather than of colour,
+   which is what the rest of the page does with its emphasis. */
 export const SESSION_TABS = [
   {
     id: 'list',
     label: 'The month',
-    copy: 'Every session lands on your device and **stays** there. No streak to protect, nothing to keep alive — just the month as it actually happened. Repeating signals get flagged as pattern candidates, and stay candidates until they confirm.',
+    copy: 'Every session lands on your device and **stays there**. No streak to protect, nothing to keep alive — just the month as it actually happened. Repeating signals get flagged as pattern candidates, and stay candidates until they confirm.',
   },
   {
     id: 'detail',

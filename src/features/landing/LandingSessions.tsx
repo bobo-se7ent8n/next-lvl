@@ -81,11 +81,17 @@ export function LandingSessions() {
               <img className={styles.shot} src={SHOTS[0].src} alt={SHOTS[0].alt} />
             </div>
             <div className={styles.words}>
-              <Display size="md" as="h2">
+              {/* THE DISPLAY SIZE, because with the section heading
+                  gone these labels ARE the heading — see the note on
+                  the component. `xl` is the token the page's other
+                  section headings carry, so the two tabs sit at the
+                  same weight in the page as PATTERNS and INSIGHTS
+                  rather than at card-title size. */}
+              <Display size="xl" as="h2">
                 {SESSION_TABS[0].label}
               </Display>
-              {/* the one accented word in it is marked in the copy
-                  itself — see copy.ts */}
+              {/* the phrase set in the display face is marked in the
+                  copy itself — see copy.ts */}
               <ScrollFillText text={SESSION_TABS[0].copy} hostRef={copyOne} />
             </div>
           </div>
@@ -96,7 +102,7 @@ export function LandingSessions() {
               <img className={styles.shot} src={SHOTS[1].src} alt={SHOTS[1].alt} />
             </div>
             <div className={styles.words}>
-              <Display size="md" as="h2">
+              <Display size="xl" as="h2">
                 {SESSION_TABS[1].label}
               </Display>
               <ScrollFillText text={SESSION_TABS[1].copy} hostRef={copyTwo} />
