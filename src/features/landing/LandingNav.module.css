@@ -1,11 +1,16 @@
 /* ============================================================
    THE FLOATING BAR
 
-   Not a band across the top of the page — a window over it. It runs
-   the full width inside the page's frame margin, cut at the window
-   radius and outlined with the one hairline in the system, so the
-   page passes BEHIND it as it scrolls and it reads as a separate
-   object rather than as the page's own edge.
+   THERE IS NO BAR. The container draws nothing at all — no fill,
+   no border, no shadow, no blur — so what floats over the page is
+   the GROUP of pills rather than a band holding them. A bar was a
+   second surface between the page and three objects that already
+   read as objects, and on a page whose ground is paper it was a
+   panel drawn over paper for no reason.
+
+   Its GEOMETRY is untouched: still sticky at one frame margin from
+   the top, still on the nav layer, still carrying the same drop to
+   whatever is under it. Only the paint is gone.
 
    Three groups on one row. The outer two are laid out with
    `justify-content: space-between` and the middle one is centred
@@ -24,11 +29,17 @@
      margin down both sides, so the bar takes no inset of its own and
      runs the whole width it is given. */
   margin: 0 0 var(--aera-landing-nav-drop);
+  /* THE PADDING STAYS, AND SO DOES `navBand`.
+
+     The border is gone but the band the sections reserve above
+     themselves is not recalculated: it is a CLEARANCE, and the two
+     unscaled pixels the hairline used to occupy are two pixels of
+     slack rather than a layout error. Retuning it would move the top
+     padding of every section on the page to buy nothing. */
   padding: var(--aera-space-4) var(--aera-space-5);
-  border: var(--aera-border-hairline) solid var(--aera-color-utility-hairline);
-  border-radius: var(--aera-radius-window);
-  background: var(--aera-color-surface-level1);
-  box-shadow: var(--aera-elevation-low);
+  background: none;
+  border: 0;
+  box-shadow: none;
   transition: opacity var(--aera-duration-base) var(--aera-ease-out);
 }
 
@@ -46,7 +57,20 @@
   min-height: var(--aera-landing-nav-pill);
 }
 
-/* ---- left · the wordmark, right · the two ways out ------------- */
+/* ---- left · the wordmark, right · the two ways out -------------
+   THE PILLS ARE THE ONLY SURFACE UP HERE NOW.
+
+   With the bar gone they sit directly on the page, and the page is
+   `surface-background` — so the fill they used to wear was the fill
+   they were standing on and the group disappeared. They carry the
+   nav-pill surface instead: a step clear of paper, so three objects
+   read as floating over the page from the first frame, at every
+   scroll position and over every section.
+
+   INK-PRIMARY ON ALL THREE. The two links used to drop to the
+   secondary ink to sit quieter than the wordmark; against a fill
+   this light that read as disabled rather than as quiet.
+   ---------------------------------------------------------------- */
 .brand,
 .action {
   display: inline-flex;
@@ -56,7 +80,7 @@
   border-radius: var(--aera-radius-pill);
   color: var(--aera-color-ink-primary);
   text-decoration: none;
-  background: var(--aera-color-surface-background);
+  background: var(--aera-color-surface-nav-pill);
   transition:
     background-color var(--aera-duration-fast) var(--aera-ease-out),
     color var(--aera-duration-fast) var(--aera-ease-out);
@@ -74,10 +98,6 @@
   gap: var(--aera-space-4);
 }
 
-.action {
-  color: var(--aera-color-ink-secondary);
-}
-
 /* ---- centre · the scroll capsule ------------------------------
    Pinned to the middle of the BAR and taken out of the flex flow,
    so widening it on the morph cannot push either neighbour. The
@@ -93,32 +113,35 @@
   transform: translate(-50%, -50%);
 }
 
-/* SQUARE, AND LIGHT.
+/* A PILL, AND THE SAME OBJECT AS ITS NEIGHBOURS.
 
-   Square because it holds one glyph and nothing else: it was 76px
-   wide for a 14px arrow, which left the glyph adrift in a slot
-   twice the width it needed and read as a button somebody had
-   forgotten to fill.
+   WIDER THAN TALL. It was square — one glyph in a box exactly the
+   height of the bar — which read as a button that had lost its
+   label rather than as the third object in a floating group. It is
+   the same height as the wordmark and the two links and comfortably
+   wider than either of them is tall, so the group reads as three
+   pills rather than as two pills and a chip.
 
-   LIGHT, because it is the same object as the wordmark and the two
-   links either side of it — paper on the bar's own level1 ground,
-   with the product's ink on top. It spent one revision inverted so
-   that a white progress indicator would read against it; the
-   indicator is an arc around the OUTSIDE of the button now, on the
-   bar's ground rather than on the button's, so the button can go
-   back to being the same thing as its neighbours.
-   ---------------------------------------------------------------- */
+   THERE IS NO GAP IN IT. `gap` applied between the glyph and the
+   zero-width "To top" label, which is still a flex item at rest —
+   so half a gap was being paid to the right of the arrow and the
+   arrow sat half a gap left of centre. Nothing here offsets the
+   glyph, transforms it or nudges it: it is one flex box with
+   `justify-content: center` and `align-items: center`, and the
+   label contributes exactly nothing until the morph opens it.
+
+   It carries the same nav-pill surface as the wordmark and the two
+   links: with the bar gone, every object up here is on the page. */
 .capsule {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--aera-space-5);
   width: var(--aera-landing-nav-progress-w);
   height: var(--aera-landing-nav-pill);
   padding: 0;
   border-radius: var(--aera-radius-pill);
-  background: var(--aera-color-surface-background);
+  background: var(--aera-color-surface-nav-pill);
   color: var(--aera-color-ink-primary);
   cursor: default;
   /* RESISTANCE, AND NOTHING ELSE. The capsule widens on a firm
@@ -129,26 +152,39 @@
   transition: width var(--aera-duration-base) var(--aera-ease-firm);
 }
 
+/* THE GAP BELONGS TO THE MORPHED STATE AND NOWHERE ELSE.
+
+   Once the label is open the glyph and the words need air between
+   them; at rest the label is a zero-width flex item and the same gap
+   is half a step of dead space on the arrow's right, which is
+   exactly what was pushing it off the centre line. */
 .capsuleWide {
   width: var(--aera-landing-nav-to-top-w);
   padding-inline: var(--aera-space-8);
+  gap: var(--aera-space-5);
   cursor: pointer;
 }
 
 /* ---- the progress arc -----------------------------------------
-   A ring travelling around the OUTSIDE of the button rather than a
-   bar sitting above it: total page scroll is how far round it has
-   got. `--p` is written on every animation frame and nothing here
-   re-renders.
+   A ring around the glyph: total page scroll is how far round it
+   has got. The dash is written on every animation frame and nothing
+   here re-renders.
 
    It is drawn in an SVG whose box is the arc's own diameter,
    centred on the capsule and pinned there — so it stays concentric
    while the capsule widens underneath it, and the ring does not
    stretch into an ellipse as the button becomes a pill.
 
-   WHITE, on the bar's level1 ground. That reads: paper against the
-   step below it is a real edge, and the blurred copy underneath
-   turns that edge into a glow rather than a hairline.
+   INSIDE THE PILL, NOW THAT THE PILL IS WIDER. The ring used to sit
+   a few pixels proud of a square capsule on all four sides. On a
+   pill two thirds wider than it is tall that same radius is outside
+   the top and bottom edges and inside the left and right ones — a
+   circle half-swallowed by a stadium. `navArc` is a radius that
+   clears the glyph and stays inside the pill's own height instead.
+
+   INK, NOT WHITE. The stroke was `ink-on-inverse` because it was
+   drawn on the bar's level1 ground and read as paper against it.
+   There is no bar: a white arc on white paper is no arc at all.
    ---------------------------------------------------------------- */
 .arc {
   position: absolute;
@@ -177,17 +213,17 @@
 }
 
 .arcRun {
-  stroke: var(--aera-color-ink-on-inverse);
+  stroke: var(--aera-color-ink-primary);
   stroke-width: var(--aera-border-base);
   stroke-linecap: round;
 }
 
 .arcGlow {
-  stroke: var(--aera-color-ink-on-inverse);
+  stroke: var(--aera-color-ink-primary);
   stroke-width: var(--aera-border-thick);
   stroke-linecap: round;
   filter: blur(var(--aera-landing-nav-glow));
-  opacity: 0.85;
+  opacity: 0.32;
 }
 
 /* ---- the glyph and the label ---------------------------------- */

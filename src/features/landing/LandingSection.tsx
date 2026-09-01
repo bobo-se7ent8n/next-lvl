@@ -15,6 +15,11 @@ export interface LandingSectionProps {
   /** the section is exactly one window tall and nothing inside it
    *  scrolls — used where the whole point is that it fits */
   fit?: boolean;
+  /** set the body on the WIDE measure rather than the readable one.
+   *  For a single centred sentence under a display heading, where
+   *  the readable measure breaks it onto a third line and a
+   *  three-line block stops reading as a caption. */
+  wideBody?: boolean;
   className?: string;
 }
 
@@ -45,6 +50,7 @@ export function LandingSection({
   children,
   centred,
   fit,
+  wideBody,
   className,
 }: LandingSectionProps) {
   return (
@@ -56,7 +62,11 @@ export function LandingSection({
       <header className={styles.head}>
         <Display size="lg">{heading}</Display>
         {body ? (
-          <Text variant="body" tone="secondary" className={styles.body}>
+          <Text
+            variant="body"
+            tone="secondary"
+            className={cx(styles.body, wideBody && styles.bodyWide)}
+          >
             {body}
           </Text>
         ) : null}

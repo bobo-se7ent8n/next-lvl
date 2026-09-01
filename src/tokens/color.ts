@@ -26,7 +26,7 @@
                        the wireframe dash, the selection ring.
    ============================================================ */
 
-export const colorSurface = {
+const SURFACE = {
   /** the paper, and the face of every card resting on it */
   background: '#FFFFFC',
   /** the first step up — chips, quiet fills, wells */
@@ -35,6 +35,24 @@ export const colorSurface = {
   level2: '#E9E7E1',
   /** the darkest surface — inverted pills, tooltips */
   inverse: '#141310',
+} as const;
+
+export const colorSurface = {
+  ...SURFACE,
+  /* THE LANDING BAR'S PILLS — A ROLE, NOT A NINTH SURFACE.
+
+     The public page's nav has no bar behind it any more: the
+     wordmark, the scroll capsule and the two links float directly on
+     the page. `surface-background` is what they were wearing and it
+     is also what they are standing on, so the group vanished into
+     the paper.
+
+     This is `level2` REFERENCED rather than a new value, which is the
+     whole point of naming it: the scale is still eight colours, and
+     the day the second step moves this moves with it. It exists so
+     the pills can say WHY they are a step up from paper rather than
+     picking a surface out of the scale in a stylesheet. */
+  navPill: SURFACE.level2,
 } as const;
 
 export const colorInk = {

@@ -39,6 +39,22 @@
   max-width: var(--aera-layout-max-read-width);
 }
 
+/* ---- THE WIDE MEASURE -------------------------------------------
+   For a section whose body is ONE SENTENCE centred under a display
+   heading. The readable measure is 54ch, which is the right width
+   for a paragraph somebody sits down to read and the wrong one for
+   a caption: the Patterns line broke onto three, and three centred
+   lines under a one-word heading read as a paragraph that had not
+   been cut rather than as a line introducing what is under it.
+
+   `balance` on top of the width, so the two lines the wider measure
+   buys come out close to even instead of a full line and a stub.
+   ---------------------------------------------------------------- */
+.bodyWide {
+  max-width: var(--aera-landing-section-body-w);
+  text-wrap: balance;
+}
+
 .content {
   display: flex;
   flex-direction: column;

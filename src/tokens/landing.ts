@@ -58,19 +58,34 @@ export const landing = {
   navPill: '36px',
   /** THE CENTRE CAPSULE, at rest and once it has morphed.
    *
-   *  At rest it is square: a capsule the height of the bar holding
-   *  one glyph, centred on both axes. It used to be 76 wide for a
-   *  14px arrow, which left the glyph adrift in a slot twice the
-   *  width it needed and read as an empty button. */
-  navProgressW: '36px',
+   *  A PILL, NOT A SQUARE. At 36 it was exactly as wide as it was
+   *  tall — one glyph in a box the height of the bar — and beside a
+   *  wordmark pill and two link pills it read as a chip somebody had
+   *  forgotten to label rather than as the third object in the
+   *  group. 60 is two thirds wider again: a real pill at the same
+   *  height, with the arrow centred in it and nothing else in there
+   *  competing for the room.
+   *
+   *  It went the other way once — 76px for a 14px arrow, which was
+   *  too far and left the glyph adrift. This is the middle. */
+  navProgressW: '60px',
   navToTopW: '124px',
   /** the drop between the bar and the first thing under it */
   navDrop: '32px',
-  /** the radius the progress arc is drawn at, measured from the
-   *  centre of the square capsule — a little outside its own edge,
-   *  so the ring reads as travelling around the button rather than
-   *  as part of it */
-  navArc: '25px',
+  /** THE RADIUS THE PROGRESS RING IS DRAWN AT, from the centre of
+   *  the capsule.
+   *
+   *  It used to be 25 — a few pixels proud of a 36px square on all
+   *  four sides, so the ring read as travelling around the outside
+   *  of the button. The capsule is a 60 x 36 pill now and that same
+   *  radius puts the ring outside its top and bottom edges while
+   *  sitting inside its left and right ones: a circle half swallowed
+   *  by a stadium.
+   *
+   *  14 is the ring drawn INSIDE the pill instead — clear of the
+   *  14px glyph it circles, and clear of the pill's own height once
+   *  the widest stroke on it is accounted for. */
+  navArc: '14px',
   /* THE BAR'S WHOLE IN-FLOW BAND — inset, padding, border, capsule
      and the drop beneath it.
 
@@ -117,6 +132,21 @@ export const landing = {
    *  free — it is one transform — where cropping is not. */
   shotWidth: '1440px',
   shotHeight: '900px',
+  /** A SECTION'S OPENING LINE, WHERE TWO LINES IS THE POINT.
+   *
+   *  The default measure for a section's body is the readable one —
+   *  `layout.maxReadWidth`, 54ch — which is right for a paragraph and
+   *  wrong for a single sentence set centred under a display
+   *  heading: the Patterns line broke onto three, and a three-line
+   *  block under a one-word heading reads as a paragraph somebody
+   *  forgot to cut rather than as a caption.
+   *
+   *  A LENGTH RATHER THAN A `ch` COUNT, so it is projected through
+   *  `--aera-scale` and steps down with the type it is measuring —
+   *  a `ch` measure would hold its character count while the type
+   *  shrank around it and the line count would drift by window. */
+  sectionBodyW: '680px',
+
   /** a fan card in the patterns arc */
   fanCardW: '284px',
   fanCardH: '372px',
