@@ -10,11 +10,29 @@
    The two `image-rendering` lines are one instruction spelled twice:
    keep the dots square when the scale factor lands somewhere
    fractional, rather than smoothing a small grid into a blur.
-   Engines that understand only one of the keywords take that one. */
+   Engines that understand only one of the keywords take that one.
+
+   `object-fit: contain` IS A GUARD, NOT A LAYOUT CHOICE.
+
+   `width` and `height` at 100% stretch the canvas box to the slot,
+   and the slot's ratio is whatever the card's text rows leave — it is
+   not the recipe's. Without this line the two ratios are reconciled
+   by squashing the bitmap, and a dot grid stretched by a few percent
+   does not look broken, it just looks slightly wrong: the dots go
+   subtly oval and nothing on screen says why. With it, the same
+   mismatch shows up as thin empty bands instead, which is a thing you
+   can SEE and go re-cut the recipe for.
+
+   So the bands are the feature. A recipe whose ratio matches its
+   slot gets none; a recipe that is off by a little gets a little
+   letterbox and stays geometrically honest. Scaling stays uniform in
+   both axes either way, which is what actually keeps the dots
+   square. */
 .canvas {
   display: block;
   width: 100%;
   height: 100%;
+  object-fit: contain;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
