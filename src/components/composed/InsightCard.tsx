@@ -4,6 +4,7 @@ import { Chip, Tag } from '../primitives/Chip';
 import { Display, Label, Text } from '../primitives/Text';
 import { Well } from '../primitives/Surface';
 import { DotMatrix } from '../graphics/DotMatrix';
+import { CardViz } from '../viz/CardViz';
 import type { DataTone } from '../../tokens';
 import type { Insight } from '../../data/types';
 import styles from './InsightCard.module.css';
@@ -63,14 +64,16 @@ export function InsightCard({ insight, onClick, id, className }: InsightCardProp
       {/* the one illustration language, never a per-card style: the
           pattern is chosen to match what the item is about */}
       <Well radius="lg" className={styles.graphic}>
-        <DotMatrix
-          pattern={insight.graphic}
-          rows={GRAPHIC_ROWS}
-          columns={COLUMNS}
-          accent={KIND_TONE[insight.kind]}
-          fill
-          ariaLabel={`${insight.title}: ${insight.graphic} field`}
-        />
+        <CardViz card={insight}>
+          <DotMatrix
+            pattern={insight.graphic}
+            rows={GRAPHIC_ROWS}
+            columns={COLUMNS}
+            accent={KIND_TONE[insight.kind]}
+            fill
+            ariaLabel={`${insight.title}: ${insight.graphic} field`}
+          />
+        </CardViz>
       </Well>
 
       {/* FILLED TAG FIRST. The filled one says where this is done and

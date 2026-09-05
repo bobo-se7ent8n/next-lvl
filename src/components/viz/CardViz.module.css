@@ -1,0 +1,20 @@
+/* THE CANVAS SCALES; IT IS NOT MEASURED.
+
+   The element's intrinsic size is its recipe's logical grid and
+   nothing here restates it — there is no px width or height in this
+   file on purpose. `100%` of the graphic slot is what that slot's own
+   flex box has already worked out, so the matrix follows the card
+   through every breakpoint with no measurement pass and no
+   ResizeObserver.
+
+   The two `image-rendering` lines are one instruction spelled twice:
+   keep the dots square when the scale factor lands somewhere
+   fractional, rather than smoothing a small grid into a blur.
+   Engines that understand only one of the keywords take that one. */
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}

@@ -4,6 +4,7 @@ import { Chip } from '../../components/primitives/Chip';
 import { Metric } from '../../components/primitives/Metric';
 import { Display, Label, Text } from '../../components/primitives/Text';
 import { DotMatrix } from '../../components/graphics/DotMatrix';
+import { CardViz } from '../../components/viz/CardViz';
 import { FOCUS } from '../../data/vitals';
 import styles from './FocusPanel.module.css';
 
@@ -56,14 +57,16 @@ export function FocusPanel({ className }: FocusPanelProps) {
           Wide and even on the left — the unpressured baseline — closing
           all the way to a dense band at the release. */}
       <div className={styles.graphic} ref={well}>
-        <DotMatrix
-          pattern="interval"
-          rows={rows}
-          columns={BEATS}
-          accent="lilac"
-          fill
-          ariaLabel="The interval between pre-shot beats, closing from the catch to the release"
-        />
+        <CardViz card={FOCUS}>
+          <DotMatrix
+            pattern="interval"
+            rows={rows}
+            columns={BEATS}
+            accent="lilac"
+            fill
+            ariaLabel="The interval between pre-shot beats, closing from the catch to the release"
+          />
+        </CardViz>
       </div>
       <div className={styles.graphicAxis}>
         <Label tone="tertiary">catch</Label>

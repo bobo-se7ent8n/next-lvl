@@ -5,6 +5,7 @@ import { Card } from '../primitives/Card';
 import { Display, Text } from '../primitives/Text';
 import { Metric } from '../primitives/Metric';
 import { PatternChart } from '../../features/patterns/PatternChart';
+import { CardViz } from '../viz/CardViz';
 import type { Pattern } from '../../data/types';
 import styles from './PatternCard.module.css';
 
@@ -73,15 +74,26 @@ export function PatternCard({
         {pattern.trend}
       </Text>
 
-      {/* 4 — THE CHART, and it takes everything left.
+      {/* 4 — THE GRAPHIC, and it takes everything left.
 
-          THE SAME CHART THE OPENED PANEL DRAWS, from the same series,
-          with its annotations off. It fills the block rather than
-          being measured into it: `100%` resolves because this block
-          has a definite height from the card's own, so no
-          ResizeObserver has to publish a pixel height to it. */}
+          BY DEFAULT, THE SAME CHART THE OPENED PANEL DRAWS, from the
+          same series, with its annotations off. It fills the block
+          rather than being measured into it: `100%` resolves because
+          this block has a definite height from the card's own, so no
+          ResizeObserver has to publish a pixel height to it.
+
+          A dot matrix fills the block the same way and for the same
+          reason — it is a canvas at its own small intrinsic
+          resolution, scaled by CSS, so it too needs nothing measured
+          for it. Which one stands here is `CardViz`'s answer, taken
+          from the pattern's OWN ID rather than from its position:
+          this card front is the same component in the Home fan, the
+          landing fan, the component browser and the stories, and it
+          must not care which of them is asking. */}
       <div className={styles.viz}>
-        <PatternChart pattern={pattern} color={chart} height="100%" compact />
+        <CardViz card={pattern}>
+          <PatternChart pattern={pattern} color={chart} height="100%" compact />
+        </CardViz>
       </div>
 
       {showTag ? (

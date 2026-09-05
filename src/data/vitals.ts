@@ -109,6 +109,15 @@ export const VITALS: Vital[] = [
 ];
 
 export const FOCUS = {
+  /* THE ONE CARD ON THESE SCREENS WITH NO ID OF ITS OWN.
+
+     Every other card is an entry in a list and carries the id its
+     list gave it. Focus is a singleton, so it had nothing stable to
+     be addressed by — and a viz registry keyed on anything else (a
+     title, a position) breaks the moment the copy or the layout
+     moves. This is that stable name, and it is the key
+     `docs/viz-cards.md` lists it under. */
+  id: 'focus',
   kicker: 'Session 14',
   stat: '0.42',
   unit: 's',

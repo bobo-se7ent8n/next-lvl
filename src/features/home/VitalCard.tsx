@@ -8,6 +8,7 @@ import { Legend } from '../../components/viz/Legend';
 import { Sparkline } from '../../components/viz/Sparkline';
 import { AreaChart } from '../../components/viz/AreaChart';
 import { BarSet } from '../../components/viz/BarSet';
+import { CardViz } from '../../components/viz/CardViz';
 import { dataColor } from '../../lib/color';
 import type { Vital } from '../../data/types';
 import styles from './VitalCard.module.css';
@@ -46,24 +47,29 @@ export function VitalCard({ vital, className }: VitalCardProps) {
         />
       ) : null}
 
+      {/* THE WELL IS UNCHANGED — only what stands in it can vary.
+          `CardViz` hands back the chart below untouched unless this
+          vital's id has a dot-matrix recipe registered against it. */}
       <Well className={styles.well}>
-        {vital.chart.type === 'bars' ? (
-          <BarSet items={vital.chart.items} className={styles.chart} style={FILL} />
-        ) : vital.chart.type === 'area' ? (
-          <AreaChart
-            values={vital.chart.values}
-            color={dataColor(vital.chart.tone)}
-            className={styles.chart}
-            style={FILL}
-          />
-        ) : (
-          <Sparkline
-            values={vital.chart.values}
-            color={dataColor(vital.chart.tone)}
-            className={styles.chart}
-            style={FILL}
-          />
-        )}
+        <CardViz card={vital}>
+          {vital.chart.type === 'bars' ? (
+            <BarSet items={vital.chart.items} className={styles.chart} style={FILL} />
+          ) : vital.chart.type === 'area' ? (
+            <AreaChart
+              values={vital.chart.values}
+              color={dataColor(vital.chart.tone)}
+              className={styles.chart}
+              style={FILL}
+            />
+          ) : (
+            <Sparkline
+              values={vital.chart.values}
+              color={dataColor(vital.chart.tone)}
+              className={styles.chart}
+              style={FILL}
+            />
+          )}
+        </CardViz>
       </Well>
     </Card>
   );
