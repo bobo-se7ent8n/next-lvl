@@ -25,7 +25,7 @@ container is the box the canvas is scaled into, not the card.
 | Patterns | `leftwing` | Left-wing hesitation | Sparkline (svg) | `#C4B5FF` lilac | 237 × 214 |
 | Patterns | `firststep` | First-step quickening | Sparkline (svg) | `#A6DBFF` blue | 237 × 205 |
 | Patterns | `finishing` | Finishing through contact | BarSet (divs) | `#F0E9D8` beige | 237 × 205 |
-| Patterns | `fatigue` | Fatigue shifts shot mix | AreaChart (svg) | `#141310` ink | 237 × 214 |
+| Patterns | `fatigue` | Fatigue shifts shot mix | AreaChart (svg) | `#FFB0CD` pink | 237 × 214 |
 | Patterns | `handle` | Handle tightens late | BarSet (divs) | `#93EAC3` mint | 237 × 214 |
 | Patterns | `freethrow` | Free-throw rhythm | Sparkline (svg) | `#FFE159` yellow | 237 × 214 |
 | Patterns | `corner3` | Corner-3 footwork | Sparkline (svg) | `#FF9B68` orange | 237 × 214 |
@@ -73,6 +73,13 @@ On Patterns that face is one of seven from `FAN_FILLS`, cycling by index
 modulo seven; the graphic sits in a flat `surface-level1` well cut into
 it, which is what a recipe's `canvas.background` should match rather than
 the face. On Focus & vitals and Insights the face is the plain surface.
+
+All seven fan faces are now light, so every card takes dark ink and the
+same `surface-level1` well. `fatigue` used to wear the near-black
+`colorFace.ink` and was the one card whose luminance flipped the
+ink/well/chart-ink helpers; it wears `colorFace.pink` (`#FFB0CD`) now and
+behaves like the other six. A recipe written for it needs no dark
+variant.
 
 **Insights card order.** The table is in `INSIGHTS` data order. On screen
 the grid round-robins them into three columns at ≥1024px, so the DOM

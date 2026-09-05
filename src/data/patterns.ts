@@ -17,16 +17,26 @@ export const STATE_LABEL: Record<PatternState, string> = {
    you are part-way through. Seven does not divide twelve, so no two
    cards on the stage at once ever share a face.
 
-   The last two are what actually break it. Beige and near-black are
-   LOW-CHROMA — they are not trying to be hues — so they read as
-   punctuation in a row of colour, and the eye stops looking for the
-   pattern the moment it hits one. Five saturated cards cannot do
-   that for each other however they are ordered.
+   The last two are the ones that are not palette hues. Beige is
+   low-chroma paper and reads as punctuation in a row of colour.
+   Pink is the warm end the five-hue palette does not reach, so it
+   extends the run without repeating any of it.
+
+   THE SEVENTH USED TO BE NEAR-BLACK, and it was the wrong kind of
+   different. Every helper in this product that measures a face
+   flips at a luminance threshold, so that one card took light type,
+   a differently-lifted viz well and a chart ink computed from the
+   other end of the scale — all correct, all consistent, and the
+   result still read as a different interface layer parked in the
+   middle of the hand rather than as the seventh card in it. A
+   pastel keeps the seven-beat and stays on the same side of every
+   one of those thresholds.
 
    Ink is COMPUTED from the face, never listed alongside it: `inkOn`
-   measures the fill's luminance and returns light ink or dark, so
-   the near-black card gets light type and the other six get dark
-   without a single special case anywhere in the component. */
+   measures the fill's luminance and returns light ink or dark. With
+   seven light faces it now returns dark for all of them — but the
+   call stays, because the rule is "ink follows the face", not
+   "these particular seven fills are light". */
 export const FAN_FILLS = [
   colorData.mint,
   colorData.yellow,
@@ -34,7 +44,7 @@ export const FAN_FILLS = [
   colorData.lilac,
   colorData.blue,
   colorFace.beige,
-  colorFace.ink,
+  colorFace.pink,
 ] as const;
 
 /* Trend copy is deliberately flat: it states the direction and the

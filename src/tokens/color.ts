@@ -76,27 +76,50 @@ export const colorData = {
 } as const;
 
 /* ------------------------------------------------------------
-   THE TWO CARD FACES THAT ARE NOT HUES
+   THE CARD FACES THAT ARE NOT PALETTE HUES
 
    A pattern card's face cycles through the five palette hues and
-   then these two. They are the reason a twelve-card hand stops
-   reading as a loop: five hues repeat every five cards and the eye
-   catches it immediately, and no amount of reordering hides that.
-   Two LOW-CHROMA faces in the cycle break the rhythm, because
-   neither of them is competing to be a hue at all.
+   then these. They are the reason a twelve-card hand stops reading
+   as a loop: five hues repeat every five cards and the eye catches
+   it immediately, and no amount of reordering hides that. Two more
+   faces in the cycle make it seven, and seven does not divide
+   twelve, so no two cards on the stage at once share a face.
 
    They live here rather than in `data` on purpose — `data` is the
    palette, and a palette entry carries a meaning slot in the
-   charts. These carry none; they are just paper and just ink.
+   charts. These carry none; they are just paper. `pink` is a hue by
+   appearance but not by role: it names no reading, sits on no ramp,
+   and nothing may infer a meaning from a card wearing it.
 
-   The near-black is `surface.inverse` referenced, not a second copy
-   of the same hex: there is one near-black in this product and it
-   is used for inverted pills, tooltips and this card face alike.
+   `ink` is `surface.inverse` referenced, not a second copy of the
+   same hex: there is one near-black in this product and it is used
+   for inverted pills and tooltips. It is NO LONGER A CARD FACE —
+   see the note on `pink` below.
    ------------------------------------------------------------ */
 export const colorFace = {
   /** warm paper — the low-chroma card face */
   beige: '#F0E9D8',
-  /** the near-black card face */
+  /**
+   * SOFT PINK — the seventh fan face, and what replaced the
+   * near-black one.
+   *
+   * The dark card was the odd one out for a reason that had nothing
+   * to do with its hue: at that luminance every helper that measures
+   * a face flipped, so it took light type, a lifted viz well and a
+   * chart ink computed from the other end of the scale. It stopped
+   * being a card in the set and started reading as a different
+   * interface layer sitting among them. A pastel keeps the cycle
+   * seven long without that break — every luminance-driven helper
+   * lands on the same side of its threshold as the other six.
+   */
+  pink: '#FFB0CD',
+  /**
+   * The near-black face. RETAINED BUT NO LONGER USED as a card
+   * face — nothing reads it since `pink` took its slot in
+   * `FAN_FILLS`. Kept because the dark-face code paths it exercised
+   * are still in place and still correct for any future dark
+   * surface; deleting the token would only hide that.
+   */
   ink: colorSurface.inverse,
 } as const;
 
