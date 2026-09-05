@@ -47,10 +47,16 @@ export interface VizEntry {
    ============================================================ */
 
 /* ---- THE SHARED BASE ------------------------------------------
-   Every card is identical except visualization, color, domain,
-   pixel style and seed. These five objects are shared by reference
-   across all twelve recipes: nothing mutates them, so one copy is
-   both cheaper and easier to keep honest than twelve. */
+   Every card is identical except visualization, color, domain and
+   seed. These five objects — format, canvas, comparison colours,
+   motion and the pixel style — are shared by reference across all
+   twelve recipes: nothing mutates them, so one copy is both cheaper
+   and easier to keep honest than twelve.
+
+   `matrix()` still takes the pixel style as an argument even though
+   all twelve pass the same one. It is the axis a per-card table is
+   written along, and threading it keeps the call sites readable as
+   a table rather than as twelve calls with a hidden constant. */
 
 const FORMAT: DataFormatRecipe = { ratio: 'custom', width: 237, height: 214 };
 
@@ -78,8 +84,16 @@ const MOTION: DataMotionRecipe = {
   changeFrequency: 1,
 };
 
-const STYLE_A: DataPixelStyleRecipe = { pixelSize: 2, gap: 1, density: 1 };
-const STYLE_B: DataPixelStyleRecipe = { pixelSize: 2, gap: 2, density: 0.82 };
+/* ONE STYLE FOR THE WHOLE FAN.
+
+   There used to be two — a tight one and a sparser one — and the
+   split did nothing a reader could name: two cards side by side in
+   the same hand had different dot pitches for no reason the data
+   gave. A pitch of 5 (3px dot, 2px gap) over the 96x87 logical field
+   lands on a 19x17 grid, which is coarse enough that the dots read as
+   dots rather than as a texture. Shared by reference across all
+   twelve recipes. */
+const PIXEL_STYLE: DataPixelStyleRecipe = { pixelSize: 3, gap: 2, density: 1 };
 
 /** one recipe off the shared base. Called at module level only. */
 function matrix(
@@ -131,62 +145,62 @@ const barValues = (id: string): number[] => byId(id).bars.map((bar) => bar.value
 export const DOT_MATRIX_VIZ: Record<string, VizEntry> = {
   /* Patterns — all twelve cards in the fan. */
   rushing: {
-    recipe: matrix(73129, 'area-zone', '#A6DBFF', 'zero-to-100', STYLE_A),
+    recipe: matrix(73129, 'area-zone', '#93EAC3', 'zero-to-100', PIXEL_STYLE),
     data: series('rushing'),
     ariaLabel: 'Rushing under pressure, release time across six sessions',
   },
   recovers: {
-    recipe: matrix(21847, 'comparison', '#93EAC3', 'auto', STYLE_A),
+    recipe: matrix(21847, 'comparison', '#93EAC3', 'auto', PIXEL_STYLE),
     data: barValues('recovers'),
     ariaLabel: 'Recovery after makes, next-possession shooting by situation',
   },
   contested3: {
-    recipe: matrix(60412, 'area-zone', '#FF9868', 'zero-to-100', STYLE_A),
+    recipe: matrix(60412, 'area-zone', '#FF9868', 'zero-to-100', PIXEL_STYLE),
     data: barValues('contested3'),
     ariaLabel: 'Contested-3 confidence, shooting against three closeout types',
   },
   leftwing: {
-    recipe: matrix(38265, 'area-zone', '#C4B5FF', 'zero-to-100', STYLE_A),
+    recipe: matrix(38265, 'area-zone', '#C4B5FF', 'zero-to-100', PIXEL_STYLE),
     data: series('leftwing'),
     ariaLabel: 'Left-wing hesitation, pause before the gather across six sessions',
   },
   firststep: {
-    recipe: matrix(91730, 'area-zone', '#A6DBFF', 'zero-to-100', STYLE_A),
+    recipe: matrix(91730, 'area-zone', '#A6DBFF', 'auto', PIXEL_STYLE),
     data: series('firststep'),
     ariaLabel: 'First-step quickening, acceleration across six sessions',
   },
   finishing: {
-    recipe: matrix(54098, 'comparison', '#A6DBFF', 'auto', STYLE_A),
+    recipe: matrix(54098, 'comparison', '#A6DBFF', 'auto', PIXEL_STYLE),
     data: barValues('finishing'),
     ariaLabel: 'Finishing through contact, three kinds of look at the rim',
   },
   fatigue: {
-    recipe: matrix(17356, 'area-zone', '#FFB0CD', 'zero-to-100', STYLE_B),
+    recipe: matrix(17356, 'area-zone', '#FFB0CD', 'zero-to-100', PIXEL_STYLE),
     data: series('fatigue'),
     ariaLabel: 'Fatigue shifts shot mix, pull-up share across four sessions',
   },
   handle: {
-    recipe: matrix(82914, 'comparison', '#FFB0CD', 'zero-to-100', STYLE_B),
+    recipe: matrix(82914, 'comparison', '#FFB0CD', 'auto', PIXEL_STYLE),
     data: barValues('handle'),
     ariaLabel: 'Handle tightens late, dribble variance early to late',
   },
   freethrow: {
-    recipe: matrix(45602, 'area-zone', '#FFE159', 'zero-to-100', STYLE_B),
+    recipe: matrix(45602, 'area-zone', '#FFE159', 'zero-to-100', PIXEL_STYLE),
     data: series('freethrow'),
     ariaLabel: 'Free-throw rhythm, percentage across six make-streaks',
   },
   corner3: {
-    recipe: matrix(29187, 'area-zone', '#FF9868', 'zero-to-100', STYLE_B),
+    recipe: matrix(29187, 'area-zone', '#FF9868', 'zero-to-100', PIXEL_STYLE),
     data: series('corner3'),
     ariaLabel: 'Corner-3 footwork, setup score across six sessions',
   },
   ballsec: {
-    recipe: matrix(70543, 'area-zone', '#C4B5FF', 'zero-to-100', STYLE_B),
+    recipe: matrix(70543, 'area-zone', '#C4B5FF', 'zero-to-100', PIXEL_STYLE),
     data: series('ballsec'),
     ariaLabel: 'Ball security, clean possessions across six sessions',
   },
   routine: {
-    recipe: matrix(36821, 'area-zone', '#A6DBFF', 'zero-to-100', STYLE_B),
+    recipe: matrix(36821, 'area-zone', '#A6DBFF', 'zero-to-100', PIXEL_STYLE),
     data: series('routine'),
     ariaLabel: 'Pre-shot routine drift, consistency across three sessions',
   },
@@ -202,7 +216,7 @@ export const DOT_MATRIX_VIZ: Record<string, VizEntry> = {
    force a cast against the engine's own `data: number[]` prop. Called
    this way the objects are genuinely immutable at runtime and the
    types stay exactly as declared above. */
-for (const shared of [FORMAT, CANVAS, COMPARISON_COLORS, MOTION, STYLE_A, STYLE_B]) {
+for (const shared of [FORMAT, CANVAS, COMPARISON_COLORS, MOTION, PIXEL_STYLE]) {
   Object.freeze(shared);
 }
 for (const entry of Object.values(DOT_MATRIX_VIZ)) {
