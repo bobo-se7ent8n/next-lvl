@@ -1,5 +1,6 @@
 import {
   createDataCanvas,
+  createGridLayout,
   type CanvasRecipe,
   type ChartDomainMode,
   type DataDotMatrixRecipe,
@@ -192,10 +193,21 @@ const barValues = (id: string): number[] => byId(id).bars.map((bar) => bar.value
    carry honestly. So they get the engine's PROCEDURAL recipe — a
    seeded field that drifts and nothing else.
 
-   The motion is IDENTICAL across all fifteen. Only the seed and the
-   colour vary, which is why every motion value below is a named
-   constant shared by reference rather than a literal repeated
-   fifteen times: the day the drift is retuned it is retuned once.
+   FOURTEEN OF THE FIFTEEN SHARE ONE MOTION — `random-drift` at the
+   fan's own 3/2 pitch — and differ only in seed, colour and cut.
+   Every value is a named constant shared by reference rather than a
+   literal repeated fourteen times: the day the drift is retuned it
+   is retuned once.
+
+   `focus` IS THE EXCEPTION, DELIBERATELY. It is the one card on
+   Focus & vitals that is not a body reading — it is the week's
+   argument, and it was reading as a seventh vital because it wore
+   the same field as the six beside it. It gets pink instead of a
+   palette hue, `pulse` instead of drift, and a 1/1 pitch that is
+   fine enough to read as a different material rather than as a
+   bigger version of the same one. Its recipe is spelled out below
+   rather than built by `ambient()`, because a card that is meant to
+   look different should not be one argument away from the others.
 
    NO REVEAL. `DotMatrixRecipe` has no `revealDuration` field and
    `PixelAnimation` passes none, so `DotMatrixCanvas` defaults it to
@@ -214,12 +226,20 @@ const AMBIENT_BACKGROUND = '#F3F2EE';
    here: a reader moving Patterns -> Focus -> Insights sees three
    screens of the same product, and a dot that changes size between
    them reads as three different graphics languages. Matching the fan
-   is the whole point, so the pitch is fixed at 5 everywhere. */
+   is the whole point, so the pitch is 5 on all fourteen. */
 const AMBIENT_PIXEL_STYLE: PixelStyleRecipe = { pixelSize: 3, gap: 2 };
+
+/* THE ONE PITCH THAT IS NOT 5. `focus` reads as a finer material —
+   a 1px dot on a 1px gap over the same logical field, which is two
+   and a half times the cell count of the vitals beside it. It is the
+   only card allowed to break the shared pitch, and it breaks it far
+   enough that nobody will read it as a rounding accident. */
+const FOCUS_PIXEL_STYLE: PixelStyleRecipe = { pixelSize: 1, gap: 1 };
 
 /* The drift itself. Full variation, slow, and the flicker allowed to
    run the entire 0..1 opacity range — a field that goes all the way
-   out and all the way back rather than shimmering inside a band. */
+   out and all the way back rather than shimmering inside a band.
+   `focus` keeps every one of these except the preset and the speed. */
 const AMBIENT_PRESET = 'random-drift' as const;
 const AMBIENT_MOTION_AMOUNT = 1;
 const AMBIENT_SPEED = 0.18;
@@ -227,39 +247,127 @@ const AMBIENT_MIN_OPACITY = 0;
 const AMBIENT_MAX_OPACITY = 1;
 const AMBIENT_CHANGE_FREQUENCY = 1;
 
-/* ---- ONE CUT PER WELL -----------------------------------------
-   THIS IS WHAT KEEPS THE CONTAINERS WHERE THEY ARE. A canvas is
-   scaled into its slot at `object-fit: contain`, so a recipe cut to
-   the wrong ratio does not resize anything — but a recipe cut to the
-   RIGHT ratio is the difference between a field that fills its well
-   and one that letterboxes into a band inside it. The Patterns cut
-   (237x214) is portrait-ish and would have left every landscape well
-   on these two screens half empty.
+/** `focus` alone: a radial pulse rather than an untimed drift */
+const FOCUS_PRESET = 'pulse' as const;
+const FOCUS_SPEED = 0.23;
 
-   The display numbers are each well's own measured size from
-   `docs/viz-cards.md`. The logical grid is NOT hand-computed from
-   them: `createDataCanvas` — the engine's own format helper — is
-   what turns a ratio into a logical field, and it is called here at
-   module load so the two can never drift. Five distinct well shapes,
-   five canvases, shared by reference by every card that stands in
-   that shape of well. */
-const wellCanvas = (displayWidth: number, displayHeight: number): CanvasRecipe => (
-  createDataCanvas(
-    { ratio: 'custom', width: displayWidth, height: displayHeight },
+/* ---- ONE CUT PER WELL, AND IT IS CUT TO THE CONTENT BOX --------
+   A canvas is scaled into its slot at `object-fit: contain`, so the
+   cut cannot resize anything — but it is the whole difference
+   between a field that fills its well and one that sits in a band
+   inside it.
+
+   TWO THINGS THE FIRST CUT GOT WRONG, BOTH MEASURED IN CHROME AT
+   1512x850 WITH THE DEV PANEL HIDDEN.
+
+   1. IT USED THE NUMBERS IN `docs/viz-cards.md`, which were recorded
+      BEFORE these cards were registered. Registering them changed
+      the very heights they were cut to: these wells have no height
+      of their own, so the graphic's own ratio is what sets them.
+      `focus` was cut to 289 and then measured 321 — a 27.8px band
+      across the bottom of the largest graphic on the screen.
+
+   2. IT USED THE WELL'S OUTER BOX. Every one of these wells carries
+      10.56px of padding, and the canvas fills the CONTENT box inside
+      it. On a short well that is the difference between a ratio of
+      3.10 and one of 2.69 — nowhere near the same cut.
+
+   So the numbers below are each well's measured `offsetWidth/Height`
+   MINUS its padding: the box the canvas is actually scaled into. */
+interface WellBox {
+  /** the well's content box at 1512x850, in CSS px */
+  width: number;
+  height: number;
+}
+
+/* ---- FITTING THE GRID, NOT JUST THE RATIO ----------------------
+   `createDataCanvas` turns a ratio into a logical field and it is
+   still what does that here. What it does not know — it is a format
+   helper, not a layout one — is the DOT PITCH. The engine tiles the
+   logical field with whole cells and centres what it lays down, so a
+   logical height that is not `rows * pitch - gap` leaves a strip of
+   empty canvas the letterbox then scales up.
+
+   `fitCanvas` closes that gap without touching the engine: it asks
+   `createDataCanvas` for the honest answer, then walks the logical
+   heights within two pitch-runs either side of it, lays each one out
+   with the engine's OWN `createGridLayout`, and keeps whichever
+   leaves the least margin between the painted field and the well's
+   content box. Ties go to the helper's answer — a candidate has to
+   be better by more than a pixel to displace it, so this can never
+   drift on rounding noise.
+
+   It runs ONCE per well shape at module load. Nothing here is
+   measured at runtime and no recipe identity changes after import. */
+function fitCanvas(box: WellBox, style: PixelStyleRecipe): CanvasRecipe {
+  const base = createDataCanvas(
+    { ratio: 'custom', width: Math.round(box.width), height: Math.round(box.height) },
     AMBIENT_BACKGROUND,
-  )
-);
+  );
+
+  /** total px of well left uncovered by the painted field, all four sides */
+  const margin = (logicalHeight: number) => {
+    const grid = createGridLayout({ ...base, logicalHeight }, style);
+    const fieldWidth = grid.columns * grid.pixelSize + (grid.columns - 1) * grid.gap;
+    const fieldHeight = grid.rows * grid.pixelSize + (grid.rows - 1) * grid.gap;
+    const scale = Math.min(box.width / grid.width, box.height / grid.height);
+    const left = (box.width - grid.width * scale) / 2
+      + Math.floor((grid.width - fieldWidth) / 2) * scale;
+    const top = (box.height - grid.height * scale) / 2
+      + Math.floor((grid.height - fieldHeight) / 2) * scale;
+    return box.width - fieldWidth * scale + box.height - fieldHeight * scale
+      + Math.abs(box.width - fieldWidth * scale - 2 * left)
+      + Math.abs(box.height - fieldHeight * scale - 2 * top);
+  };
+
+  const pitch = style.pixelSize + style.gap;
+  let best = base.logicalHeight;
+  let least = margin(best);
+  for (let height = Math.max(3, best - 2 * pitch); height <= best + 2 * pitch; height += 1) {
+    const candidate = margin(height);
+    if (candidate < least - 1) {
+      least = candidate;
+      best = height;
+    }
+  }
+  return { ...base, logicalHeight: best };
+}
+
+/* The measured content boxes.
+
+   A VITAL'S WELL IS NOT SHARED WITH ANY OTHER VITAL. The six sit in
+   a three-column grid whose rows are `auto` inside a column that is
+   stretched to the Focus card beside it, so every card in a row ends
+   up the same TOTAL height while its well takes whatever the head,
+   metric, description and legend above it leave. Three legends and
+   three descriptions of different lengths means six different wells,
+   and the earlier assumption that they came in two shapes was simply
+   the old, pre-registration measurement being coarse.
+
+   These are a fixed point, not a one-shot reading: cutting a recipe
+   changes the well it was cut to, because the well takes its height
+   from the graphic. They were re-measured and re-cut until the
+   numbers stopped moving. Change a legend, a description, or the
+   pitch, and they have to be measured again — the arrangement is
+   what they describe, not a constant of the design. */
+const FOCUS_BOX: WellBox = { width: 348.49, height: 301.29 };
+const STRESS_BOX: WellBox = { width: 274.04, height: 81.72 };
+/** `hrv` and `rhr` are the one genuine pair — same legend, same rows */
+const HRV_BOX: WellBox = { width: 274.05, height: 122.99 };
+const CARDIO_BOX: WellBox = { width: 274.04, height: 137.69 };
+const RESILIENCE_BOX: WellBox = { width: 274.05, height: 96.43 };
+const LOAD_BOX: WellBox = { width: 274.04, height: 114.43 };
+/** every library well IS the same landscape frame, by design */
+const INSIGHT_BOX: WellBox = { width: 272.71, height: 164.74 };
 
 /** the Focus panel's tall well, the largest slot on either screen */
-const FOCUS_WELL = wellCanvas(370, 289);
-/** a vital carrying a three-item legend — `stress`, `resilience` */
-const VITAL_WELL_LEGEND3 = wellCanvas(295, 94);
-/** a vital carrying a one-item legend — `hrv`, `rhr`, `cardio` */
-const VITAL_WELL_LEGEND1 = wellCanvas(295, 135);
-/** `load` sits between the two */
-const VITAL_WELL_LOAD = wellCanvas(295, 112);
-/** every library well is the same landscape frame */
-const INSIGHT_WELL = wellCanvas(294, 178);
+const FOCUS_WELL = fitCanvas(FOCUS_BOX, FOCUS_PIXEL_STYLE);
+const STRESS_WELL = fitCanvas(STRESS_BOX, AMBIENT_PIXEL_STYLE);
+const HRV_WELL = fitCanvas(HRV_BOX, AMBIENT_PIXEL_STYLE);
+const CARDIO_WELL = fitCanvas(CARDIO_BOX, AMBIENT_PIXEL_STYLE);
+const RESILIENCE_WELL = fitCanvas(RESILIENCE_BOX, AMBIENT_PIXEL_STYLE);
+const LOAD_WELL = fitCanvas(LOAD_BOX, AMBIENT_PIXEL_STYLE);
+const INSIGHT_WELL = fitCanvas(INSIGHT_BOX, AMBIENT_PIXEL_STYLE);
 
 /** one ambient recipe off the shared base. Called at module level only. */
 function ambient(seed: number, color: string, canvas: CanvasRecipe): DotMatrixRecipe {
@@ -278,12 +386,36 @@ function ambient(seed: number, color: string, canvas: CanvasRecipe): DotMatrixRe
   };
 }
 
+/* THE ONE RECIPE WRITTEN OUT IN FULL. Same seed, same opacity range
+   and the same full motion amount as the other fourteen; a different
+   colour, preset, pitch and speed. Spelled out rather than threaded
+   through `ambient()` as four more arguments — the difference is the
+   point of the card, so it should be readable in one place. */
+const FOCUS_RECIPE: DotMatrixRecipe = {
+  type: 'dot-matrix',
+  preset: FOCUS_PRESET,
+  seed: 48291,
+  canvas: FOCUS_WELL,
+  color: '#FFB0CD',
+  pixelStyle: FOCUS_PIXEL_STYLE,
+  motionAmount: AMBIENT_MOTION_AMOUNT,
+  speed: FOCUS_SPEED,
+  minOpacity: AMBIENT_MIN_OPACITY,
+  maxOpacity: AMBIENT_MAX_OPACITY,
+  changeFrequency: AMBIENT_CHANGE_FREQUENCY,
+};
+
 /* ---- THE COLOURS ARE READ, NOT ASSIGNED ------------------------
    Each hex below is the hue that card is drawing TODAY, taken from
    the component or the data that draws it. Nothing here is a new
    palette and nothing cycles.
 
-   · `focus`      FocusPanel.tsx passes `accent="lilac"` to DotMatrix.
+   · `focus`      THE ONE ASSIGNED COLOUR, and deliberately so. It
+     was read from `FocusPanel.tsx` (`accent="lilac"`) like the rest
+     and that is exactly what made it read as a seventh vital: lilac
+     is a palette hue and the vitals wear palette hues. It wears
+     `colorFace.pink` (`#FFB0CD`) now — a face colour, which carries
+     no meaning slot in the charts and so claims no reading.
    · the six vitals  `src/data/vitals.ts` — a `line`/`area` card's
      `chart.tone`, which for all three equals the card's own `tone`.
      A `bars` card draws three tones at once (mint/yellow/orange for
@@ -369,31 +501,31 @@ export const DOT_MATRIX_VIZ: Record<string, VizEntry> = {
 
   /* Focus & vitals — the Focus panel plus all six vitals. */
   focus: {
-    recipe: ambient(48291, LILAC, FOCUS_WELL),
+    recipe: FOCUS_RECIPE,
     ariaLabel: 'Focus, an ambient field behind this week\u2019s release reading',
   },
   stress: {
-    recipe: ambient(63194, MINT, VITAL_WELL_LEGEND3),
+    recipe: ambient(63194, MINT, STRESS_WELL),
     ariaLabel: 'Stress, an ambient field behind the arousal reading',
   },
   hrv: {
-    recipe: ambient(27508, MINT, VITAL_WELL_LEGEND1),
+    recipe: ambient(27508, MINT, HRV_WELL),
     ariaLabel: 'HRV, an ambient field behind the beat-to-beat reading',
   },
   rhr: {
-    recipe: ambient(85073, BLUE, VITAL_WELL_LEGEND1),
+    recipe: ambient(85073, BLUE, HRV_WELL),
     ariaLabel: 'Resting heart rate, an ambient field behind the reading',
   },
   cardio: {
-    recipe: ambient(31642, MINT, VITAL_WELL_LEGEND1),
+    recipe: ambient(31642, MINT, CARDIO_WELL),
     ariaLabel: 'Cardio capacity, an ambient field behind the VO\u2082 estimate',
   },
   resilience: {
-    recipe: ambient(79285, MINT, VITAL_WELL_LEGEND3),
+    recipe: ambient(79285, MINT, RESILIENCE_WELL),
     ariaLabel: 'Resilience, an ambient field behind the recovery reading',
   },
   load: {
-    recipe: ambient(50937, YELLOW, VITAL_WELL_LOAD),
+    recipe: ambient(50937, YELLOW, LOAD_WELL),
     ariaLabel: 'Activity load, an ambient field behind the volume reading',
   },
 
@@ -454,10 +586,13 @@ for (const shared of [
   MOTION,
   PIXEL_STYLE,
   AMBIENT_PIXEL_STYLE,
+  FOCUS_PIXEL_STYLE,
   FOCUS_WELL,
-  VITAL_WELL_LEGEND3,
-  VITAL_WELL_LEGEND1,
-  VITAL_WELL_LOAD,
+  STRESS_WELL,
+  HRV_WELL,
+  CARDIO_WELL,
+  RESILIENCE_WELL,
+  LOAD_WELL,
   INSIGHT_WELL,
 ]) {
   Object.freeze(shared);
