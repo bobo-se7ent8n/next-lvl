@@ -4,6 +4,7 @@ export const BASE_HUES = {
   orange: '#FF9868',
   lilac: '#C4B5FF',
   blue: '#A6DBFF',
+  pink: '#FFB0CD',
 } as const
 
 export const DEFAULT_BACKGROUND = '#F3F2EE'

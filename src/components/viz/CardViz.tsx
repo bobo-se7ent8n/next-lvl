@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { cx } from '../../lib/css';
 import { DataDotMatrix } from '../../vendor/pixel-motion/DataDotMatrix';
-import { DOT_MATRIX_VIZ } from '../../vendor/pixel-motion/recipes/registry';
+import { PixelAnimation } from '../../vendor/pixel-motion/PixelAnimation';
+import { DOT_MATRIX_VIZ, isDataViz } from '../../vendor/pixel-motion/recipes/registry';
 import styles from './CardViz.module.css';
 
 /** anything that can stand in a card's graphic slot. Structural on
@@ -40,17 +41,44 @@ export interface CardVizProps {
    `children` is a React element either way, but building an element
    is not rendering one: when a registry entry wins, the chart below
    is never mounted and does no work.
+
+   ------------------------------------------------------------
+   TWO KINDS OF ENTRY, ONE SLOT.
+
+   A registry entry is either a CHART — a `data-dot-matrix` recipe
+   with the card's own series, which reveals column by column — or an
+   AMBIENT FIELD, a procedural `dot-matrix` recipe with a seed and no
+   data and no reveal. The recipe's own `type` says which, and that
+   is the only thing branched on here.
+
+   The two components take the same `className` and `ariaLabel`, so
+   everything below the branch is identical: the same canvas class,
+   the same `object-fit: contain`, the same mount point. Which one
+   renders is not a layout question and cannot move anything.
    ============================================================ */
 export function CardViz({ card, children, className }: CardVizProps) {
   const viz = DOT_MATRIX_VIZ[card.id];
   if (!viz) return <>{children}</>;
 
+  const canvas = cx(styles.canvas, className);
+
+  if (isDataViz(viz)) {
+    return (
+      <DataDotMatrix
+        recipe={viz.recipe}
+        data={viz.data}
+        autoPlay
+        className={canvas}
+        ariaLabel={viz.ariaLabel}
+      />
+    );
+  }
+
   return (
-    <DataDotMatrix
+    <PixelAnimation
       recipe={viz.recipe}
-      data={viz.data}
       autoPlay
-      className={cx(styles.canvas, className)}
+      className={canvas}
       ariaLabel={viz.ariaLabel}
     />
   );

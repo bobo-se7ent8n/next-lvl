@@ -3,18 +3,23 @@
 A **vendored copy** of the dot-matrix render engine from
 [`render-engine-tool`](https://github.com/bobo-se7ent8n/render-engine-tool)
 (`src/engine/**`, `src/components/DataDotMatrix.tsx`,
-`src/components/DotMatrixCanvas.tsx`).
+`src/components/DotMatrixCanvas.tsx`, `src/components/PixelAnimation.tsx`).
 
 | | |
 | --- | --- |
-| **Upstream commit** | `183f2ac` — "Refine independent pixel flicker" |
-| **Authored upstream** | 2026-09-04 |
-| **Copied here** | 2026-09-05 |
+| **Upstream commit** | `ddedf1a` — "Add pink color to Dot Matrix and Data modes" |
+| **Copied here** | 2026-09-09 |
 
 Re-copied wholesale, not merged file by file. To refresh it again, clone
-upstream, replace `engine/` and the two components, delete
+upstream, replace `engine/` and the three components, delete
 `engine/engine.test.ts`, redo the one import-path edit below, and update
 this block.
+
+`PixelAnimation.tsx` was deliberately left out of the first copy — nothing
+here rendered a procedural recipe then. The fifteen Focus & vitals and
+Insights cards do, so it is in now. The only engine change since `183f2ac`
+is one line: `BASE_HUES` gained `pink: '#FFB0CD'`. `engine/` was still
+re-copied wholesale rather than patched, per the rule above.
 
 ## Do not hand-edit
 
@@ -23,9 +28,9 @@ change, make it in `render-engine-tool` and **re-copy** — a local edit
 is silently lost the next time that happens, and it puts this copy out
 of step with the tool the recipes are authored in.
 
-The only deliberate divergence from source is the import path: the
-components import `./engine` rather than `../engine`, because the
-engine sits beside them here instead of one level up.
+The only deliberate divergence from source is the import path: all three
+components import `./engine` rather than `../engine`, because the engine
+sits beside them here instead of one level up.
 
 ## What is in here
 
@@ -34,6 +39,10 @@ engine sits beside them here instead of one level up.
   procedural composition builders, and the canvas 2d renderer.
 - `DataDotMatrix.tsx` — takes a `DataDotMatrixRecipe` plus a
   `number[]` series and memoizes the composition off them.
+- `PixelAnimation.tsx` — takes a procedural `DotMatrixRecipe` and
+  memoizes the composition on `recipe` BY REFERENCE, exactly as
+  `DataDotMatrix` does. It passes no `revealDuration`, so there is no
+  reveal phase on a procedural field at all.
 - `DotMatrixCanvas.tsx` — owns its own `requestAnimationFrame` loop
   and its own `prefers-reduced-motion` listener. Do not wrap either.
 - `recipes/` — **ours**, not vendored. Recipe objects authored in the
