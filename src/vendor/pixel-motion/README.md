@@ -41,8 +41,13 @@ sits beside them here instead of one level up.
   `number[]` series and memoizes the composition off them.
 - `PixelAnimation.tsx` — takes a procedural `DotMatrixRecipe` and
   memoizes the composition on `recipe` BY REFERENCE, exactly as
-  `DataDotMatrix` does. It passes no `revealDuration`, so there is no
-  reveal phase on a procedural field at all.
+  `DataDotMatrix` does. **Nothing in the app renders it.** It passes
+  no `revealDuration` and its canvas is the recipe's, and the fifteen
+  ambient cards need both of those to be otherwise, so they are
+  hosted by `src/components/viz/AmbientField.tsx` instead — a
+  documented copy of `DotMatrixCanvas`'s loop, not a wrapper around
+  it. This file stays as the upstream reference, so the next re-copy
+  has something to diff against.
 - `DotMatrixCanvas.tsx` — owns its own `requestAnimationFrame` loop
   and its own `prefers-reduced-motion` listener. Do not wrap either.
 - `recipes/` — **ours**, not vendored. Recipe objects authored in the

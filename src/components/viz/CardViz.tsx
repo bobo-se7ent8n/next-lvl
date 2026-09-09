@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { cx } from '../../lib/css';
 import { DataDotMatrix } from '../../vendor/pixel-motion/DataDotMatrix';
-import { PixelAnimation } from '../../vendor/pixel-motion/PixelAnimation';
 import { DOT_MATRIX_VIZ, isDataViz } from '../../vendor/pixel-motion/recipes/registry';
+import { AmbientField } from './AmbientField';
 import styles from './CardViz.module.css';
 
 /** anything that can stand in a card's graphic slot. Structural on
@@ -76,20 +76,18 @@ export interface CardVizProps {
    all eight, and twenty wheel events inside any of the three screens
    run it zero times.
 
-   WHY IT LOOKS LIKE THE PROCEDURAL CARDS DO NOT RESTART. A seeded
-   `random-drift` field at t=0 is statistically the same picture as
-   the same field at t=30s — there is no beginning to see. The
-   Patterns cards look like they restart because they have a reveal
-   to replay, and `focus` looks like it restarts because `pulse` has
-   a phase that resets. The other fourteen restart just as hard; the
-   restart is simply invisible, which is the point of an ambient
-   field. Do not "fix" that by giving them a reveal.
+   THE RESTART IS NOW VISIBLE ON ALL THREE SCREENS. It was not,
+   for one revision: a remount restarted the fifteen procedural
+   fields exactly as it restarted the twelve Patterns cards, but a
+   seeded drift at t=0 is the same picture as at t=30s, so there was
+   no beginning to see. `AmbientField` gives them the same
+   left-to-right sweep the Patterns cards have — the engine's own
+   `revealAt`, the engine's own easing, the same 1400ms — so entering
+   a tab now looks like entering a tab everywhere.
    ============================================================ */
 export function CardViz({ card, children, className }: CardVizProps) {
   const viz = DOT_MATRIX_VIZ[card.id];
   if (!viz) return <>{children}</>;
-
-  const canvas = cx(styles.canvas, className);
 
   if (isDataViz(viz)) {
     return (
@@ -97,17 +95,16 @@ export function CardViz({ card, children, className }: CardVizProps) {
         recipe={viz.recipe}
         data={viz.data}
         autoPlay
-        className={canvas}
+        className={cx(styles.canvas, className)}
         ariaLabel={viz.ariaLabel}
       />
     );
   }
 
   return (
-    <PixelAnimation
+    <AmbientField
       recipe={viz.recipe}
-      autoPlay
-      className={canvas}
+      className={cx(styles.canvas, styles.field, className)}
       ariaLabel={viz.ariaLabel}
     />
   );

@@ -36,3 +36,26 @@
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
+
+/* THE AMBIENT FIELDS COVER; THE CHARTS CONTAIN.
+
+   `object-fit: contain` is right for a `DataDotMatrix`: it draws a
+   reading, and a reading that is cropped is a reading that lies. A
+   letterbox band is the honest failure there, which is the whole
+   argument in the note above.
+
+   A procedural field draws nothing. It is a texture with no edges
+   worth preserving and no value at any particular dot, so the honest
+   failure is the opposite one: fill the well and let whatever does
+   not fit run off the edge. `AmbientField` fits its grid to the
+   measured box, so in practice almost nothing is cropped — this is
+   the guarantee underneath that, and it is what makes "fills its
+   container" true at every breakpoint rather than at the one the
+   recipe was cut for.
+
+   BOTH ARE UNIFORM. `cover` and `contain` scale by a single factor in
+   both axes; only `fill` would stretch. The dots stay square either
+   way, which is the property that actually matters. */
+.field {
+  object-fit: cover;
+}

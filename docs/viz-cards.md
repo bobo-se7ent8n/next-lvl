@@ -13,14 +13,16 @@ An entry is one of two kinds, and its recipe's own `type` says which:
 - **`DataDotMatrix`** — a `data-dot-matrix` recipe plus the card's own
   series. It is a chart: the numbers are encoded and the field reveals
   column by column. All twelve **Patterns** cards.
-- **`PixelAnimation`** — a procedural `dot-matrix` recipe: a seed, a
-  colour, and no data at all. It is ambient, and it has **no reveal
-  phase** — the field is there from the first frame. All seven
-  **Focus & vitals** cards and all eight **Insights** cards.
+- **`AmbientField`** — a procedural `dot-matrix` recipe: a seed, a
+  colour, and no data at all. All seven **Focus & vitals** cards and
+  all eight **Insights** cards. It sweeps in left to right on every
+  tab entry, the same 1400ms gesture the Patterns cards make, and it
+  fits its grid to the well it is standing in.
 
-`CardViz` branches on `recipe.type`. Both components take the same
-`className` and `ariaLabel`, so the canvas class, the `object-fit:
-contain` guard and the mount point are the same either way.
+`CardViz` branches on `recipe.type`. Both take the same `className`
+and `ariaLabel` and mount in the same place; they differ in one line
+of CSS — a chart CONTAINS (a cropped reading lies), an ambient field
+COVERS (a texture has no edges worth keeping).
 
 Ids come from the data source (`Pattern.id`, `Vital.id`, `Insight.id`).
 The one exception is **Focus**, a singleton that had no id; `id: 'focus'`
@@ -28,14 +30,13 @@ was added to the `FOCUS` object in `src/data/vitals.ts`. Nothing is keyed
 off array index — the fan reorders.
 
 Container sizes are the viz container's own `offsetWidth × offsetHeight`
-measured in Chrome at **1512×850**, with the dev panel hidden, and they
-are re-measured every time a recipe on these two screens is re-cut — see
+measured in Chrome at **1512×850**, with the dev panel hidden — see
 *The container is an output* below.
 
-**The container is not the box the canvas is scaled into.** Every well on
-Focus & vitals and Insights carries 10.56px of padding, and the canvas
-fills the content box inside it. The recipes are cut to that content box,
-not to the numbers in this column.
+**The container is not the box the graphic fills.** Every well on Focus
+& vitals and Insights carries 10.56px of padding, and the canvas fills
+the content box inside it. A field that looks inset by a few pixels is
+the well's own padding, not a short field.
 
 | screen | card id | card title | current viz type | card fill color | container size at 1512×850 |
 | --- | --- | --- | --- | --- | --- |
@@ -51,21 +52,21 @@ not to the numbers in this column.
 | Patterns | `corner3` | Corner-3 footwork | **DataDotMatrix** (canvas, `area-zone`) | `#FF9B68` orange | 237 × 214 |
 | Patterns | `ballsec` | Ball security | **DataDotMatrix** (canvas, `area-zone`) | `#C4B5FF` lilac | 237 × 214 |
 | Patterns | `routine` | Pre-shot routine drift | **DataDotMatrix** (canvas, `area-zone`) | `#A6DBFF` blue | 237 × 205 |
-| Focus & vitals | `focus` | Focus | **PixelAnimation** (canvas, `pulse`) | `#FFFFFC` surface | 370 × 322 |
-| Focus & vitals | `stress` | Stress | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 295 × 103 |
-| Focus & vitals | `hrv` | HRV | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 295 × 144 |
-| Focus & vitals | `rhr` | Resting HR | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 295 × 144 |
-| Focus & vitals | `cardio` | Cardio capacity | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 295 × 159 |
-| Focus & vitals | `resilience` | Resilience | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 295 × 118 |
-| Focus & vitals | `load` | Activity load | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 295 × 136 |
-| Insights | `breath` | Breath before the gather | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 186 |
-| Insights | `closeout` | Closeout release reps | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 186 |
-| Insights | `rushing-lesson` | What rushing feels like | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 186 |
-| Insights | `film-pressure` | Film · pressure possessions | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 186 |
-| Insights | `handle-fatigue` | Handle under fatigue | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 186 |
-| Insights | `reset` | Pre-game reset routine | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 186 |
-| Insights | `sleep` | Sleep & decision speed | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 186 |
-| Insights | `ladder` | Two-ball dribble ladder | **PixelAnimation** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 186 |
+| Focus & vitals | `focus` | Focus | **AmbientField** (canvas, `pulse`) | `#FFFFFC` surface | 370 × 326 |
+| Focus & vitals | `stress` | Stress | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 295 × 106 |
+| Focus & vitals | `hrv` | HRV | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 295 × 147 |
+| Focus & vitals | `rhr` | Resting HR | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 295 × 147 |
+| Focus & vitals | `cardio` | Cardio capacity | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 295 × 159 |
+| Focus & vitals | `resilience` | Resilience | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 295 × 118 |
+| Focus & vitals | `load` | Activity load | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 295 × 136 |
+| Insights | `breath` | Breath before the gather | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 185 |
+| Insights | `closeout` | Closeout release reps | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 185 |
+| Insights | `rushing-lesson` | What rushing feels like | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 185 |
+| Insights | `film-pressure` | Film · pressure possessions | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 185 |
+| Insights | `handle-fatigue` | Handle under fatigue | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 185 |
+| Insights | `reset` | Pre-game reset routine | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 185 |
+| Insights | `sleep` | Sleep & decision speed | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 185 |
+| Insights | `ladder` | Two-ball dribble ladder | **AmbientField** (canvas, `random-drift`) | `#FFFFFC` surface | 294 × 185 |
 
 27 cards: 12 Patterns, 7 Focus & vitals (the Focus panel plus six vitals),
 8 Insights.
@@ -90,23 +91,24 @@ them.
 
 **THE CONTAINER IS AN OUTPUT, NOT AN INPUT.** The fifteen procedural
 wells changed height when the canvas replaced the SVG in them, and they
-change again every time a recipe is re-cut. On Patterns the
+change again whenever the graphic's shape changes. On Patterns the
 graphic slot has a definite height — the fan sizes all twelve slots as
 one object — so what stands in it cannot move it, and all twelve are
 byte-identical before and after. On Focus & vitals and Insights the well
 has NO height of its own: it is `flex: 1 1 auto` with `min-height: auto`
 around a child that has an intrinsic aspect ratio, so **the well's height
 is an output of the graphic's ratio, not an input to it**. The old
-`DotMatrix` SVG had a `364 × 210` viewBox; the canvas has its recipe's
-logical grid. Different ratio, different well.
+`DotMatrix` SVG had a `364 × 210` viewBox; the canvas has the grid
+`AmbientField` fitted to it. Different ratio, different well.
 
-So cutting a recipe to fill its well MOVES that well, and the two have to
-be solved together. The numbers in this table are that solution: each
-recipe was cut to its well's measured content box, the wells re-measured,
-and the loop repeated until nothing moved — three rounds, ending with
-every measurement stable to 0.00px. All eight Insights wells and all
-twelve Patterns slots came out unchanged; the seven on Focus & vitals did
-not, and could not.
+So changing what a graphic draws MOVES its well, and the two have to be
+solved together. They are, at runtime: `AmbientField` measures the box it
+is standing in and fits its grid to it, and a canvas fitted to ratio r
+makes the well ratio r — the circle closes on itself on the first
+measurement. That is why the numbers in this column shift by a few pixels
+whenever the pitch or the preset changes, and why they are recorded
+rather than designed. All twelve Patterns slots are unaffected: the fan
+gives its slots a definite height, so what stands in one cannot move it.
 
 **A vital's well is its own.** The six sit in a three-column grid whose
 rows are `auto`, inside a column stretched to the Focus card beside it:
@@ -137,88 +139,100 @@ the point of keying on it.
 
 ## The fifteen procedural recipes
 
+All fifteen run at **`pixelSize: 1`, `gap: 1`** — a 48-column grid,
+with the dot landing near 3px on screen. They ran at the fan's 3/2 for
+one revision and the dots read as tiles you could count rather than as
+a field. The twelve Patterns cards keep 3/2: they ARE readings, and you
+are meant to see the individual marks. That is the difference the two
+pitches now carry.
+
 Fourteen share one motion — `random-drift`, `motionAmount: 1`,
-`speed: 0.18`, `minOpacity: 0`, `maxOpacity: 1`, `changeFrequency: 1`,
-`pixelSize: 3`, `gap: 2` — through named constants in the registry. Only
-the seed, the colour and the cut vary.
+`speed: 0.18`, `minOpacity: 0`, `maxOpacity: 1`, `changeFrequency: 1` —
+through named constants in the registry. Only the seed and the colour
+vary.
 
-**`focus` is the exception, and deliberately.** It is the one card on
-Focus & vitals that is not a body reading, and it was reading as a
-seventh vital because it wore the same field as the six beside it. It
-keeps the seed, the full motion amount and the 0→1 opacity range, and
-changes everything else: `#FFB0CD` pink instead of a palette hue,
-`pulse` instead of drift, `speed: 0.23`, and a **1px dot on a 1px gap**
-— a 48 × 42 grid where the vitals beside it run 19 wide.
+**`focus` is the exception.** It is the one card on Focus & vitals that
+is not a body reading, and it was reading as a seventh vital. It keeps
+the seed, the motion amount and the opacity range, and changes
+`#FFB0CD` pink for a palette hue, `pulse` for drift, and `speed: 0.23`.
 
-**The cut is to the well's CONTENT box**, measured in Chrome at 1512×850
-with the dev panel hidden, and iterated to a fixed point (a recipe
-changes the well it was cut to). The logical grid is chosen by
-`fitCanvas` in the registry: `createDataCanvas` — the engine's own format
-helper — gives the honest answer from the ratio, and `fitCanvas` then
-walks two pitch-runs either side of it, lays each candidate out with the
-engine's own `createGridLayout`, and keeps whichever leaves the least
-margin. Ties go to the helper's answer.
+| card id | seed | colour | where the colour was read | preset |
+| --- | --- | --- | --- | --- |
+| `focus` | 48291 | `#FFB0CD` pink | **assigned** — see above | `pulse` |
+| `stress` | 63194 | `#93EAC3` mint | `vitals.ts` — `tone: 'mint'`, and its leading bar | `random-drift` |
+| `hrv` | 27508 | `#93EAC3` mint | `vitals.ts` — `chart.tone: 'mint'` | `random-drift` |
+| `rhr` | 85073 | `#A6DBFF` blue | `vitals.ts` — `chart.tone: 'blue'` | `random-drift` |
+| `cardio` | 31642 | `#93EAC3` mint | `vitals.ts` — `chart.tone: 'mint'` | `random-drift` |
+| `resilience` | 79285 | `#93EAC3` mint | `vitals.ts` — `tone: 'mint'`, and its leading bar | `random-drift` |
+| `load` | 50937 | `#FFE159` yellow | `vitals.ts` — `tone: 'yellow'`, and its leading bar | `random-drift` |
+| `breath` | 14806 | `#93EAC3` mint | `InsightCard.tsx` — `KIND_TONE.DRILL` | `random-drift` |
+| `closeout` | 35719 | `#93EAC3` mint | `KIND_TONE.DRILL` | `random-drift` |
+| `rushing-lesson` | 21895 | `#C4B5FF` lilac | `KIND_TONE.LESSON` | `random-drift` |
+| `film-pressure` | 68351 | `#A6DBFF` blue | `KIND_TONE.VIDEO` | `random-drift` |
+| `handle-fatigue` | 80462 | `#93EAC3` mint | `KIND_TONE.DRILL` | `random-drift` |
+| `reset` | 76403 | `#C4B5FF` lilac | `KIND_TONE.LESSON` | `random-drift` |
+| `sleep` | 92047 | `#A6DBFF` blue | `KIND_TONE.VIDEO` | `random-drift` |
+| `ladder` | 47130 | `#93EAC3` mint | `KIND_TONE.DRILL` | `random-drift` |
 
-| card id | seed | colour | where the colour was read | content box @1512 | logical | dot grid | fill @1512 (l/r/t/b px) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `focus` | 48291 | `#FFB0CD` pink | **assigned** — see above | 348.49 × 301.29 | 96 × 83 | 48 × 42 | 0 / 3.6 / 0 / 0 |
-| `stress` | 63194 | `#93EAC3` mint | `vitals.ts` — `tone: 'mint'`, and its leading bar | 274.04 × 81.72 | 96 × 28 | 19 × 6 | 2.8 / 5.7 / 0.9 / 0.9 |
-| `hrv` | 27508 | `#93EAC3` mint | `vitals.ts` — `chart.tone: 'mint'` | 274.05 × 122.99 | 96 × 43 | 19 × 9 | 2.8 / 5.7 / 0.1 / 0.1 |
-| `rhr` | 85073 | `#A6DBFF` blue | `vitals.ts` — `chart.tone: 'blue'` | 274.05 × 122.99 | 96 × 43 | 19 × 9 | 2.8 / 5.7 / 0.1 / 0.1 |
-| `cardio` | 31642 | `#93EAC3` mint | `vitals.ts` — `chart.tone: 'mint'` | 274.04 × 137.69 | 96 × 48 | 19 × 10 | 2.8 / 5.7 / 0.3 / 0.3 |
-| `resilience` | 79285 | `#93EAC3` mint | `vitals.ts` — `tone: 'mint'`, and its leading bar | 274.05 × 96.43 | 96 × 33 | 19 × 7 | 2.8 / 5.7 / 1.1 / 1.1 |
-| `load` | 50937 | `#FFE159` yellow | `vitals.ts` — `tone: 'yellow'`, and its leading bar | 274.04 × 114.43 | 96 × 40 | 19 × 8 | 2.8 / 5.7 / 3.0 / 3.0 |
-| `breath` | 14806 | `#93EAC3` mint | `InsightCard.tsx` — `KIND_TONE.DRILL` | 272.71 × 164.74 | 96 × 58 | 19 × 12 | 2.8 / 5.7 / 0 / 0 |
-| `closeout` | 35719 | `#93EAC3` mint | `KIND_TONE.DRILL` | 272.72 × 164.75 | 96 × 58 | 19 × 12 | 2.8 / 5.7 / 0 / 0 |
-| `rushing-lesson` | 21895 | `#C4B5FF` lilac | `KIND_TONE.LESSON` | 272.71 × 164.74 | 96 × 58 | 19 × 12 | 2.8 / 5.7 / 0 / 0 |
-| `film-pressure` | 68351 | `#A6DBFF` blue | `KIND_TONE.VIDEO` | 272.71 × 164.74 | 96 × 58 | 19 × 12 | 2.8 / 5.7 / 0 / 0 |
-| `handle-fatigue` | 80462 | `#93EAC3` mint | `KIND_TONE.DRILL` | 272.72 × 164.76 | 96 × 58 | 19 × 12 | 2.8 / 5.7 / 0 / 0 |
-| `reset` | 76403 | `#C4B5FF` lilac | `KIND_TONE.LESSON` | 272.71 × 164.74 | 96 × 58 | 19 × 12 | 2.8 / 5.7 / 0 / 0 |
-| `sleep` | 92047 | `#A6DBFF` blue | `KIND_TONE.VIDEO` | 272.71 × 164.74 | 96 × 58 | 19 × 12 | 2.8 / 5.7 / 0 / 0 |
-| `ladder` | 47130 | `#93EAC3` mint | `KIND_TONE.DRILL` | 272.72 × 164.76 | 96 × 58 | 19 × 12 | 2.8 / 5.7 / 0 / 0 |
+### The grid is fitted to the well, not cut for one breakpoint
 
-### The horizontal 2.8 / 5.7 is the engine, not the cut
+The recipes used to carry a logical grid measured against one well at
+1512×850, arrived at by cutting, re-measuring and re-cutting until the
+numbers stopped moving. It worked at 1512×850 and nowhere else — a
+well's ratio changes with the viewport, because the six vitals are
+stretched to whatever the Focus card beside them needs — so at
+1728×1000 the fields sat in bands of 8.7px (`focus`), 15.6px
+(`stress`), 16.4px (`load`) and 24.6px (`resilience`).
 
-Every card above leaves the same left/right margin, and no recipe can
-close it. `createGridLayout` tiles the logical field with whole cells and
-centres what it lays down: at pitch 5 over a 96-wide logical field it
-fits `floor((96 + 2) / 5) = 19` columns, which paint 93px, and centres
-them with `floor(3 / 2) = 1` on the left and 2 on the right. Scaled up
-that is 2.84px and 5.70px — the asymmetry is the floor, not a bug in the
-cut, and it is identical on all twenty-seven cards including Patterns.
+`AmbientField` measures the box it is standing in and fits the ROW
+COUNT to it, so the canvas ratio tracks the well at every width. It
+also snaps both logical dimensions to `count * pitch - gap`, which is
+what removes the last of the old margin: `createGridLayout` lays down
+whole cells and centres them, so a logical 96 at pitch 2 painted 95px
+and left a bare strip, and a logical **95** paints 95 and leaves none.
 
-`logicalWidth` is pinned to 96 by `createDataCanvas` for any landscape
-format, so the recipe cannot choose a width that tiles exactly. Closing
-it means changing the engine, which this repo does not do — the copy
-under `src/vendor/pixel-motion/` is re-copied, never patched.
+Measured after the change, at three viewports:
 
-`focus` shows what it would look like fixed: at pitch 2 the same field
-fits 48 columns painting 95px, so its margin is 0 / 3.6 rather than
-2.8 / 5.7.
+| | 1512×850 | 1728×1000 | 1900×1060 |
+| --- | --- | --- | --- |
+| vertical band, all 15 | **0px** | **0px** | **0px** |
+| horizontal, worst | 4.8px cropped | 4.6px cropped | 1.2px cropped |
+| dot size, vitals + insights | 2.87–2.94px | 3.30–3.36px | 3.90–3.92px |
+| dot size, `focus` | 3.67px | 4.21px | 4.18px |
+| `focus` grid | 48 × 42 | 48 × 44 | 48 × 50 |
 
-### The residual at 1728×1000
+The horizontal figure is a CROP, not a band — `object-fit: cover` on
+the ambient fields means a residual ratio mismatch runs a dot column
+off the edge instead of leaving paper showing. Both `cover` and
+`contain` scale by one factor in both axes, so the dots stay square.
 
-A recipe has one ratio and a well has a different one at every
-breakpoint, so a cut made at 1512×850 cannot fill at 1728×1000 as well.
-Measured there: `hrv`, `rhr`, `cardio` and all eight Insights fill exactly
-(0px band); `focus` leaves 8.7px top and bottom, `stress` 15.6px,
-`load` 16.4px and `resilience` 24.6px. At 1728 the six vitals wells are
-pushed to two heights by the taller viewport, and the short-legend cards
-are the ones that letterbox into them.
+The cuts in the registry are now **nominal**: a sensible starting shape
+per well for the first layout pass, before the measurement lands. They
+do not need re-measuring when the design moves.
 
 ### Restarting on tab entry
 
 Every one of these restarts when its screen is entered, and there is no
 mechanism for it beyond the two `key`s that were already there:
 `AppLayout`'s `<div key={location.pathname}>` and `Home`'s
-`<div key={view}>`. A remount rebuilds the composition and resets
-`startedAt`, which is the restart. Measured: entering Focus & vitals runs
-the canvas effect for all seven cards, entering Insights for all eight,
-and twenty wheel events inside a screen run it zero times.
+`<div key={view}>`. A remount rebuilds the composition and resets the
+clock.
 
-A seeded `random-drift` field has no visible beginning — t=0 looks like
-t=30s — so fourteen of the fifteen restart invisibly. `focus` does not:
-`pulse` has a phase, and it resets.
+Since `AmbientField` drives a reveal, that restart is now VISIBLE — the
+field sweeps in left to right over 1400ms, the same gesture the twelve
+Patterns cards make. Measured painted-edge position after entering a
+tab, against Patterns as the reference:
+
+| | 180ms | 420ms | 700ms | 1000ms | 1300ms | 1700ms |
+| --- | --- | --- | --- | --- | --- | --- |
+| Patterns | 20% | 35% | 56% | 82% | 93% | 93% |
+| Focus & vitals | 16% | 35% | 56% | 77% | 98% | 100% |
+| Insights | 7% | 37% | 58% | 79% | 100% | 100% |
+
+Twenty wheel events inside any of the three screens restart nothing,
+and five seconds of sitting still rebuilds nothing — the fit settles on
+the first measurement and the integer row count is the guard that keeps
+it there.
 
 ### Notes
 
