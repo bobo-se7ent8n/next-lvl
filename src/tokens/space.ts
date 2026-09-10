@@ -128,4 +128,25 @@ export const layout = {
   columnHeight:
     'calc(100svh - var(--aera-layout-header-block)' +
     ' - var(--aera-layout-nav-height) - var(--aera-space-12))',
+
+  /** THE HEIGHT ONE VIEW GETS, and it is not `columnHeight`.
+   *
+   *  `columnHeight` is where a PINNED column parks: it subtracts the
+   *  bare nav capsule and a gutter, because a parked column scrolls
+   *  its own contents past the nav. This is the other number — the
+   *  room a view has when it must not scroll AT ALL — so it subtracts
+   *  the whole band the page actually reserves under itself
+   *  (`navReserve`, the capsule plus its clearance) and nothing else.
+   *
+   *  The two differ by about forty pixels, which is exactly the range
+   *  in which "fits on a 16-inch" and "scrolls by a hair" are decided,
+   *  so they cannot share one token.
+   *
+   *  Composed from `var()` references for the same reason
+   *  `columnHeight` is: `100svh` is the window and must not be scaled,
+   *  the rest already is. No bare px, so the projection in
+   *  `cssVars.ts` leaves it alone. */
+  viewHeight:
+    'calc(100svh - var(--aera-layout-header-block)' +
+    ' - var(--aera-layout-nav-reserve))',
 } as const;

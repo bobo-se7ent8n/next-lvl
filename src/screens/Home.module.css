@@ -6,6 +6,15 @@
    used to be stacked stages of one very long scroll, which made
    the vitals reachable only by exhausting the pattern fan.
 
+   AND ON FOCUS & VITALS THAT IS NOW ENFORCED RATHER THAN HOPED
+   FOR. It was true only on a window tall enough for the two
+   columns' own content — a 16" Pro in a browser with a bookmarks
+   bar was already short of it, and every smaller machine more so.
+   The layout scale steps the whole page down as the window gets
+   shorter, but it steps in four fixed bands, and a view that
+   overruns by forty pixels at the top of a band overruns for the
+   whole band. The ceiling below is the part the scale cannot do.
+
    Both run edge to edge and neither leaves a band of padding
    under its last row.
    ============================================================ */
@@ -40,12 +49,34 @@
   gap: var(--aera-layout-split-gap);
   align-items: stretch;
   width: 100%;
+
+  /* THE CEILING. A MAXIMUM, NOT A HEIGHT — the distinction is the
+     whole reason this can go back in after a fixed height was taken
+     out. The row still hugs its content wherever the content fits,
+     so no window gets the dead band under the shorter column that
+     the fixed height left. It binds only where it has to, and where
+     it binds it is the difference between this view being one screen
+     and being a scroll.
+
+     The row is an `auto` track under a definite ceiling, which sizes
+     to the smaller of its content and the space available. What
+     gives when it binds is named in the two rules below: the wells,
+     which are texture, and never the readings, which are words and
+     numbers. */
+  max-height: var(--aera-layout-view-height);
 }
 
 .vitals {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* TWO ROWS THAT SHARE WHAT THE CEILING LEAVES. `auto` rows size to
+     their tallest card and hand the overflow to the page; `1fr` rows
+     split the height the grid actually has. The `0` floor is what
+     lets them go below their content — without it the six cards
+     refuse to compress and the ceiling above is decorative. */
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: var(--aera-card-gap);
+  min-height: 0;
 }
 
 /* below the split the two halves stack, and one screen is no longer
@@ -55,6 +86,10 @@
     grid-template-columns: 1fr;
     height: auto;
     gap: var(--aera-space-10);
+    /* the ceiling comes off with the split: one column of eight
+       cards is a scroll by definition, and capping it would only
+       crush the wells to no purpose */
+    max-height: none;
   }
   .vitals {
     grid-template-rows: auto;

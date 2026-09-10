@@ -5,6 +5,16 @@
    card is stretched to match the vitals grid beside it, so the
    graphic is the thing that takes up the slack: it grows into
    whatever height is left after the reading and the three beats.
+
+   IT SHRINKS INTO IT TOO, AND THAT IS THE NEWER HALF. The card is
+   the tall one on this screen — a reading, an axis and three beats
+   of prose is more copy than any vital carries — and under the
+   view ceiling in Home.module.css the graphic is the block that
+   gives way. It is the only thing on the card with no reading in
+   it: a texture behind the argument rather than part of it, so it
+   is the only thing that can lose height without losing meaning.
+   Everything above and below it is a word or a number and holds
+   its size.
    ============================================================ */
 .card {
   /* gap is a no-op on a block box — this must stay flex */
@@ -27,13 +37,19 @@
 }
 
 /* the graphic well — bottom-aligned like every other well, and the
-   one element on the card that is allowed to grow */
+   one element on the card that is allowed to grow, or to give */
 .graphic {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  min-height: var(--aera-space-15);
+  /* 48 rather than 72. The floor is what the well may not go below,
+     and at 72 the card's own minimum was two dozen pixels taller
+     than it needed to be on exactly the short windows where those
+     pixels decide whether the view scrolls. 48 is still four rows
+     of the field at this pitch — a band that reads as a field
+     rather than as a stripe. */
+  min-height: var(--aera-space-13);
   padding: var(--aera-inner-padding);
   border-radius: var(--aera-radius-lg);
   background: var(--aera-color-surface-level1);

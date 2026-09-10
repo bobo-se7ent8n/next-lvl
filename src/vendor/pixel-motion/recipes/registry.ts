@@ -193,29 +193,27 @@ const barValues = (id: string): number[] => byId(id).bars.map((bar) => bar.value
    carry honestly. So they get the engine's PROCEDURAL recipe — a
    seeded field that drifts and nothing else.
 
-   THE EIGHT INSIGHTS SHARE ONE MOTION — `random-drift` at the fine
-   1/1 pitch — and differ only in seed, colour and cut. They are a
-   uniform library grid and should stay one material.
-
-   THE SIX VITALS NO LONGER DO. They share the speed, the motion
-   amount and the opacity range, but each takes its own preset, its
-   own hue and a coarser 2/1 pitch, because six wells in one block
-   wearing one preset and four of them one colour read as a single
-   animation cut into windows rather than as six readings. What is
-   still shared is a named constant shared by reference rather than a
-   literal repeated fifteen times: the day the drift is retuned it is
-   retuned once.
+   ALL FIFTEEN SHARE ONE PITCH AND ONE MOTION SETTING — 1/1, full
+   amount, the whole 0..1 opacity range, and one speed. THE PRESET IS
+   THE ONE PER-CARD AXIS: fourteen of the fifteen name their own, and
+   no two that sit next to each other on screen name the same. Six
+   wells in a block wearing one preset and four of them one colour
+   read as a single animation cut into windows rather than as six
+   readings, and the eight-card library had the same problem one tab
+   over. What is still shared is a named constant shared by reference
+   rather than a literal repeated fifteen times: the day the drift is
+   retuned it is retuned once.
 
    `focus` IS THE EXCEPTION, DELIBERATELY. It is the one card on
    Focus & vitals that is not a body reading — it is the week's
    argument, and it was reading as a seventh vital because it wore
    the same field as the six beside it. It gets pink instead of a
-   palette hue, its own speed, and the fine 1/1 pitch the six beside
-   it have now left behind. It shares `pulse` with `load` alone, and
-   on a different pitch, a different colour and its own panel that
-   repeat does not read as a pair. Its recipe is spelled out below
-   rather than built by `ambient()`, because a card that is meant to
-   look different should not be one argument away from the others.
+   palette hue and a speed of its own. It shares `pulse` with `load`
+   and with `handle-fatigue` a tab away, and on its own colour, its
+   own tempo and its own panel that repeat does not read as a pair.
+   Its recipe is spelled out below rather than built by `ambient()`,
+   because a card that is meant to look different should not be one
+   argument away from the others.
 
    THE REVEAL IS NOT IN THESE RECIPES, AND CANNOT BE.
    `DotMatrixRecipe` has no `revealDuration` field — that is a
@@ -228,41 +226,43 @@ const barValues = (id: string): number[] => byId(id).bars.map((bar) => bar.value
 /** the well every one of these fields sits in — `surface-level1` */
 const AMBIENT_BACKGROUND = '#F3F2EE';
 
-/* ---- THREE PITCHES, AND EACH ONE MEANS SOMETHING ---------------
+/* 1px dot, 1px gap — A FINER MATERIAL THAN THE FAN, ON PURPOSE, AND
+   ONE PITCH FOR ALL FIFTEEN.
+
+   These fifteen ran at the fan's own 3/2 for one revision and the
+   dots read as tiles rather than as a field: nineteen columns across
+   a 295px card is a coarse enough grid that you count them. At 1/1
+   the 96-wide logical field `AmbientField` refits to carries 48
+   columns, the dot lands near 3px on screen, and the card reads as a
+   texture with a shape in it rather than as a low-resolution chart.
+
+   THE SIX VITALS WERE BRIEFLY COARSER — 2/1, 32 columns — on the
+   theory that a small shallow well needs a bigger mark before the
+   shape in it can be read. On screen it did not buy the shape; it
+   just made the six look like a different product from the panel
+   beside them and the library one tab over. The distinction those
+   six needed turned out to be colour and motion, both of which they
+   now have, so the pitch went back to being the one thing every
+   ambient field in the product shares.
+
    The twelve Patterns cards keep 3/2. They ARE readings — you are
-   meant to see the individual marks — and the two ambient pitches
-   below are the other twenty-one cards saying they are not.
-
-   1/1 IS THE FINE MATERIAL — `focus` and the eight Insights. These
-   fields ran at the fan's own 3/2 for one revision and the dots read
-   as tiles rather than as a field: nineteen columns across a 295px
-   card is a coarse enough grid that you count them. At 1/1 the
-   96-wide logical field `AmbientField` refits to carries 48 columns,
-   the dot lands near 3px on screen, and the card reads as a texture
-   with a shape in it rather than as a low-resolution chart.
-
-   2/1 IS THE SIX VITALS, AND THEIRS ALONE. Pitch 3 over that same
-   96-wide field is 32 columns where 1/1 gives 48 — coarser than the
-   Insights grid, finer than the fan's, which is where these six
-   belong: small, shallow wells read at a glance in a two-by-three
-   block, where at 1/1 the shape in the field went to haze. The mark
-   has to be big enough to see before the shape can be. `focus`
-   stays at 1/1 beside them on purpose — a material the six do not
-   wear is part of what keeps it from reading as a seventh vital. */
+   meant to see the individual marks — and that is the difference the
+   two pitches carry. */
 const AMBIENT_PIXEL_STYLE: PixelStyleRecipe = { pixelSize: 1, gap: 1 };
-const VITALS_PIXEL_STYLE: PixelStyleRecipe = { pixelSize: 2, gap: 1 };
 
 /* The motion every ambient field shares. Full variation, slow, and
    the flicker allowed to run the entire 0..1 opacity range — a field
    that goes all the way out and all the way back rather than
-   shimmering inside a band. All twenty-one keep the amount, the
-   opacity range and the change frequency; the speed too, except
-   `focus`. Only the PRESET is a per-card axis now.
+   shimmering inside a band. All fifteen keep the amount, the opacity
+   range and the change frequency; the speed too, except `focus`.
 
-   `AMBIENT_PRESET` is the EIGHT INSIGHTS' drift, not a default for
-   everything: they stay one material. The six vitals each name their
-   own in the table below. */
-const AMBIENT_PRESET = 'random-drift' as const;
+   THERE IS NO `AMBIENT_PRESET` ANY MORE, and its absence is the
+   point. It named `random-drift` as the default every ambient card
+   fell back to, which is precisely the arrangement that made three
+   screens' worth of fields read as one field. Fourteen of the
+   fifteen name their preset at the call site now; `random-drift` is
+   simply one of the five, spelled out twice, rather than the thing
+   you get by not choosing. */
 const AMBIENT_MOTION_AMOUNT = 1;
 const AMBIENT_SPEED = 0.18;
 const AMBIENT_MIN_OPACITY = 0;
@@ -312,17 +312,15 @@ const INSIGHT_WELL = wellCanvas(273, 165);
 
 /** one ambient recipe off the shared base. Called at module level only.
  *
- *  `preset` and `pixelStyle` are arguments rather than the two shared
- *  constants they used to be, for the reason `matrix()` takes its pixel
- *  style: they are the axes the table below is written along, and
- *  threading them keeps the call sites readable as a table rather than
- *  as fourteen calls with two hidden constants. */
+ *  `preset` is an argument and the pixel style is not, and that split
+ *  is the whole arrangement in one line: the pitch is the material
+ *  every ambient field is made of, the preset is what each one does.
+ *  Threading the preset keeps the call sites readable as a table. */
 function ambient(
   seed: number,
   color: string,
   canvas: CanvasRecipe,
   preset: MotionPreset,
-  pixelStyle: PixelStyleRecipe,
 ): DotMatrixRecipe {
   return {
     type: 'dot-matrix',
@@ -330,7 +328,7 @@ function ambient(
     seed,
     canvas,
     color,
-    pixelStyle,
+    pixelStyle: AMBIENT_PIXEL_STYLE,
     motionAmount: AMBIENT_MOTION_AMOUNT,
     speed: AMBIENT_SPEED,
     minOpacity: AMBIENT_MIN_OPACITY,
@@ -339,13 +337,11 @@ function ambient(
   };
 }
 
-/* THE ONE RECIPE WRITTEN OUT IN FULL. The same opacity range and the
-   same full motion amount as the other fourteen; its own colour, its
-   own speed, the fine 1/1 pitch the six vitals beside it have left,
-   and a `pulse` it now shares with `load` alone. Spelled out rather
-   than threaded through `ambient()` as more arguments — the
-   difference is the point of the card, so it should be readable in
-   one place. */
+/* THE ONE RECIPE WRITTEN OUT IN FULL. The same pitch, the same
+   opacity range and the same full motion amount as the other
+   fourteen; its own colour and its own speed. Spelled out rather than
+   threaded through `ambient()` as two more arguments — the difference
+   is the point of the card, so it should be readable in one place. */
 const FOCUS_RECIPE: DotMatrixRecipe = {
   type: 'dot-matrix',
   preset: FOCUS_PRESET,
@@ -468,68 +464,84 @@ export const DOT_MATRIX_VIZ: Record<string, VizEntry> = {
     ariaLabel: 'Pre-shot routine drift, consistency across three sessions',
   },
 
-  /* Focus & vitals — the Focus panel plus all six vitals. Six hues,
-     six presets, one pitch: the two notes above are this table. */
+  /* Focus & vitals — the Focus panel plus all six vitals. Six hues
+     and six presets over one shared pitch: the notes above are this
+     table. */
   focus: {
     recipe: FOCUS_RECIPE,
     ariaLabel: 'Focus, an ambient field behind this week\u2019s release reading',
   },
   stress: {
-    recipe: ambient(63194, ORANGE, STRESS_WELL, 'wave', VITALS_PIXEL_STYLE),
+    recipe: ambient(63194, ORANGE, STRESS_WELL, 'wave'),
     ariaLabel: 'Stress, an ambient field behind the arousal reading',
   },
   hrv: {
-    recipe: ambient(27508, MINT, HRV_WELL, 'flow', VITALS_PIXEL_STYLE),
+    recipe: ambient(27508, MINT, HRV_WELL, 'flow'),
     ariaLabel: 'HRV, an ambient field behind the beat-to-beat reading',
   },
   rhr: {
-    recipe: ambient(85073, BLUE, HRV_WELL, 'sweep', VITALS_PIXEL_STYLE),
+    recipe: ambient(85073, BLUE, HRV_WELL, 'sweep'),
     ariaLabel: 'Resting heart rate, an ambient field behind the reading',
   },
   cardio: {
-    recipe: ambient(31642, YELLOW, CARDIO_WELL, 'gather', VITALS_PIXEL_STYLE),
+    recipe: ambient(31642, YELLOW, CARDIO_WELL, 'gather'),
     ariaLabel: 'Cardio capacity, an ambient field behind the VO\u2082 estimate',
   },
   resilience: {
-    recipe: ambient(79285, LILAC, RESILIENCE_WELL, 'random-drift', VITALS_PIXEL_STYLE),
+    recipe: ambient(79285, LILAC, RESILIENCE_WELL, 'random-drift'),
     ariaLabel: 'Resilience, an ambient field behind the recovery reading',
   },
   load: {
-    recipe: ambient(50937, ORANGE, LOAD_WELL, 'pulse', VITALS_PIXEL_STYLE),
+    recipe: ambient(50937, ORANGE, LOAD_WELL, 'pulse'),
     ariaLabel: 'Activity load, an ambient field behind the volume reading',
   },
 
-  /* Insights — all eight library cards. */
+  /* ---- Insights — all eight library cards -----------------------
+     THE SAME FIVE PRESETS THE VITALS WEAR, MINUS `wave`. They were
+     eight `random-drift` fields, which on a grid of identically sized
+     wells is one animation shown eight times: the library read as a
+     single texture with cards cut out of it. `wave` is held back
+     because it is the most legible gesture of the six and it belongs
+     to `stress`, the first reading on the other screen — spending it
+     here would cost that card the thing that makes it first.
+
+     THE CYCLE OF FIVE IS LOAD-BEARING AGAINST THE ROUND-ROBIN. The
+     library packs its cards into columns with `columnize` (i % count,
+     see lib/columns.ts) at three columns, two, or one depending on
+     width. Five presets over eight cards put the two repeats five
+     apart, and five is coprime with 3, 2 and 1 — so no column, at any
+     of the three widths, ever stacks a preset directly above itself.
+     Re-order these eight and that property has to be re-checked. */
   breath: {
-    recipe: ambient(14806, MINT, INSIGHT_WELL, AMBIENT_PRESET, AMBIENT_PIXEL_STYLE),
+    recipe: ambient(14806, MINT, INSIGHT_WELL, 'flow'),
     ariaLabel: 'Breath before the gather, an ambient field for this drill',
   },
   closeout: {
-    recipe: ambient(35719, MINT, INSIGHT_WELL, AMBIENT_PRESET, AMBIENT_PIXEL_STYLE),
+    recipe: ambient(35719, MINT, INSIGHT_WELL, 'sweep'),
     ariaLabel: 'Closeout release reps, an ambient field for this drill',
   },
   'rushing-lesson': {
-    recipe: ambient(21895, LILAC, INSIGHT_WELL, AMBIENT_PRESET, AMBIENT_PIXEL_STYLE),
+    recipe: ambient(21895, LILAC, INSIGHT_WELL, 'gather'),
     ariaLabel: 'What rushing feels like, an ambient field for this lesson',
   },
   'film-pressure': {
-    recipe: ambient(68351, BLUE, INSIGHT_WELL, AMBIENT_PRESET, AMBIENT_PIXEL_STYLE),
+    recipe: ambient(68351, BLUE, INSIGHT_WELL, 'random-drift'),
     ariaLabel: 'Film on pressure possessions, an ambient field for this video',
   },
   'handle-fatigue': {
-    recipe: ambient(80462, MINT, INSIGHT_WELL, AMBIENT_PRESET, AMBIENT_PIXEL_STYLE),
+    recipe: ambient(80462, MINT, INSIGHT_WELL, 'pulse'),
     ariaLabel: 'Handle under fatigue, an ambient field for this drill',
   },
   reset: {
-    recipe: ambient(76403, LILAC, INSIGHT_WELL, AMBIENT_PRESET, AMBIENT_PIXEL_STYLE),
+    recipe: ambient(76403, LILAC, INSIGHT_WELL, 'flow'),
     ariaLabel: 'Pre-game reset routine, an ambient field for this lesson',
   },
   sleep: {
-    recipe: ambient(92047, BLUE, INSIGHT_WELL, AMBIENT_PRESET, AMBIENT_PIXEL_STYLE),
+    recipe: ambient(92047, BLUE, INSIGHT_WELL, 'sweep'),
     ariaLabel: 'Sleep and decision speed, an ambient field for this video',
   },
   ladder: {
-    recipe: ambient(47130, MINT, INSIGHT_WELL, AMBIENT_PRESET, AMBIENT_PIXEL_STYLE),
+    recipe: ambient(47130, MINT, INSIGHT_WELL, 'gather'),
     ariaLabel: 'Two-ball dribble ladder, an ambient field for this drill',
   },
 };
@@ -556,7 +568,6 @@ for (const shared of [
   MOTION,
   PIXEL_STYLE,
   AMBIENT_PIXEL_STYLE,
-  VITALS_PIXEL_STYLE,
   FOCUS_WELL,
   STRESS_WELL,
   HRV_WELL,
