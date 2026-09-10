@@ -82,7 +82,7 @@ export interface CardVizProps {
    seeded drift at t=0 is the same picture as at t=30s, so there was
    no beginning to see. `AmbientField` gives them the same
    left-to-right sweep the Patterns cards have — the engine's own
-   `revealAt`, the engine's own easing, the same 1400ms — so entering
+   `revealAt`, the engine's own easing, the same 700ms — so entering
    a tab now looks like entering a tab everywhere.
    ============================================================ */
 export function CardViz({ card, children, className }: CardVizProps) {

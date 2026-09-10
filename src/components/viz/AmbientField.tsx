@@ -58,8 +58,8 @@ const smoothstep = (edge0: number, edge1: number, value: number) => {
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
-/** the same 1400ms the twelve Patterns recipes sweep in over */
-const REVEAL_MS = 1400;
+/** the same 700ms the twelve Patterns recipes sweep in over */
+const REVEAL_MS = 700;
 
 /* THE LOGICAL FIELD IS 96 WIDE, LIKE EVERY OTHER RECIPE IN THE
    PRODUCT — that is what fixes the dot's size relative to its card,
