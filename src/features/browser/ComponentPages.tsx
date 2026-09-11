@@ -655,9 +655,8 @@ export function LandingPage() {
       <BrowserSection title="The sticky bar — landing page only, never inside the product">
         <Note>
           Two groups and nothing drawn behind them: a wordmark, and three pills. The last of the
-          three opens the dot matrix tool, and under the pointer its fill steps down and its label
-          is set in the pixel face — both labels share one grid cell, so the pill is the width of
-          the wider of them and the hover moves nothing.
+          three opens the dot matrix tool in a new tab, and under the pointer its fill steps a
+          shade darker.
         </Note>
         <Demo>
           <LandingNav />

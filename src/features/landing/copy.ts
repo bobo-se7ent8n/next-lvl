@@ -127,8 +127,10 @@ export const SESSION_TABS = [
 /** what the scroll types into the bubble, one character at a time */
 export const ASK_PROMPT = 'what should I work on this week?';
 
-export const ASK_NOTE =
-  'Ask AERA reads your own sessions and patterns to answer. The model runs on the device — nothing you ask and nothing it finds ever leaves it.';
+/** what the bubble hands over to once the question is asked —
+ *  three lines at most, in the hero's face */
+export const ASK_FOUND =
+  'aera searches the whole internet for the drills, film and lessons your game needs.';
 
 /* ---- the closing block's footer ------------------------------ */
 

@@ -41,6 +41,8 @@ export function LandingFuture() {
       body="The hardware is still ahead of us. This part is honest about that."
       centred
       fit
+      heroHeading
+      className={styles.after}
     >
       <div className={styles.pair}>
         {RENDERS.map((render) => (

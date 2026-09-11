@@ -1,99 +1,89 @@
 /* ============================================================
-   INSIGHTS — THE REVEAL
+   INSIGHTS — THE SCENE
 
-   A pinned stage holding two things in one grid cell: the Ask
-   AERA group, and the full Insights screen behind it. Five custom
-   properties drive everything —
+   A pinned window holding three things: the library drifting up
+   behind, the Ask bubble in the middle, and the line that takes the
+   bubble's place. Four custom properties drive the middle —
 
-     --fill    how much of the prompt has been typed, 0 → 1
-     --exit    the bubble group leaving, 0 → 1
-     --arrive  the screen coming in, 0 → 1
-     --head    the section heading, 1 → 0
+     --fill    how much of the question has been typed, 0 → 1
+     --leave   the bubble lifting away, 0 → 1
+     --arrive  the line rising into its place, 0 → 1
+     --gone    how far the line has scrolled away once the cards are
+               all down, in px
 
-   — and all of them are written by one rAF loop. Nothing below
-   reads a scroll position and nothing re-renders while you scroll.
-
-   `--exit` FINISHES BEFORE `--arrive` STARTS. The two used to be
-   one value, so the interface faded up through the dissolving
-   bubble and the reader saw a ghost of the product behind a
-   half-gone input. They are sequential now, and the screen carries
-   `visibility` as well as opacity so that at `--arrive: 0` it is
-   genuinely not rendered rather than merely transparent.
-
-   Both children are stacked in the same cell so the handover has no
-   vertical movement in it: the bubble grows and dissolves exactly
-   where the screen appears.
+   — and each card carries its own `--e`, 0 above the window to 1
+   landed. All of them are written by the page's one scroll
+   loop, and only transform and opacity move. Nothing here reads the
+   scroll position and nothing here writes it: the page scrolls
+   natively and this only reacts.
    ============================================================ */
 .track {
-  /* every section on the page is a snap point — see global.css */
   position: relative;
-  height: 300dvh;
+  height: 400dvh;
 }
 
 .pin {
-  --head: 1;
   position: sticky;
   top: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  /* CLOSE, not a section's worth of rhythm. The heading introduces
-     the bubble directly under it; a `space-12` drop between them put
-     a section gap between a label and the thing it labels, and left
-     the pair reading as two unrelated objects that happened to be
-     stacked. */
-  gap: var(--aera-space-9);
   height: 100dvh;
-  /* the bar floats over the pin, so the clearance comes out of
-     the pin's own content box — see `navClear` in the tokens */
-  padding-block: var(--aera-landing-nav-clear) var(--aera-space-12);
   overflow: hidden;
 }
 
-/* centred over the bubble it introduces, and it leaves with it —
-   see `--head`, and the unmount in the component */
-.head {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--aera-space-4);
-  flex: none;
-  text-align: center;
-  opacity: var(--head);
+/* ---- the library: a well, seen from above -----------------------
+   The field carries the perspective, with its vanishing point in the
+   middle of the window. A card lies at its place; while it is falling
+   (`--e` below 1) it is lifted toward the eye by `translateZ`, so the
+   perspective makes it bigger and throws it out from the centre — and
+   as it drops it shrinks and closes in on its place. Transform and
+   opacity only; the stacking is the arrival order, by z-index.
+   ------------------------------------------------------------------ */
+.field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  perspective: var(--aera-landing-well-perspective);
+  perspective-origin: 50% 50%;
 }
 
+.drop {
+  --e: 0;
+  position: absolute;
+  left: calc(var(--x) * 100%);
+  top: calc(var(--y) * 100%);
+  width: var(--aera-landing-float-card-w);
+  transform: translate(-50%, -50%)
+    translateZ(calc((1 - var(--e)) * var(--aera-landing-well-depth)))
+    scale(var(--s));
+  /* it comes out of nothing rather than popping in at full size */
+  opacity: clamp(0, calc(var(--e) * 3), 1);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* ---- the middle -------------------------------------------------- */
 .stage {
   --fill: 0;
-  --exit: 0;
+  --leave: 0;
   --arrive: 0;
+  --gone: 0;
   position: relative;
+  /* above every card in the stack */
+  z-index: 20;
   display: grid;
   place-items: center;
-  flex: 1 1 auto;
-  min-height: 0;
+  height: 100%;
+  /* centred in the window under the bar, not in the whole window */
+  padding-top: calc(var(--aera-landing-frame) + var(--aera-hero-nav-height));
+  pointer-events: none;
 }
 
-/* ---- the ask group --------------------------------------------
-   Vertically centred in the stage, with the heading close above it
-   — the stage takes the room the heading leaves and centres the
-   bubble in it, so the bubble sits in the middle of the section
-   whatever the heading happens to be.
-   ---------------------------------------------------------------- */
+/* the bubble, lifting away once the question is asked */
 .ask {
   grid-area: 1 / 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--aera-space-11);
   width: 100%;
   max-width: var(--aera-landing-bubble-w);
-  /* it grows as it goes rather than simply fading: one gesture, not
-     two. Over half the distance it used to take — this is a
-     dismissal, and a dismissal as long as an arrival reads as
-     hesitation. */
-  transform: scale(calc(1 + var(--exit) * 0.34));
-  opacity: calc(1 - var(--exit));
-  pointer-events: none;
+  translate: 0 calc(var(--leave) * var(--aera-landing-ask-lift) * -1);
+  opacity: calc(1 - var(--leave));
 }
 
 .bubble {
@@ -116,14 +106,8 @@
 }
 
 /* ---- the border, and the light coming off it -------------------
-   A FLAT STROKE. It was a two-stop gradient that warmed as it
-   closed; there are no gradients in this product.
-
-   Drawn twice: a blurred copy underneath and a crisp one over it,
-   so the border reads as lit rather than as a line painted on. Both
-   are dashed to the same fraction — the crisp one inherits the dash
-   the loop writes on the glow, so one attribute write drives both
-   and they can never fall out of step.
+   A flat stroke, drawn twice: a blurred copy under a crisp one, so
+   it reads as lit rather than painted on. Both take the same dash.
    ---------------------------------------------------------------- */
 .strokeRect,
 .strokeGlow {
@@ -142,42 +126,17 @@
   opacity: 0.8;
 }
 
-/* ---- THE TRAVELLING DOT ----------------------------------------
-   A round-capped dash of almost no length walking the same outline,
-   so the border always has one live point on it while the bubble is
-   the thing on screen.
-
-   IT IS DRIVEN BY THE SCROLL, AND ONLY BY THE SCROLL. This used to
-   be a CSS keyframe loop on its own clock, which meant the one live
-   point in the section was the one thing in it the reader was not
-   moving: it circled while the page was still and it kept circling
-   at the same rate however fast the page was travelling. The
-   offset is written from the section's own progress now — nought at
-   the start of the path, one at the end — by the same rAF loop that
-   types the prompt and draws the border. There is no animation and
-   no second clock in here at all.
-
-   The pathLength is 1, set on the element, so the offset the loop
-   writes is a plain fraction of the outline rather than a length
-   that would have to be recomputed every time the bubble resized.
-
-   It stops with the bubble: once the group is leaving there is
-   nothing for it to be circling.
+/* ---- the dot at the head of the stroke ---------------------------
+   A round-capped dash of almost no length on the same outline, moved
+   by the same fraction the stroke has drawn — so it is where the
+   colour ends, always. Its width is its diameter.
    ---------------------------------------------------------------- */
 .runner {
   fill: none;
   stroke: var(--aera-color-data-lilac);
-  /* the diameter, not a line weight — see `traceDot` in the tokens */
   stroke-width: var(--aera-border-trace-dot);
   stroke-linecap: round;
   stroke-dasharray: 0.0001 1;
-  opacity: calc(1 - var(--exit));
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .runner {
-    opacity: 0;
-  }
 }
 
 .prompt {
@@ -190,7 +149,7 @@
   color: var(--aera-color-ink-primary);
 }
 
-/* the cursor sitting at the end of what has been typed so far */
+/* the cursor at the end of what has been typed so far */
 .caret {
   width: var(--aera-border-base);
   height: var(--aera-text-body-size);
@@ -198,86 +157,21 @@
   opacity: calc(1 - var(--fill) * 0.4);
 }
 
-/* the line under the bubble, revealed word by word on the same
-   cadence the prompt types itself in on — it used to fade in whole,
-   which made it the one thing in the section that simply appeared */
-.note {
-  max-width: var(--aera-layout-max-read-width);
-  text-align: center;
-}
-
-/* ---- the screen it hands over to ------------------------------
-   ONE STROKE, ONE SHADOW.
-
-   It carried `elevation-high` and its own rounded, clipped frame on
-   top of a plate whose cards already draw their own edges, which is
-   where the doubled borders came from: the frame's corner and the
-   card corner inside it, a pixel apart, reading as two strokes. It
-   is one hairline and the standard card shadow now — the same
-   treatment any other resting card on this page gets, because that
-   is what it is.
-   ---------------------------------------------------------------- */
-.screen {
+/* ---- the line that takes the bubble's place ---------------------- */
+.found {
   grid-area: 1 / 1;
-  display: flex;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  max-width: var(--aera-layout-max-content-width);
-  /* arriving: it comes up out of where the bubble was rather than
-     sliding in. `visibility` is the half that matters — at
-     `--arrive: 0` this is not a transparent screen, it is no
-     screen: nothing of the interface is visible in any form until
-     the bubble has completely gone. */
-  transform: scale(calc(0.9 + var(--arrive) * 0.1));
+  margin: 0;
+  max-width: var(--aera-landing-phrase-measure);
+  text-align: center;
+  text-wrap: balance;
+  color: var(--aera-color-hero-ink);
+  font-family: var(--aera-text-landing-phrase-family);
+  font-size: var(--aera-text-landing-phrase-size);
+  line-height: var(--aera-text-landing-phrase-leading);
+  letter-spacing: var(--aera-text-landing-phrase-tracking);
+  font-weight: var(--aera-text-landing-phrase-weight);
+  /* rising into place, and later scrolling away: `--gone` is the
+     pixels the page has travelled since the last card landed */
+  translate: 0 calc((1 - var(--arrive)) * var(--aera-landing-phrase-rise) - var(--gone) * 1px);
   opacity: var(--arrive);
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.screenIn {
-  border: var(--aera-border-hairline) solid var(--aera-color-utility-hairline);
-  border-radius: var(--aera-radius-card);
-  overflow: hidden;
-  background: var(--aera-color-surface-background);
-  box-shadow: var(--aera-elevation-low);
-  /* THE CONTENTS FOLLOW THE CONTAINER, on their own delay. The
-     geometry above lands first and this settles into it a beat
-     later, so the reveal reads as something opening rather than as
-     a finished picture being swapped in. */
-  opacity: calc(clamp(0, (var(--arrive) - 0.45) * 2.6, 1));
-  transform: translateY(calc((1 - clamp(0, (var(--arrive) - 0.45) * 2.6, 1)) * var(--aera-space-9)));
-}
-
-/* the moment the arrival begins, and not one frame before it */
-.stage[data-arriving='true'] .screen {
-  visibility: visible;
-}
-
-/* live only once the handover has finished — a screen you can click
-   while it is still eighty percent transparent is a screen that
-   answers a click you did not mean to make */
-.stage[data-live='true'] .screen {
-  pointer-events: auto;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* no travel: the section lands on its final state and the reader
-     scrolls past a finished screen */
-  .ask,
-  .head {
-    display: none;
-  }
-
-  .screen {
-    transform: none;
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-  }
-
-  .screenIn {
-    opacity: 1;
-    transform: none;
-  }
 }

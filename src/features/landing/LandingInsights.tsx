@@ -1,111 +1,108 @@
-import { useCallback, useRef, useState } from 'react';
-import { Display } from '../../components/primitives/Text';
-import { EnterContext } from '../../lib/enterContext';
-import { FitBox } from './FitBox';
-import { ScreenPlate } from './ScreenPlate';
-import { ScrollFillText } from './ScrollFillText';
-import { InsightsShot } from './screens';
+import { useCallback, useRef, useState, type CSSProperties } from 'react';
+import { InsightCard } from '../../components/composed/InsightCard';
+import { INSIGHTS } from '../../data';
 import { roundRectLength } from './navGeometry';
-import { span, useSectionProgress } from './scroll';
+import { easeOut, span, useSectionProgress } from './scroll';
 import { useBoxSize } from './useBoxSize';
-import { ASK_NOTE, ASK_PROMPT } from './copy';
+import { ASK_FOUND, ASK_PROMPT } from './copy';
 import styles from './LandingInsights.module.css';
 
-/* THE FOUR STAGES, AS WINDOWS OF THE SECTION'S SCROLL.
+/* THE STAGES, AS WINDOWS OF THE SECTION'S SCROLL.
 
-   1  0.00 → 0.06   the empty bubble, alone and centred
-   2  0.06 → 0.48   the prompt types itself in, and the stroke draws
-   3  at 85% of 2   the note under it fades in
-   4  0.56 → 0.71   the bubble group leaves
-      0.71 → 0.90   and only then does the screen arrive
+   1  0.00 → 0.04   the empty bubble, alone in the middle
+   2  0.04 → 0.26   the question types itself in; the stroke closes
+                    round the bubble with the dot at its head
+   3  0.26 → 0.30   held: the question asked, the outline whole
+   4  0.30 → 0.38   the bubble lifts and fades
+      0.33 → 0.41   and the line rises into its place
+   5  0.40 → 0.79   the library lands round it, card after card
+   6  0.80 → 1.00   everything has landed; the cards hold still and
+                    the line alone scrolls on up and out
 
-   THE TWO HALVES OF STAGE 4 DO NOT OVERLAP, and that is the whole
-   point of splitting what used to be one span. The screen used to
-   fade in across the same window the bubble was fading out of, so
-   for a third of a section the reader was looking at a ghost of the
-   Insights interface showing through a half-dissolved input — two
-   states of the product at once, which is exactly the thing this
-   page is arguing the product does not do. `EXIT` ends before
-   `ARRIVE` begins: the bubble is gone, and then the screen is
-   there.
+   Everything comes out of one progress value, so scrolling back runs
+   the same arithmetic backwards and nothing has to be reset. */
+const TYPE = [0.04, 0.26] as const;
+const LEAVE = [0.3, 0.38] as const;
+const ARRIVE = [0.33, 0.41] as const;
+/** how much of the section one card takes to land */
+const LAND = 0.11;
+/** where the line lets go and scrolls with the page */
+const LINE_GOES = 0.8;
 
-   The exit is also half the length it was. It is a dismissal, and a
-   dismissal that takes as long as an arrival reads as hesitation.
+/* ------------------------------------------------------------
+   THE LIBRARY, FALLING INTO A WELL.
 
-   Everything is derived from one progress value, so scrolling back
-   up runs the same arithmetic backwards and the stages reverse
-   cleanly with nothing to reset. */
-const TYPE = [0.06, 0.48] as const;
-const NOTE_AT = 0.85;
-const EXIT = [0.56, 0.71] as const;
-const ARRIVE = [0.71, 0.9] as const;
-/* the head goes with the bubble: once the interface is what the
-   section is showing, a heading over it is a label on a thing that
-   is already named. It is faded out and then unmounted — the
-   unmount lands after the fade has finished, so nothing snaps. */
-const HEAD_OUT = [0.56, 0.68] as const;
-const HEAD_GONE = 0.72;
+   We are looking down into the scene. Each card starts close to the
+   eye — big, and thrown out towards the edges of the window by the
+   perspective — and falls away into the depth until it lies at its
+   place on the bottom, on the decelerating curve with no overshoot.
+   The vanishing point is the middle of the window, so a falling card
+   closes in on the centre as it shrinks, the way something dropped
+   down a well does.
+
+   A card that falls later lands ON TOP of the ones already down: the
+   stacking is the arrival order, so the pile builds as the page
+   scrolls, and scrolling back lifts the cards out again in reverse.
+   The last one is down before the line starts to go.
+
+   Frozen at module load; nothing here is built during a render.
+   ------------------------------------------------------------ */
+interface Drop {
+  /** where it rests: its centre, as shares of the window */
+  x: number;
+  y: number;
+  /** its size at rest */
+  scale: number;
+  /** where in the section it starts coming down */
+  start: number;
+}
+
+const DROPS = Object.freeze(
+  (
+    [
+      { x: 0.15, y: 0.27, scale: 0.66, start: 0.4 },
+      { x: 0.85, y: 0.25, scale: 0.64, start: 0.44 },
+      { x: 0.26, y: 0.77, scale: 0.6, start: 0.48 },
+      { x: 0.74, y: 0.79, scale: 0.64, start: 0.52 },
+      { x: 0.07, y: 0.63, scale: 0.56, start: 0.56 },
+      { x: 0.93, y: 0.65, scale: 0.58, start: 0.6 },
+      { x: 0.36, y: 0.13, scale: 0.5, start: 0.64 },
+      { x: 0.64, y: 0.11, scale: 0.52, start: 0.68 },
+    ] satisfies Drop[]
+  ).map((d) => Object.freeze(d)),
+);
 
 /**
- * INSIGHTS, REVEALED BY SCROLLING.
+ * INSIGHTS, BY SCROLLING.
  *
  * The section starts as one empty input bubble in the middle of an
- * otherwise empty screen. Scrolling types a question into it a
- * character at a time and draws a stroke around its border as the
- * text fills; a line explaining where the answer comes from fades
- * in under it near the end; and then the whole group scales up and
- * hands over to the full Insights screen, which becomes live once
- * it has settled.
+ * empty screen. Scrolling types a question into it, a character at
+ * a time, and closes a lit stroke round its border with a dot
+ * leading the stroke; once the question is asked the bubble lifts
+ * away and a line takes its place, and the library the question is
+ * answered from falls into the scene round it — as if down a well —
+ * card by card, each landing on top of the last.
+ * Once the last card is down they hold still and the line scrolls on
+ * up and out on its own.
  *
  * THE ONLY REACT STATE IS THE CHARACTER COUNT, and it changes about
- * thirty times across the whole section — once per character —
- * rather than once per frame. Everything continuous is a custom
- * property written straight onto a node by the rAF loop.
+ * thirty times across the whole section — once per character. The
+ * rest is custom properties written straight onto nodes by the page's
+ * one scroll loop; nothing re-renders while you scroll.
  */
 export function LandingInsights() {
   const track = useRef<HTMLElement>(null);
-  /* the pinned box. `--head` is written here rather than on the
-     stage because the heading is the stage's SIBLING, and a custom
-     property set on the stage would never reach it. */
-  const pin = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const bubble = useRef<HTMLDivElement>(null);
-  /* the border is drawn twice — a blurred copy and a crisp one over
-     it — and both take the same dash, so the loop writes to both.
-     `stroke-dasharray` does not inherit from a sibling; the only
-     honest way to keep two strokes in step is to write both. */
+  /* the border is drawn twice — a blurred copy under a crisp one —
+     and both take the same dash, so the loop writes to both */
   const stroke = useRef<SVGRectElement>(null);
   const strokeGlow = useRef<SVGRectElement>(null);
-  /* the note reads its own fill off this node, exactly the way the
-     Sessions read-through does — one property write per frame */
-  const note = useRef<HTMLParagraphElement>(null);
-  /* THE TRAVELLING DOT, and it has no clock of its own.
-
-     It was a CSS keyframe loop, which made the one live point in the
-     section the one thing in it the reader was not moving: it
-     circled while the page was still and circled at the same rate
-     however fast the page was travelling. Its position is the
-     section's progress now — 0 at the start of the path, 1 at the
-     end — written on the same frames as everything else here.
-
-     The smoothing is already done and is not repeated: the value
-     `useSectionProgress` hands over has been eased toward the scroll
-     position by `EASE` a frame in the page's one shared loop (see
-     scroll.ts), which is exactly the `prog += delta * 0.22` this
-     needs. A second loop here would be a second clock — the thing
-     the keyframes were. */
   const runner = useRef<SVGRectElement>(null);
+  const cards = useRef<Array<HTMLDivElement | null>>([]);
 
   const [typed, setTyped] = useState(0);
-  /* the last value handed to React, so a frame that would set the
-     same count does not go near it */
   const shown = useRef(0);
-  const liveRef = useRef(false);
-  const arrivingRef = useRef(false);
-  /* the heading is unmounted rather than merely hidden once the
-     interface has arrived; this is the only other discrete state */
-  const [headOn, setHeadOn] = useState(true);
-  const headRef = useRef(true);
 
   const box = useBoxSize(bubble);
   const radius = box.h / 2;
@@ -114,22 +111,22 @@ export function LandingInsights() {
   useSectionProgress(
     track,
     useCallback((p: number) => {
+      /* read before anything is written, so this frame lays out once */
+      const travel = (track.current?.offsetHeight ?? 0) - window.innerHeight;
       const fill = span(p, TYPE[0], TYPE[1]);
-      const exit = span(p, EXIT[0], EXIT[1]);
-      const arrive = span(p, ARRIVE[0], ARRIVE[1]);
 
       const node = stage.current;
       if (node) {
         node.style.setProperty('--fill', fill.toFixed(4));
-        node.style.setProperty('--exit', exit.toFixed(4));
-        node.style.setProperty('--arrive', arrive.toFixed(4));
+        node.style.setProperty('--leave', span(p, LEAVE[0], LEAVE[1]).toFixed(4));
+        node.style.setProperty('--arrive', span(p, ARRIVE[0], ARRIVE[1]).toFixed(4));
+        /* THE LINE LETS GO. From here it is moved up by exactly as
+           much as the page has scrolled since, so it reads as scrolling
+           with the page while the cards round it stay where they are */
+        node.style.setProperty('--gone', Math.max(0, (p - LINE_GOES) * travel).toFixed(1));
       }
-      pin.current?.style.setProperty(
-        '--head',
-        (1 - span(p, HEAD_OUT[0], HEAD_OUT[1])).toFixed(4),
-      );
 
-      /* the border closing around the bubble as the text fills */
+      /* the border closing round the bubble as the question fills */
       const rect = stroke.current;
       if (rect) {
         const len = Number.parseFloat(rect.dataset.len ?? '0');
@@ -140,60 +137,48 @@ export function LandingInsights() {
         }
       }
 
-      /* THE NOTE TYPES ITSELF IN TOO, on the same cadence and out of
-         the same progress value — it used to fade in whole, which
-         made it the one thing in the section that simply appeared. */
-      note.current?.style.setProperty('--fill', span(fill, NOTE_AT, 1).toFixed(4));
+      /* THE DOT IS THE HEAD OF THE STROKE. It walks the same outline
+         from the same starting point by the SAME fraction the stroke
+         has drawn — `pathLength` is 1 on it — so it is always exactly
+         where the colour ends: it leads the fill rather than circling
+         on a clock of its own. Negative, because a positive offset
+         walks a dash backwards. */
+      runner.current?.setAttribute('stroke-dashoffset', (-fill).toFixed(5));
 
-      /* and the dot walks the outline with it. `pathLength` is 1 on
-         the element, so the offset is a plain fraction of the path
-         and none of this has to know how big the bubble is. Negative
-         because a positive offset walks the dash backwards. */
-      runner.current?.setAttribute('stroke-dashoffset', (-p).toFixed(5));
+      /* each card's own landing, eased so it settles rather than stops */
+      for (let i = 0; i < DROPS.length; i += 1) {
+        const d = DROPS[i];
+        cards.current[i]?.style.setProperty('--e', easeOut(span(p, d.start, d.start + LAND)).toFixed(4));
+      }
 
       const chars = Math.round(ASK_PROMPT.length * fill);
       if (chars !== shown.current) {
         shown.current = chars;
         setTyped(chars);
       }
-
-      /* THE SCREEN IS NOT PAINTED AT ALL UNTIL THE BUBBLE IS GONE.
-         `visibility` cannot be interpolated, so it is flipped by a
-         data attribute at the one instant it changes rather than
-         written per frame. */
-      const arriving = arrive > 0;
-      if (arriving !== arrivingRef.current) {
-        arrivingRef.current = arriving;
-        if (node) node.dataset.arriving = arriving ? 'true' : 'false';
-      }
-
-      /* and it takes clicks only once it has finished arriving */
-      const live = arrive > 0.98;
-      if (live !== liveRef.current) {
-        liveRef.current = live;
-        if (node) node.dataset.live = live ? 'true' : 'false';
-      }
-
-      /* and the heading leaves for good, a beat after its fade */
-      const head = p < HEAD_GONE;
-      if (head !== headRef.current) {
-        headRef.current = head;
-        setHeadOn(head);
-      }
     }, []),
   );
 
   return (
-    <section ref={track} className={styles.track} data-section="insights">
-      <div ref={pin} className={styles.pin}>
-        {headOn ? (
-          <header className={styles.head}>
-            <Display size="lg">Insights</Display>
-          </header>
-        ) : null}
+    <section ref={track} className={styles.track} data-section="insights" aria-label="Insights">
+      <div className={styles.pin}>
+        {/* the library, behind everything else in the scene */}
+        <div className={styles.field} aria-hidden="true">
+          {DROPS.map((d, i) => (
+            <div
+              key={INSIGHTS[i].id}
+              ref={(el) => {
+                cards.current[i] = el;
+              }}
+              className={styles.drop}
+              style={{ '--x': d.x, '--y': d.y, '--s': d.scale, zIndex: i + 1 } as CSSProperties}
+            >
+              <InsightCard insight={INSIGHTS[i]} />
+            </div>
+          ))}
+        </div>
 
-        <div ref={stage} className={styles.stage} data-live="false" data-arriving="false">
-          {/* 1–3 · the bubble, the prompt, and the note under it */}
+        <div ref={stage} className={styles.stage}>
           <div className={styles.ask}>
             <div ref={bubble} className={styles.bubble}>
               {outline > 0 ? (
@@ -204,8 +189,6 @@ export function LandingInsights() {
                   height={box.h}
                   aria-hidden="true"
                 >
-                  {/* the border, closing as the prompt fills: a
-                      blurred copy underneath, a crisp one over it */}
                   <rect
                     ref={strokeGlow}
                     className={styles.strokeGlow}
@@ -227,20 +210,8 @@ export function LandingInsights() {
                     rx={radius}
                     strokeDasharray={`0 ${outline}`}
                   />
-
-                  {/* THE TRAVELLING DOT.
-
-                      A round-capped dash of almost no length, walked
-                      round the same outline BY THE SCROLL. It is a
-                      dot made out of a stroke rather than a circle
-                      moving along a path: `animateMotion` is SMIL and
-                      `offset-path` would need the path duplicated in
-                      a second syntax, where this needs neither — the
-                      rect is already the shape, and the browser
-                      already knows how to walk a dash around it.
-
-                      Its offset is written by the progress loop
-                      above; there is no animation on it. */}
+                  {/* the dot at the head of the stroke — a round-capped
+                      dash of almost no length on the same outline */}
                   <rect
                     ref={runner}
                     className={styles.runner}
@@ -259,37 +230,9 @@ export function LandingInsights() {
                 <span className={styles.caret} aria-hidden="true" />
               </span>
             </div>
-
-            <ScrollFillText text={ASK_NOTE} hostRef={note} quiet className={styles.note} />
           </div>
 
-          {/* 4 · the screen the group hands over to.
-
-              A STAGED ARRIVAL, not one fade. The container's own
-              geometry lands first — it comes up out of where the
-              bubble was and settles — and the card groups inside it
-              follow a beat later, on their own delay. One object
-              arriving with its contents already painted reads as a
-              picture being swapped in; the container first, then
-              what is in it, reads as something opening. */}
-          <div className={styles.screen}>
-            {/* CENTRED, AND THE PROP RATHER THAN A RULE ON THE
-                CLASS. The stylesheet used to set `justify-content:
-                center` on this node alone, which centred an
-                overflowing screen against a scale still anchored to
-                its top edge and quietly cropped its first thirty
-                pixels. The alignment and the origin belong to
-                FitBox, together. */}
-            <FitBox centred>
-              <div className={styles.screenIn}>
-                <EnterContext.Provider value="landing-insights">
-                  <ScreenPlate live>
-                    <InsightsShot />
-                  </ScreenPlate>
-                </EnterContext.Provider>
-              </div>
-            </FitBox>
-          </div>
+          <p className={styles.found}>{ASK_FOUND}</p>
         </div>
       </div>
     </section>

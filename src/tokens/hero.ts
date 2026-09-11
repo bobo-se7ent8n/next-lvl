@@ -30,8 +30,12 @@ export const hero = {
   navGap: '4px',
   navPillHeight: '22px',
   navPillPadX: '10px',
-  markWidth: '20px',
-  markHeight: '11px',
+  /* the mark, cropped to its own glyph (the file used to carry three
+     times its width in empty margin, which is what made it read as a
+     dash and would have widened the gap to the word if scaled) —
+     twice the size it was, with the gap to the word unchanged */
+  markWidth: '36px',
+  markHeight: '22px',
 
   /* ---- the call to action (px, interface) ---- */
   ctaHeight: '40px',

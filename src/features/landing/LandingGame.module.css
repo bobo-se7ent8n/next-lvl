@@ -1,0 +1,93 @@
+/* ============================================================
+   A GAME THAT KNOWS YOU
+
+   Drawn at a 2046 × 1151 window and scaled as a picture, like the
+   full picture before it. The words are placed by their centres, so
+   a word's width never moves where it sits.
+   ============================================================ */
+.section {
+  --u: min(
+    calc(100vw / var(--aera-story-design-width)),
+    calc(100dvh / var(--aera-story-design-height))
+  );
+  position: relative;
+  width: 100vw;
+  height: calc(var(--aera-story-design-height) * var(--u));
+  margin-top: var(--aera-landing-section-gap);
+  margin-inline: calc(var(--aera-landing-frame) * -1);
+  overflow: hidden;
+  /* white, as drawn — the one section on the page on a sheet of its
+     own rather than on the page's paper */
+  background: var(--aera-color-hero-sheet);
+}
+
+.canvas {
+  position: relative;
+  width: calc(var(--aera-story-design-width) * var(--u));
+  height: 100%;
+  margin-inline: auto;
+}
+
+.words {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  font: inherit;
+}
+
+.line {
+  position: absolute;
+  left: calc(50% + var(--cx) * var(--u));
+  top: calc(var(--y) * var(--u));
+  translate: -50% 0;
+  white-space: nowrap;
+  color: var(--aera-color-hero-ink);
+  font-family: var(--aera-font-hero);
+  font-size: calc(var(--aera-story-game-size) * var(--u));
+  font-weight: var(--aera-weight-regular);
+  line-height: 1;
+  letter-spacing: var(--aera-story-game-tracking);
+}
+
+.line[data-italic] {
+  font-style: italic;
+}
+
+.tile {
+  position: absolute;
+  left: calc(var(--x) * var(--u));
+  top: calc(var(--y) * var(--u));
+  width: calc(var(--aera-story-tile-width) * var(--u));
+  height: calc(var(--aera-story-tile-height) * var(--u));
+  border-radius: calc(var(--aera-story-tile-radius) * var(--u));
+  object-fit: cover;
+}
+
+/* ---- arriving, once ----------------------------------------------
+   Every piece rises a little and fades in, one step after the one
+   before it. It latches: nothing here plays backwards or twice.
+   ------------------------------------------------------------------ */
+.line,
+.tile {
+  opacity: 0;
+  transform: translateY(var(--aera-story-reveal-rise));
+  transition:
+    opacity var(--aera-story-reveal-duration) var(--aera-hero-ease-in),
+    transform var(--aera-story-reveal-duration) var(--aera-hero-ease-in);
+  transition-delay: calc(var(--aera-story-reveal-step) * var(--i));
+}
+
+.section[data-shown='true'] .line,
+.section[data-shown='true'] .tile {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .line,
+  .tile {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

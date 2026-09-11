@@ -98,3 +98,24 @@
   justify-content: center;
   min-height: 0;
 }
+
+/* ---- the hero's face, for a heading -----------------------------
+   Open Sans, bold, sentence case — and at exactly the size "The full
+   picture" is set at: the same design number on the same picture
+   unit, so two headings in a row on the page cannot disagree.
+   ---------------------------------------------------------------- */
+.heroHeading {
+  margin: 0;
+  color: var(--aera-color-hero-ink);
+  font-family: var(--aera-text-hero-display-family);
+  font-size: calc(
+    var(--aera-story-head-size) *
+      min(
+        calc(100vw / var(--aera-story-design-width)),
+        calc(100dvh / var(--aera-story-design-height))
+      )
+  );
+  line-height: var(--aera-text-hero-display-leading);
+  letter-spacing: var(--aera-text-hero-display-tracking);
+  font-weight: var(--aera-text-hero-display-weight);
+}

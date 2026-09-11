@@ -1,0 +1,169 @@
+/* ============================================================
+   THE FULL PICTURE
+
+   Drawn at a 2046 × 1151 window and scaled as a picture: `--u` is
+   the smaller of the window's width and height shares, and every
+   design number is multiplied by it. Full-bleed, like the hero, and
+   clipped at its own edges — the deck runs off the bottom as drawn.
+   ============================================================ */
+.section {
+  --u: min(
+    calc(100vw / var(--aera-story-design-width)),
+    calc(100dvh / var(--aera-story-design-height))
+  );
+  position: relative;
+  width: 100vw;
+  height: calc(var(--aera-story-design-height) * var(--u));
+  margin-top: var(--aera-landing-section-gap);
+  margin-inline: calc(var(--aera-landing-frame) * -1);
+  overflow: hidden;
+  /* NO FILL OF ITS OWN: the design draws these on white, but on a
+     page with air between sections a white sheet on the page's paper
+     reads as a grey band in every gap. The page's paper runs under
+     them instead, so the gaps are seamless. */
+}
+
+/* the design's window, centred when a short screen makes it narrower */
+.canvas {
+  position: relative;
+  width: calc(var(--aera-story-design-width) * var(--u));
+  height: 100%;
+  margin-inline: auto;
+}
+
+.head {
+  position: absolute;
+  top: calc(var(--aera-story-head-top) * var(--u));
+  left: 50%;
+  z-index: 10;
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--aera-story-head-gap) * var(--u));
+  width: max-content;
+}
+
+.title {
+  margin: 0;
+  color: var(--aera-color-hero-ink);
+  font-family: var(--aera-text-hero-display-family);
+  font-size: calc(var(--aera-story-head-size) * var(--u));
+  line-height: var(--aera-text-hero-display-leading);
+  letter-spacing: var(--aera-text-hero-display-tracking);
+  font-weight: var(--aera-text-hero-display-weight);
+}
+
+.sub {
+  margin: 0;
+  max-width: calc(var(--aera-story-sub-measure) * var(--u));
+  text-align: center;
+  color: var(--aera-color-hero-copy);
+  font-family: var(--aera-font-body);
+  font-size: calc(var(--aera-story-sub-size) * var(--u));
+  line-height: var(--aera-story-sub-leading);
+}
+
+/* ---- the deck ----------------------------------------------------
+   One control over the whole canvas, but only the cards take the
+   pointer: the box itself lets clicks through, and each card turns
+   them back on — so the white round the deck is not a button.
+   ------------------------------------------------------------------ */
+.deck {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  outline: none;
+}
+
+.card,
+.face {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* the keyboard ring goes on the card in front, not on the canvas */
+.deck:focus-visible .face[data-front='true'] {
+  outline: var(--aera-border-base) solid var(--aera-color-utility-focus);
+  outline-offset: calc(var(--aera-space-4) * 1);
+}
+
+.card,
+.face {
+  position: absolute;
+  left: calc(var(--x) * var(--u));
+  top: calc(var(--y) * var(--u));
+  width: calc(var(--w) * var(--u));
+  height: calc(var(--h) * var(--u));
+  border-radius: calc(var(--aera-story-deck-radius) * var(--u));
+  background: var(--fill);
+}
+
+/* ---- the front two ------------------------------------------------
+   Laid out in front and pushed back by one transform. The z-index
+   flips HALFWAY through the move — a zero-length transition with a
+   half-length delay — which is the moment the two cards cross, so the
+   incoming card rises over the outgoing one rather than popping over
+   it at the start.
+   ------------------------------------------------------------------ */
+.face {
+  z-index: 4;
+  overflow: hidden;
+  transform-origin: 0 0;
+  transform: translate(calc(var(--px) * var(--u)), calc(var(--py) * var(--u)))
+    scale(var(--sx), var(--sy));
+  transition:
+    transform var(--aera-story-swap-duration) var(--aera-hero-ease-in),
+    z-index 0s linear calc(var(--aera-story-swap-duration) / 2);
+}
+
+.face[data-front='true'] {
+  z-index: 5;
+  transform: none;
+}
+
+/* the contents leave first and arrive last, so the scale of the move
+   is only ever applied to a plain block of colour */
+.content {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--aera-story-content-out) var(--aera-hero-ease-out);
+}
+
+.face[data-front='true'] .content {
+  opacity: 1;
+  transition: opacity var(--aera-story-content-in) var(--aera-hero-ease-in)
+    calc(var(--aera-story-swap-duration) / 2);
+}
+
+.shot {
+  position: absolute;
+  left: calc(var(--aera-story-inner-inset) * var(--u));
+  top: calc(var(--aera-story-inner-inset) * var(--u));
+  width: calc(var(--aera-story-inner-width) * var(--u));
+  height: calc(var(--sh) * var(--u));
+  border-radius: calc(var(--aera-story-inner-radius) * var(--u));
+  object-fit: cover;
+}
+
+.copy {
+  position: absolute;
+  left: calc(50% + var(--cx) * var(--u));
+  top: calc(50% + var(--cy) * var(--u));
+  translate: -50% -50%;
+  width: calc(var(--aera-story-copy-measure) * var(--u));
+  margin: 0;
+  color: var(--aera-color-hero-copy);
+  font-family: var(--aera-font-body);
+  font-size: calc(var(--aera-story-copy-size) * var(--u));
+  line-height: var(--lh);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .face,
+  .content,
+  .face[data-front='true'] .content {
+    transition: none;
+  }
+}

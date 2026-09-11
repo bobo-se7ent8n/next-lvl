@@ -21,6 +21,8 @@ export * from './LandingPatterns';
 export * from './LandingSessions';
 export * from './LandingScoreboard';
 export * from './LandingInsights';
+export * from './LandingPicture';
+export * from './LandingGame';
 export * from './LandingFuture';
 export * from './LandingClosure';
 

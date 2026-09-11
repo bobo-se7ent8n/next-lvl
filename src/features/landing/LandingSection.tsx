@@ -20,6 +20,10 @@ export interface LandingSectionProps {
    *  the readable measure breaks it onto a third line and a
    *  three-line block stops reading as a caption. */
   wideBody?: boolean;
+  /** set the heading in the hero's face — Open Sans, bold, sentence
+   *  case — instead of the display caps, for the sections that follow
+   *  the hero's own headings rather than the product's */
+  heroHeading?: boolean;
   className?: string;
 }
 
@@ -51,6 +55,7 @@ export function LandingSection({
   centred,
   fit,
   wideBody,
+  heroHeading,
   className,
 }: LandingSectionProps) {
   return (
@@ -60,7 +65,11 @@ export function LandingSection({
       data-section={heading}
     >
       <header className={styles.head}>
-        <Display size="lg">{heading}</Display>
+        {heroHeading ? (
+          <h2 className={styles.heroHeading}>{heading}</h2>
+        ) : (
+          <Display size="lg">{heading}</Display>
+        )}
         {body ? (
           <Text
             variant="body"

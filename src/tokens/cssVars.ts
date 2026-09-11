@@ -217,6 +217,12 @@ export function buildCssVars(): Record<string, string> {
     vars[`${key}-transform`] = t.transform;
   }
 
+  /* the two sections after insights, drawn at a 2046-wide window
+     and scaled as pictures — the same arrangement as the hero */
+  for (const [name, value] of Object.entries(tokens.story)) {
+    vars[`${PREFIX}-story-${kebab(name)}`] = scaleLength(value);
+  }
+
   // breakpoints and the scale steps ----------------------------
   for (const [name, value] of Object.entries(tokens.breakpoint)) {
     vars[`${PREFIX}-breakpoint-${kebab(name)}`] = value;

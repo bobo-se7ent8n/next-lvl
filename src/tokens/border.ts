@@ -35,7 +35,7 @@ export const borderWidth = {
    *  sits on a stroke the scale does not touch either, and a dot
    *  that shrank while the two strokes beside it held their weight
    *  would stop being twice the line and become 1.6 times it. */
-  traceDot: '6px',
+  traceDot: '12px',
 } as const;
 
 export type BorderWidth = keyof typeof borderWidth;

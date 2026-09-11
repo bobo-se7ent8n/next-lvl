@@ -85,42 +85,10 @@
   background: var(--aera-color-utility-hover);
 }
 
-/* ---- the tool link, which becomes what it opens ----------------
-   Both labels live in ONE grid cell, so the cell is as wide as the
-   wider of them and the pill never changes size: hovering swaps two
-   opacities and a fill and moves nothing.
+/* ---- the tool link: the one that leaves the product -------------
+   A shade darker under the pointer than the other two. Only the fill
+   moves; the word stays exactly where it is.
    ---------------------------------------------------------------- */
-.tool {
-  display: inline-grid;
-  align-items: center;
-  justify-items: center;
-}
-
 .tool:hover {
   background: var(--aera-color-hero-nav-pill-hover);
-}
-
-.toolRest,
-.toolHover {
-  grid-area: 1 / 1;
-  transition: opacity var(--aera-duration-fast) var(--aera-ease-out);
-}
-
-.toolHover {
-  opacity: 0;
-  font-family: var(--aera-text-hero-tool-family);
-  font-size: var(--aera-text-hero-tool-size);
-  line-height: var(--aera-text-hero-tool-leading);
-  letter-spacing: var(--aera-text-hero-tool-tracking);
-  font-weight: var(--aera-text-hero-tool-weight);
-}
-
-.tool:hover .toolRest,
-.tool:focus-visible .toolRest {
-  opacity: 0;
-}
-
-.tool:hover .toolHover,
-.tool:focus-visible .toolHover {
-  opacity: 1;
 }

@@ -19,13 +19,10 @@ import styles from './LandingNav.module.css';
  * the top of the page, which is the part of that behaviour worth
  * keeping.
  *
- * THE TOOL LINK CHANGES FACE UNDER THE POINTER. It opens the dot
- * matrix tool, so on hover its fill steps down and its label is set
- * in the pixel face — the label becomes the thing it opens. Both
- * labels are rendered, stacked in one grid cell, so the pill is the
- * width of the wider of the two at rest and NOTHING about the hover
- * changes the layout: only opacity and a fill, which is what this
- * page is allowed to animate.
+ * The tool link is the one that leaves the product, so under the
+ * pointer its fill steps a shade darker than the other two. Its type
+ * does not change: a hover that swaps the face is a hover that moves
+ * the word.
  */
 /* the tool lives on its own deployment, so this is a plain link out
    and it opens beside the page rather than replacing it */
@@ -37,7 +34,7 @@ export function LandingNav() {
       {/* named explicitly: the mark is decorative and the wordmark is
           a styled span, so the name is stated rather than inferred */}
       <Link to={ROUTES.landing} aria-label="Aera — to the top" className={styles.brand}>
-        <img className={styles.mark} src="/hero/mark.png" alt="" width={20} height={11} />
+        <img className={styles.mark} src="/hero/mark.png" alt="" width={36} height={22} />
         <span className={styles.word}>Aera</span>
       </Link>
 
@@ -49,9 +46,7 @@ export function LandingNav() {
           Storybook
         </Link>
 
-        {/* the label is in the DOM twice — once per face — so the
-            name is given here and both copies are hidden from the
-            tree, rather than letting it be read out twice */}
+        {/* a link out: the tool is its own deployment */}
         <a
           href={DOT_MATRIX}
           target="_blank"
@@ -59,13 +54,7 @@ export function LandingNav() {
           aria-label="Dot matrix tool (opens in a new tab)"
           className={cx(styles.pill, styles.tool)}
         >
-          {/* one cell, two labels: the pill cannot change width */}
-          <span className={styles.toolRest} aria-hidden="true">
-            Dot matrix tool
-          </span>
-          <span className={styles.toolHover} aria-hidden="true">
-            Dot matrix tool
-          </span>
+          Dot matrix tool
         </a>
       </div>
     </nav>

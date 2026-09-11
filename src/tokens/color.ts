@@ -348,6 +348,11 @@ export const colorHero = {
   progress: 'rgba(13, 13, 13, 0.22)',
   /** the page under the hero — a cooler paper than the app's */
   paper: '#FCFCFC',
+  /** the white sheet "A game" is drawn on */
+  sheet: '#FFFFFF',
+  /** running copy on the story sections — a warm near-black, softer
+   *  than the headline ink */
+  copy: '#2B2B29',
 } as const;
 
 export const color = {

@@ -169,6 +169,29 @@ export const landing = {
    *  the arc keeps its shape relative to the cards it is made of —
    *  the same correction the app's own fan geometry carries. */
   fanDrop: '26px',
+  /* ---- THE INSIGHTS SCENE ------------------------------------
+     How far the bubble lifts as it leaves, how far the line rises as
+     it takes the bubble's place, the line's measure, and the width an
+     insight card floats at before its depth scale is applied.
+     ------------------------------------------------------------ */
+  askLift: '96px',
+  phraseRise: '64px',
+  phraseMeasure: '600px',
+  /** half as big again as it was — the cards are the answer, not a
+   *  texture round the question */
+  floatCardW: '570px',
+  /** THE WELL. The cards are seen from above, falling away into it:
+   *  the perspective distance, and how close to the eye a card starts
+   *  before it drops to its place at the bottom. The start has to stay
+   *  well inside the perspective distance or the card is behind the
+   *  viewer. */
+  wellPerspective: '1000px',
+  wellDepth: '680px',
+  /* ---- THE AIR BETWEEN SECTIONS -------------------------------
+     The full-bleed sections after insights were butting straight
+     onto each other, and a section drawn as a picture needs white
+     round it to read as one. One gap, above each of them. */
+  sectionGap: '160px',
   /** the Ask AERA bubble in the insights reveal */
   bubbleW: '540px',
   bubbleH: '76px',

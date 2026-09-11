@@ -10,6 +10,11 @@
    4:3 pair at full width would be taller than the room under the
    heading on every laptop the page targets.
    ============================================================ */
+/* the air above it — the section before is a full-bleed picture */
+.after {
+  margin-top: var(--aera-landing-section-gap);
+}
+
 .pair {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

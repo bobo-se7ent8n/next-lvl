@@ -20,6 +20,7 @@ export * from './size';
 export * from './scale';
 export * from './landing';
 export * from './hero';
+export * from './story';
 
 import { color } from './color';
 import { space, layout } from './space';
@@ -44,6 +45,7 @@ import { iconSize, iconStroke, controlSpec, minTarget } from './size';
 import { breakpoint, breakpointHeight, scaleStep } from './scale';
 import { landing, scatter, trail, dotCanvas } from './landing';
 import { hero, heroType } from './hero';
+import { story } from './story';
 
 export const tokens = {
   color,
@@ -81,6 +83,7 @@ export const tokens = {
   landing,
   hero,
   heroType,
+  story,
   scatter,
   trail,
   dotCanvas,

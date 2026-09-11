@@ -1,25 +1,24 @@
 import {
   LandingClosure,
-  LandingFuture,
   LandingHero,
   LandingInsights,
   LandingNav,
-  LandingPatterns,
-  LandingScoreboard,
-  LandingSessions,
+  LandingPicture,
+  LandingGame,
 } from '../features/landing';
 import styles from './Landing.module.css';
 
 /**
  * THE PUBLIC PAGE.
  *
- * The bar, and then the sections: the poster the whole argument is
+ * The bar, and then four sections: the poster the whole argument is
  * on — which does not end where the window does: its product shot
  * pins and the page scrolls on through the three things the
- * sentence named — then the pattern hand, the two scroll-driven
- * ones that pin and play, the board, what does not exist yet, and
- * the line to leave with. "See it working" is gone from the run:
- * the handoff is the product in a window now, and says more.
+ * sentence named — then the insights scene, the full picture (a
+ * deck that turns its front card on the hero's clock), a game that
+ * knows you, and the line to leave with. "Not built yet" is off the
+ * page too; its file is still here. Patterns, Sessions and the
+ * Scoreboard are off the page; their files are still here.
  *
  * IT OPENS ON THE PAGE ITSELF. There used to be a dark state in
  * front of all of this holding two lines on a white card, which
@@ -44,11 +43,9 @@ export function Landing() {
 
       <div className={styles.sections}>
         <LandingHero />
-        <LandingPatterns />
-        <LandingSessions />
-        <LandingScoreboard />
         <LandingInsights />
-        <LandingFuture />
+        <LandingPicture />
+        <LandingGame />
         <LandingClosure />
       </div>
     </div>

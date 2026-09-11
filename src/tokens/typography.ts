@@ -57,10 +57,6 @@ export const fontFamily = {
      product, which is why it is named for where it lives.
      ------------------------------------------------------------ */
   hero: "'Open Sans', system-ui, -apple-system, sans-serif",
-  /** Silkscreen — the pixel face, and it appears in exactly one
-   *  place: the bar's tool link once the pointer is on it. The tool
-   *  it opens draws with a dot matrix, so the label becomes one. */
-  pixel: "'Silkscreen', ui-monospace, monospace",
 } as const;
 
 export const fontWeight = {
@@ -294,20 +290,20 @@ export const textStyle = {
   /** the wordmark beside the mark */
   heroWordmark: {
     fontFamily: fontFamily.hero,
-    fontSize: '14px',
+    fontSize: '28px',
     lineHeight: '1',
     letterSpacing: '-0.04em',
     fontWeight: fontWeight.semibold,
   },
-  /** the bar's tool link, hovered — the pixel face at its own size */
-  heroTool: {
-    fontFamily: fontFamily.pixel,
-    /* 8, not something between: Silkscreen is drawn on an 8px grid
-       and anywhere else it is anti-aliased into mush */
-    fontSize: '8px',
-    lineHeight: '1',
-    letterSpacing: '-0.01em',
-    fontWeight: fontWeight.regular,
+  /** THE INSIGHTS SCENE'S ONE LINE — what the bubble hands over to.
+   *  The hero's face, at a size that reads as a statement rather than
+   *  a caption, and three lines at most at its measure. */
+  landingPhrase: {
+    fontFamily: fontFamily.hero,
+    fontSize: '40px',
+    lineHeight: '1.2',
+    letterSpacing: '-0.02em',
+    fontWeight: fontWeight.medium,
   },
   /** a pill in the hero's bar — at the type floor, since the pills
    *  are half the height they were drawn at */
