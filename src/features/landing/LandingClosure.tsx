@@ -62,10 +62,10 @@ export function LandingClosure() {
         <DotCanvas />
 
         <div className={styles.content}>
-          {/* THE LINE AND THE WAY IN, as one group: they take the
-              block and centre in whatever the footer leaves. The
-              footer is the block's other group and stands on its
-              bottom padding — see the stylesheet. */}
+          {/* THE LINE AND THE WAY IN. The line sits on the block's
+              vertical centre exactly, the button directly under it;
+              the footer stands on the block's bottom padding and
+              shifts neither — see the stylesheet. */}
           <div className={styles.lead}>
             <Display size="xl" as="p" className={styles.line}>
               Built to be outgrown.

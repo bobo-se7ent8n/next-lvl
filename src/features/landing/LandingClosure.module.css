@@ -1,53 +1,37 @@
 /* ============================================================
    THE CLOSING BLOCK
 
-   A window, treated like the bar at the top of the page: inset
-   from both sides on top of the page's own gutter, cut at the
-   window radius. It is deliberately SHORT — it holds one line and
-   one button, and a full-height canvas under two pieces of type
-   was a lot of empty surface pretending to be a section.
+   A plate with the tactile dot field across it, on a white ground
+   that runs to both edges of the window — the ground carries on
+   from "A game" above it, so the page ends on one surface.
 
-   THE PAGE ENDS AT ITS BOTTOM EDGE. There is no footer strip and
-   no trailing padding: the section's own bottom padding is the
-   frame margin and nothing follows it, so the last thing the reader
-   scrolls to is the block itself rather than a band of nothing
-   under it. The footer lives INSIDE the block, under the call to
-   action.
+   HALF A WINDOW, AND THE LINE IN ITS MIDDLE. The plate is half the
+   height the window leaves under the bar; the line sits exactly on
+   its vertical centre, the way in directly under it, and the footer
+   stands on the plate's bottom inset. The page ends at the plate's
+   bottom edge and its frame margin — nothing follows it.
    ============================================================ */
 .section {
   display: flex;
   flex-direction: column;
-  /* one window, like every other section — the block takes what the
-     clearance and the frame margin leave, and the page stops at its
-     bottom edge */
-  height: 100dvh;
-  padding-block: var(--aera-landing-nav-clear) var(--aera-landing-frame);
+  width: 100vw;
+  margin-inline: calc(var(--aera-landing-frame) * -1);
+  padding: var(--aera-landing-nav-clear) var(--aera-landing-frame) var(--aera-landing-frame);
+  background: var(--aera-color-hero-sheet);
 }
 
 .block {
   position: relative;
   display: flex;
-  /* STRETCH, so the content column is as tall as the block and can
-     divide it — see `.content`. It used to be `center`, which sized
-     the column to its own contents and left the footer hanging
-     directly under the button with the whole lower half of the block
-     empty beneath it. */
   align-items: stretch;
   justify-content: center;
-  flex: 1 1 auto;
-  min-height: var(--aera-landing-close-block-h);
-  padding: var(--aera-space-13) var(--aera-layout-gutter);
-  /* THE PAGE'S OWN FRAME, and no more. The block used to take a
-     second inset of its own on top of it, which put the closing
-     block on a different left edge from every section above it. */
-  margin-inline: 0;
+  height: var(--aera-landing-close-block-h);
+  padding: var(--aera-space-9) var(--aera-layout-gutter);
   border-radius: var(--aera-radius-window);
   overflow: hidden;
   background: var(--aera-color-surface-level1);
-  /* THE OPENING REVEAL. Up from just under full size on the firm
-     curve: resistance, and no overshoot anywhere in it. Scale only —
-     the block's own layout box never moves, so nothing below it
-     reflows while it is arriving. */
+  /* the opening reveal: up from just under full size on the firm
+     curve, no overshoot, and the layout box never moves */
   transform: scale(0.94);
   opacity: 0;
   transition:
@@ -60,52 +44,60 @@
   opacity: 1;
 }
 
-/* THE FIELD TAKES THE POINTER; THE WORDS GIVE IT BACK.
-   The canvas is under the content and would never see a pointermove
-   that landed on the type, so the content is transparent to the
-   pointer and only the link opts back in. */
-/* ---- TWO GROUPS, AND THE BLOCK IS DIVIDED BETWEEN THEM ---------
-   The line and the button take the room, centred in whatever the
-   footer leaves; the footer itself sits on the block's bottom
-   padding. They used to be one stack centred as a whole, so the four
-   links and the build line hung immediately under the button with
-   the entire lower half of the block empty under them — a footer
-   floating in the middle of the thing it is the foot of.
+/* ---- THE LINE ON THE CENTRE -----------------------------------
+   Three rows, the outer two equal: the line is the middle row, so it
+   sits on the plate's centre exactly — the button and the footer do
+   not push it anywhere. The button starts the lower row; the footer
+   stands on the bottom of the plate, out of the rows altogether.
 
-   The bottom edge is the block's own padding, not zero: the footer
-   stands on the same inset the heading stands in.
+   The field takes the pointer and the words give it back: the
+   content is transparent to it and only the links opt back in.
    ---------------------------------------------------------------- */
 .content {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--aera-space-12);
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  justify-items: center;
   width: 100%;
   max-width: var(--aera-layout-max-prose-width);
   pointer-events: none;
 }
 
-/* the line and the way in, centred in everything the footer leaves */
 .lead {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--aera-space-12);
-  min-height: 0;
+  display: contents;
 }
 
-/* ---- the footer row -------------------------------------------
-   Two lines, both centred, both in the annotation voice: the ways
-   out, and the machine facts. The generous tracking is what tells
-   the reader this is furniture rather than something else to read.
-   ---------------------------------------------------------------- */
+.line {
+  grid-row: 2;
+  text-align: center;
+}
+
+.cta {
+  grid-row: 3;
+  align-self: start;
+  margin-top: var(--aera-space-9);
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--aera-min-target-tap);
+  padding-inline: var(--aera-space-11);
+  border-radius: var(--aera-radius-pill);
+  color: var(--aera-color-ink-on-inverse);
+  background: var(--aera-color-surface-inverse);
+  text-decoration: none;
+  pointer-events: auto;
+  transition: background-color var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.cta:hover {
+  background: var(--aera-color-ink-secondary);
+}
+
+/* ---- the footer, on the plate's bottom inset ------------------- */
 .footer {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
   display: flex;
-  flex: none;
   flex-direction: column;
   align-items: center;
   gap: var(--aera-space-6);
@@ -126,8 +118,8 @@
 .link {
   color: var(--aera-color-ink-tertiary);
   text-decoration: none;
-  /* colour only. Four links in a row each growing an underline for
-     one pointer is four things answering a gesture aimed at one. */
+  /* colour only — four links each growing an underline for one
+     pointer is four things answering a gesture aimed at one */
   transition: color var(--aera-duration-fast) var(--aera-ease-out);
 }
 
@@ -145,30 +137,7 @@
   letter-spacing: var(--aera-tracking-mono);
 }
 
-.line {
-  text-align: center;
-}
-
-.cta {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--aera-min-target-tap);
-  padding-inline: var(--aera-space-11);
-  border-radius: var(--aera-radius-pill);
-  color: var(--aera-color-ink-on-inverse);
-  background: var(--aera-color-surface-inverse);
-  text-decoration: none;
-  pointer-events: auto;
-  transition: background-color var(--aera-duration-fast) var(--aera-ease-out);
-}
-
-.cta:hover {
-  background: var(--aera-color-ink-secondary);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  /* it is simply there — a block that scales into view is exactly
-     the kind of arrival this asks us not to run */
   .block {
     transform: none;
     opacity: 1;

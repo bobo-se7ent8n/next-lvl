@@ -17,10 +17,9 @@
   margin-top: var(--aera-landing-section-gap);
   margin-inline: calc(var(--aera-landing-frame) * -1);
   overflow: hidden;
-  /* NO FILL OF ITS OWN: the design draws these on white, but on a
-     page with air between sections a white sheet on the page's paper
-     reads as a grey band in every gap. The page's paper runs under
-     them instead, so the gaps are seamless. */
+  /* the deck's own ground — the first step up from paper, so the white
+     session card reads as a card on it rather than as a hole in it */
+  background: var(--aera-color-surface-level1);
 }
 
 /* the design's window, centred when a short screen makes it narrower */

@@ -40,7 +40,7 @@ const PUSH = Object.freeze({
 const FACES = Object.freeze([
   {
     id: 'month',
-    fill: 'var(--aera-color-surface-level2)',
+    fill: 'var(--aera-color-hero-sheet)',
     shot: '/story/picture-calendar.png',
     shotH: 659,
     alt: 'The month in AERA: every session on the calendar, coloured by intensity',

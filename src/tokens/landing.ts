@@ -197,7 +197,8 @@ export const landing = {
   bubbleH: '76px',
   /** the closing block — a floating window like the nav, and short:
    *  it holds a line and a button, not a section */
-  closeBlockH: '54dvh',
+  closeBlockH:
+    'calc((100dvh - var(--aera-landing-nav-clear) - var(--aera-landing-frame)) / 2)',
 
   /** HOW FAR THE POINTER REACHES ACROSS THE CLOSING BLOCK'S FIELD.
    *
