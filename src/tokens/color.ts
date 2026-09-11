@@ -288,8 +288,72 @@ export const colorUtility = {
   gridDark: 'rgba(255,255,252,0.055)',
 } as const;
 
+/* ------------------------------------------------------------
+   THE HERO KEYWORD PALETTE — six colours, and they are TYPE.
+
+   The landing headline names three things the product does, and
+   the one being shown is set letter by letter in these. They are
+   NOT the AERA palette: `data` is five pastels designed to be
+   FILLED with, and a pastel cannot carry a letter at display size
+   — the same reason `accent` exists. These six are the design's
+   own, saturated enough to be read as words.
+
+   ONE SEQUENCE PER KEYWORD, and the underline under it is a
+   gradient through that keyword's own sequence in order (see
+   `heroScenes`). Letters and underline therefore cannot drift
+   apart: both read the same array.
+   ------------------------------------------------------------ */
+export const colorKeyword = {
+  blue: '#10A0E8',
+  yellow: '#FCD448',
+  orange: '#FC6C28',
+  pink: '#FCC0CC',
+  green: '#04B84C',
+  lilac: '#CEB0FB',
+} as const;
+
+/* ------------------------------------------------------------
+   THE HERO'S OWN FEW COLOURS.
+
+   `ink` is the one that needs saying out loud: it is NOT
+   `ink.primary`. The headline, the call to action and the nav are
+   set in a neutral near-black that is four steps darker than the
+   product's warm one, and the difference is deliberate — the hero
+   is a poster and the app is paper. Two values, named apart, so
+   neither can be "tidied" into the other.
+
+   The rest are the sticker fills the palette has no entry for. The
+   ones it DOES have — mint, lilac, orange, yellow, level1, level2
+   — are referenced from `data` and `surface` in `heroScenes`
+   rather than repeated here.
+   ------------------------------------------------------------ */
+export const colorHero = {
+  /** the headline, the CTA fill, the nav — a neutral near-black */
+  ink: '#0D0D0D',
+  /** the blue sticker pill, a shade off the keyword blue */
+  sticker: '#0EA0E7',
+  /** the pink sticker pill */
+  stickerPink: '#FCBDC6',
+  /** the hand-drawn line behind the play scene */
+  squigglePlay: '#FEAFCD',
+  /** the shell the Scoreboard/patterns chip pair sits in */
+  chipShell: '#E9E7E4',
+  /** the bar's tool pill once the pointer is on it — a step down
+   *  from the paper the other two wear, so the one link that opens
+   *  something other than the product reads as the odd one out */
+  navPillHover: '#E0DDD6',
+  /** the handoff list's row divider — a hairline in the hero's ink */
+  rowLine: 'rgba(13, 13, 13, 0.08)',
+  /** and the progress drawn along it as the page scrolls a mode */
+  progress: 'rgba(13, 13, 13, 0.22)',
+  /** the page under the hero — a cooler paper than the app's */
+  paper: '#FCFCFC',
+} as const;
+
 export const color = {
   surface: colorSurface,
+  keyword: colorKeyword,
+  hero: colorHero,
   ink: colorInk,
   data: colorData,
   face: colorFace,

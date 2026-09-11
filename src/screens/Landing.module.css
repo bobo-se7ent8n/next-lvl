@@ -15,8 +15,15 @@
    flex box for the sticky bar's containing block to be the page
    rather than whichever section it happens to be over.
    ============================================================ */
+/* THE PAPER IS THE PAGE'S, NOT THE HERO'S.
+
+   The design's ground is a hair cooler than the product's own, and
+   it belongs to the whole public page: setting it on the hero alone
+   drew a visible edge where the hero's fill met the page's under
+   the bar. One fill, no seam. */
 .landing {
   position: relative;
+  background: var(--aera-color-hero-paper);
   display: flex;
   flex-direction: column;
   padding: var(--aera-landing-frame) var(--aera-landing-frame) 0;

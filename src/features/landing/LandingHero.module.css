@@ -1,58 +1,589 @@
 /* ============================================================
-   THE HERO
+   THE HERO AND ITS HANDOFF
 
-   One screen, one sentence, centred. The height is `dvh` rather
-   than `vh` deliberately: on a phone or an iPad with a retracting
-   browser chrome, `vh` is the tallest the viewport ever gets, so a
-   `100vh` hero is cut off by the toolbar that is actually there.
+   THE HERO IS A PICTURE ON ONE UNIT. The design is a 2050-wide
+   window; every scene number in `tokens/hero.ts` is a design pixel
+   at that width, and it becomes a length here by one multiply:
 
-   The nav is sticky above it, so the hero's own height is one
-   viewport LESS the bar — otherwise the sentence sits half a bar
-   below centre and the first scroll of the page is a correction.
+   · `--ux`  the window's width share — 1px at 2050 wide
+   · `--u`   the smaller of `--ux` and what the first screen's
+             height allows. Sizes, type and vertical positions use
+             this, so the composition keeps its shape and fits.
+   · x positions use `--ux` alone, so the field reaches both edges
+     of the window at every size — the design is edge to edge.
+   · `--spare` is height the window has beyond what the design
+     needs (a window taller than 2050:1096); it is split above the
+     sentence and under the shot, so the composition sits centred.
+
+   The bar and the button stay interface-sized (px tokens), so the
+   design's own height is solved WITHOUT the button and the button
+   is added back as a length.
+
+   THE SECTION IS FULL-BLEED. The page has a frame margin; the hero
+   steps out of it to the window's edges, as drawn, and clips what
+   the design lets run off the side. `overflow-x: clip` rather than
+   `hidden`: clip makes no scroll container, so the sticky pin below
+   still sticks to the window.
    ============================================================ */
 .hero {
   position: relative;
-  display: grid;
-  place-items: center;
-  /* EVERY SECTION IS A SNAP POINT — and this one's snap position is
-     not its own top edge.
-
-     The bar is IN FLOW above the hero, so the hero's border box
-     starts a frame margin and a bar's band down the page. Snapping
-     to that edge would scroll both of them off the top and leave the
-     hero's bottom hanging a hundred pixels into the next section —
-     the exact bleed this section is supposed to be free of. A
-     positive `scroll-margin-top` outsets the snap area upward by
-     precisely what sits above it, so the snap position is the top of
-     the page, which is where the hero actually begins. */
-  scroll-snap-align: start;
-  scroll-margin-top: var(--aera-landing-nav-clear);
-  /* EXACTLY ONE WINDOW, AND EXACTLY ONE.
-
-     The hero is the one section the bar does NOT float over: the bar
-     is in flow above it, so the hero's own box begins where the bar's
-     band ends. Its height is therefore the window less the frame
-     margin at the top of the page and less that band — no more,
-     because the next section's heading would show under it, and no
-     less, because then the hero would not fill the screen it is
-     supposed to be.
-
-     `height`, not `min-height`, for the same reason every fitted
-     section uses one: a minimum is a promise the content can break. */
-  height: calc(100dvh - var(--aera-landing-frame) - var(--aera-landing-nav-band));
-  overflow: hidden;
-}
-
-
-.stack {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--aera-space-11);
-  max-width: var(--aera-layout-max-subhead-width);
-  text-align: center;
+  width: 100vw;
+  margin-inline: calc(var(--aera-landing-frame) * -1);
+  overflow-x: clip;
+
+  --avail: calc(100dvh - var(--aera-landing-frame) - var(--aera-hero-nav-height));
+  --design-h: calc(
+    var(--aera-hero-head-top) + 3 * var(--aera-hero-head-size) + var(--aera-hero-head-gap) +
+      var(--aera-hero-head-bottom) + var(--aera-hero-shot-height) + var(--aera-hero-fold-gap)
+  );
+  --ux: calc(100vw / var(--aera-hero-design-width));
+  --u: min(var(--ux), calc((var(--avail) - var(--aera-hero-cta-height)) / var(--design-h)));
+  --spare: calc(var(--avail) - var(--aera-hero-cta-height) - var(--design-h) * var(--u));
+
+  --shot-w: calc(var(--aera-hero-shot-width) * var(--u));
+  --shot-h: calc(var(--aera-hero-shot-height) * var(--u));
+  --scene-h: calc(var(--aera-hero-scene-height) * var(--u));
+
+  /* the handoff: the shot at the size it grows to, beside the list */
+  --col: 100vw;
+  --feat-h: min(
+    calc(var(--avail) - 2 * var(--aera-hero-feat-pad-y)),
+    calc(
+      (var(--col) - var(--aera-hero-modes-width) - var(--aera-hero-modes-gap) - 2 *
+            var(--aera-hero-feat-pad-x)) / var(--aera-hero-shot-aspect)
+    ),
+    var(--aera-hero-feat-max-height)
+  );
+  --feat-w: calc(var(--feat-h) * var(--aera-hero-shot-aspect));
+  --comp-w: calc(var(--aera-hero-modes-width) + var(--aera-hero-modes-gap) + var(--feat-w));
+}
+
+/* ---- the sentence and the button under it ----------------------- */
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--aera-hero-head-gap) * var(--u));
+  width: 100%;
+  max-width: calc((var(--aera-hero-head-measure) + 2 * var(--aera-hero-head-pad-x)) * var(--u));
+  padding-top: calc(var(--aera-hero-head-top) * var(--u) + var(--spare) / 2);
+  padding-bottom: calc(var(--aera-hero-head-bottom) * var(--u));
+  padding-inline: calc(var(--aera-hero-head-pad-x) * var(--u));
+}
+
+/* a flex box, so the button's box IS the row's height — an inline
+   box would add a strut and the first screen's sum would be off */
+.riseCta {
+  display: flex;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--aera-hero-cta-height);
+  padding-inline: var(--aera-hero-cta-pad-x);
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-hero-ink);
+  color: var(--aera-color-ink-on-inverse);
+  font-family: var(--aera-text-hero-action-family);
+  font-size: var(--aera-text-hero-action-size);
+  line-height: var(--aera-text-hero-action-leading);
+  letter-spacing: var(--aera-text-hero-action-tracking);
+  font-weight: var(--aera-text-hero-action-weight);
+  text-decoration: none;
+  transition: opacity var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.cta:hover {
+  opacity: 0.88;
+}
+
+/* ============================================================
+   THE TRACK AND THE PIN
+
+   The pin sticks where the SHOT is in the middle of the window
+   under the bar; the page scrolls on through `travel` while it
+   stays. Native scroll — `position: sticky` and nothing else.
+   ============================================================ */
+.track {
+  position: relative;
+  width: 100%;
+  height: calc(var(--scene-h) + var(--aera-hero-travel));
+}
+
+.pin {
+  position: sticky;
+  top: calc(
+    var(--aera-landing-frame) + var(--aera-hero-nav-height) + (var(--avail) - var(--shot-h)) / 2
+  );
+  width: 100%;
+  height: var(--scene-h);
+}
+
+/* the sticker field's coordinate space: the full window width, from
+   the top of the shot down */
+.scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--scene-h);
+}
+
+/* where the shot sits under the headline — drawn nowhere, measured
+   for the one ratio CSS cannot divide out */
+.heroSlot {
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  margin-inline: auto;
+  width: var(--shot-w);
+  height: var(--shot-h);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ============================================================
+   THE SHOT
+
+   Laid out at its HANDOFF size, right of the list and centred on
+   the same line as the hero shot, and pulled back to the hero's
+   place and size with `translate` and `scale`. The corner is set so
+   that under the headline it is exactly the design's 32 — which
+   also keeps it in proportion to the picture once it has grown.
+   ============================================================ */
+.shotRise {
+  position: absolute;
+  top: calc((var(--shot-h) - var(--feat-h)) / 2);
+  left: calc(
+    (100% - var(--comp-w)) / 2 + var(--aera-hero-modes-width) + var(--aera-hero-modes-gap)
+  );
+  width: var(--feat-w);
+  height: var(--feat-h);
+  pointer-events: none;
+}
+
+.shotBox {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: calc(var(--aera-hero-shot-radius) * var(--u) / var(--from, 1));
+  box-shadow: var(--aera-elevation-hero-shot);
+  background: var(--aera-color-surface-background);
+  translate: calc((var(--aera-hero-modes-width) + var(--aera-hero-modes-gap)) / -2) 0;
+  scale: var(--from, 0.7);
+  transition:
+    translate var(--aera-hero-handoff-duration) var(--aera-hero-ease-in),
+    scale var(--aera-hero-handoff-duration) var(--aera-hero-ease-in);
+}
+
+.hero[data-phase='modes'] .shotBox {
+  translate: 0 0;
+  scale: 1;
+}
+
+.shot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--aera-hero-shot-fade) var(--aera-hero-ease-shot);
+}
+
+.shot[data-on='true'] {
+  opacity: 1;
+}
+
+/* ---- the list, which comes in from the right -------------------- */
+.modesSlot {
+  position: absolute;
+  top: calc((var(--shot-h) - var(--feat-h)) / 2);
+  left: calc((100% - var(--comp-w)) / 2);
+  width: var(--aera-hero-modes-width);
+  opacity: 0;
+  translate: var(--aera-hero-modes-slide) 0;
+  pointer-events: none;
+  transition:
+    opacity var(--aera-hero-handoff-duration) var(--aera-hero-ease-in),
+    translate var(--aera-hero-handoff-duration) var(--aera-hero-ease-in);
+}
+
+.hero[data-phase='modes'] .modesSlot {
+  opacity: 1;
+  translate: 0 0;
+  pointer-events: auto;
+}
+
+/* ============================================================
+   THE STICKER FIELD
+   ============================================================ */
+.field {
+  position: absolute;
+  inset: 0;
+}
+
+/* the handoff's exit: the whole field grows away from the shot */
+.leave {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% calc(var(--shot-h) / 2);
+  transition:
+    opacity var(--aera-hero-handoff-duration) var(--aera-hero-ease-in),
+    scale var(--aera-hero-handoff-duration) var(--aera-hero-ease-in);
+}
+
+.hero:not([data-phase='hero']) .leave {
+  opacity: 0;
+  scale: var(--aera-hero-leave-scale);
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---- one sticker: the slot is the place and the motion ---------- */
+.slot {
+  position: absolute;
+  left: calc(var(--x) * var(--ux));
+  top: calc(var(--y) * var(--u));
+  opacity: 0;
+  transform: translate(
+      calc(var(--dx) * var(--aera-hero-sticker-drift)),
+      calc(var(--dy) * var(--aera-hero-sticker-drift))
+    )
+    rotate(var(--twist, 0deg));
+  transition:
+    opacity var(--aera-hero-sticker-out) var(--aera-hero-ease-out),
+    transform var(--aera-hero-sticker-out) var(--aera-hero-ease-out);
+}
+
+.slot[data-sized] {
+  width: calc(var(--sw) * var(--u));
+}
+
+.layer[data-on='true'] .slot {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--aera-hero-sticker-in) var(--aera-hero-ease-in) var(--aera-hero-sticker-in-delay),
+    transform var(--aera-hero-sticker-in) var(--aera-hero-ease-in) var(--aera-hero-sticker-in-delay);
+}
+
+/* ---- the art: the tilt, about the top-left corner --------------- */
+.art {
+  rotate: var(--rot);
+  transform-origin: 0 0;
+}
+
+.picture {
+  width: 100%;
+  height: calc(var(--sh) * var(--u));
+  background-size: cover;
+  background-position: 50%;
+  background-repeat: no-repeat;
 }
 
 .line {
-  max-width: var(--aera-layout-max-subhead-width);
+  display: block;
+  width: 100%;
+  height: calc(var(--sh) * var(--u));
+  overflow: visible;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--aera-hero-sticker-pad-y) * var(--u)) calc(var(--aera-hero-sticker-pad-x) * var(--u));
+  border-radius: calc(var(--aera-hero-sticker-radius) * var(--u));
+  white-space: nowrap;
+  font-family: var(--aera-hero-type-pill-family);
+  font-size: calc(var(--aera-hero-type-pill-size) * var(--u));
+  line-height: var(--aera-hero-type-pill-leading);
+  letter-spacing: var(--aera-hero-type-pill-tracking);
+  font-weight: var(--aera-hero-type-pill-weight);
+}
+
+.strip {
+  display: inline-flex;
+  align-items: center;
+  padding: calc(var(--aera-hero-strip-pad-y) * var(--u)) calc(var(--aera-hero-strip-pad-x) * var(--u));
+  border-radius: var(--aera-radius-pill);
+  background: var(--aera-color-surface-level2);
+  color: var(--aera-color-ink-secondary);
+  white-space: nowrap;
+  font-family: var(--aera-hero-type-strip-family);
+  font-size: calc(var(--aera-hero-type-strip-size) * var(--u));
+  line-height: var(--aera-hero-type-strip-leading);
+  letter-spacing: var(--aera-hero-type-strip-tracking);
+  font-weight: var(--aera-hero-type-strip-weight);
+  text-transform: var(--aera-hero-type-strip-transform);
+}
+
+.tabs {
+  display: inline-flex;
+  align-items: flex-start;
+  padding: calc(var(--aera-hero-chip-shell-pad) * var(--u));
+  border-radius: calc(var(--aera-hero-sticker-radius) * var(--u));
+  background: var(--aera-color-hero-chip-shell);
+  white-space: nowrap;
+}
+
+.tabOn,
+.tabOff {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--aera-hero-chip-gap) * var(--u));
+  padding: calc(var(--aera-hero-chip-pad-y) * var(--u)) calc(var(--aera-hero-chip-pad-x) * var(--u));
+  border-radius: calc(var(--aera-hero-chip-radius) * var(--u));
+  color: var(--aera-color-hero-ink);
+  font-family: var(--aera-hero-type-chip-family);
+  font-size: calc(var(--aera-hero-type-chip-size) * var(--u));
+  line-height: var(--aera-hero-type-chip-leading);
+  letter-spacing: var(--aera-hero-type-chip-tracking);
+  font-weight: var(--aera-hero-type-chip-weight);
+}
+
+.tabOn {
+  background: var(--aera-color-surface-background);
+}
+
+.tabOff {
+  font-weight: var(--aera-weight-medium);
+  opacity: 0.4;
+}
+
+.lock {
+  flex: none;
+  width: calc(var(--aera-hero-lock-size) * var(--u));
+  height: calc(var(--aera-hero-lock-size) * var(--u));
+  opacity: 0.4;
+}
+
+.legend {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--aera-hero-legend-gap) * var(--u));
+  white-space: nowrap;
+}
+
+.swatch {
+  flex: none;
+  width: calc(var(--aera-hero-legend-dot) * var(--u));
+  height: calc(var(--aera-hero-legend-dot) * var(--u));
+  border-radius: var(--aera-radius-pill);
+}
+
+.legend[data-small] .swatch {
+  width: calc(var(--aera-hero-legend-dot-small) * var(--u));
+  height: calc(var(--aera-hero-legend-dot-small) * var(--u));
+}
+
+.legendWord {
+  color: var(--aera-color-ink-tertiary);
+  font-family: var(--aera-hero-type-legend-family);
+  font-size: calc(var(--aera-hero-type-legend-size) * var(--u));
+  line-height: var(--aera-hero-type-legend-leading);
+  letter-spacing: var(--aera-hero-type-legend-tracking);
+  font-weight: var(--aera-hero-type-legend-weight);
+  text-transform: var(--aera-hero-type-legend-transform);
+}
+
+.legend[data-small] .legendWord {
+  font-family: var(--aera-hero-type-legend-small-family);
+  font-size: calc(var(--aera-hero-type-legend-small-size) * var(--u));
+  line-height: var(--aera-hero-type-legend-small-leading);
+  letter-spacing: var(--aera-hero-type-legend-small-tracking);
+  font-weight: var(--aera-hero-type-legend-small-weight);
+}
+
+/* ---- a session's line, in the app's own type -------------------- */
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--aera-hero-stat-gap) * var(--u));
+}
+
+.statTitle {
+  color: var(--aera-color-ink-primary);
+  font-family: var(--aera-hero-type-stat-title-family);
+  font-size: calc(var(--aera-hero-type-stat-title-size) * var(--u));
+  line-height: var(--aera-hero-type-stat-title-leading);
+  letter-spacing: var(--aera-hero-type-stat-title-tracking);
+  font-weight: var(--aera-hero-type-stat-title-weight);
+  text-transform: var(--aera-hero-type-stat-title-transform);
+}
+
+.statRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--aera-hero-stat-row-gap) * var(--u));
+}
+
+.statPair {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--aera-hero-stat-pair-gap) * var(--u));
+}
+
+.statValue {
+  color: var(--aera-color-ink-primary);
+  font-family: var(--aera-hero-type-stat-value-family);
+  font-size: calc(var(--aera-hero-type-stat-value-size) * var(--u));
+  line-height: var(--aera-hero-type-stat-value-leading);
+  letter-spacing: var(--aera-hero-type-stat-value-tracking);
+  font-weight: var(--aera-hero-type-stat-value-weight);
+  font-variant-numeric: var(--aera-numeric-tabular);
+}
+
+.statUnit {
+  color: var(--aera-color-ink-tertiary);
+  font-family: var(--aera-hero-type-stat-unit-family);
+  font-size: calc(var(--aera-hero-type-stat-unit-size) * var(--u));
+  line-height: var(--aera-hero-type-stat-unit-leading);
+  letter-spacing: var(--aera-hero-type-stat-unit-tracking);
+  font-weight: var(--aera-hero-type-stat-unit-weight);
+  text-transform: var(--aera-hero-type-stat-unit-transform);
+}
+
+/* ---- the Focus reading ----------------------------------------- */
+.reading {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--aera-hero-reading-gap) * var(--u));
+}
+
+.readingRow {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--aera-hero-reading-unit-gap) * var(--u));
+}
+
+.readingValue {
+  color: var(--aera-color-ink-primary);
+  font-family: var(--aera-hero-type-reading-family);
+  font-size: calc(var(--aera-hero-type-reading-size) * var(--u));
+  line-height: var(--aera-hero-type-reading-leading);
+  letter-spacing: var(--aera-hero-type-reading-tracking);
+  font-weight: var(--aera-hero-type-reading-weight);
+}
+
+.readingUnit {
+  color: var(--aera-color-ink-tertiary);
+  font-family: var(--aera-hero-type-reading-unit-family);
+  font-size: calc(var(--aera-hero-type-reading-unit-size) * var(--u));
+  line-height: var(--aera-hero-type-reading-unit-leading);
+  font-weight: var(--aera-hero-type-reading-unit-weight);
+}
+
+.caption {
+  color: var(--aera-color-ink-tertiary);
+  font-family: var(--aera-hero-type-caption-family);
+  font-size: calc(var(--aera-hero-type-caption-size) * var(--u));
+  line-height: var(--aera-hero-type-caption-leading);
+  letter-spacing: var(--aera-hero-type-caption-tracking);
+  font-weight: var(--aera-hero-type-caption-weight);
+  text-transform: var(--aera-hero-type-caption-transform);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: calc(var(--aera-hero-badge-pad-y) * var(--u)) calc(var(--aera-hero-badge-pad-x) * var(--u));
+  border-radius: var(--aera-radius-pill);
+  white-space: nowrap;
+  font-family: var(--aera-hero-type-badge-family);
+  font-size: calc(var(--aera-hero-type-badge-size) * var(--u));
+  line-height: var(--aera-hero-type-badge-leading);
+  letter-spacing: var(--aera-hero-type-badge-tracking);
+  font-weight: var(--aera-hero-type-badge-weight);
+  text-transform: var(--aera-hero-type-badge-transform);
+}
+
+.label {
+  display: block;
+  color: var(--aera-color-ink-tertiary);
+  font-family: var(--aera-hero-type-label-family);
+  font-size: calc(var(--aera-hero-type-label-size) * var(--u));
+  line-height: var(--aera-hero-type-label-leading);
+  letter-spacing: var(--aera-hero-type-label-tracking);
+  font-weight: var(--aera-hero-type-label-weight);
+  text-transform: var(--aera-hero-type-label-transform);
+}
+
+/* ============================================================
+   THE OPENING — the sentence, the button, the shot, the field
+   ============================================================ */
+.riseHead,
+.riseCta,
+.shotRise,
+.field {
+  opacity: 0;
+  transform: translateY(var(--aera-hero-open-rise));
+  transition:
+    opacity var(--aera-hero-open-duration) var(--aera-hero-ease-in),
+    transform var(--aera-hero-open-duration) var(--aera-hero-ease-in);
+}
+
+.riseHead {
+  transition-delay: var(--aera-hero-open-head-delay);
+}
+
+.riseCta {
+  transition-delay: var(--aera-hero-open-cta-delay);
+}
+
+.shotRise {
+  transition-delay: var(--aera-hero-open-shot-delay);
+}
+
+.field {
+  transition-delay: var(--aera-hero-open-sticker-delay);
+}
+
+.hero[data-open='true'] .riseHead,
+.hero[data-open='true'] .riseCta,
+.hero[data-open='true'] .shotRise,
+.hero[data-open='true'] .field {
+  opacity: 1;
+  transform: none;
+}
+
+.preload {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot,
+  .slot,
+  .layer[data-on='true'] .slot,
+  .riseHead,
+  .riseCta,
+  .shotRise,
+  .field,
+  .shotBox,
+  .leave,
+  .modesSlot {
+    transition: none;
+  }
+
+  .riseHead,
+  .riseCta,
+  .shotRise,
+  .field {
+    opacity: 1;
+    transform: none;
+  }
 }

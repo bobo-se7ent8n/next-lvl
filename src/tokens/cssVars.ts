@@ -198,6 +198,25 @@ export function buildCssVars(): Record<string, string> {
     vars[`${PREFIX}-landing-${kebab(name)}`] = scaleLength(value);
   }
 
+  /* the hero's own constants. Lengths are scaled; the timings,
+     easings, ratios and per-cent positions in the same object have
+     no px in them, so `scaleLength` hands them back untouched. */
+  for (const [name, value] of Object.entries(tokens.hero)) {
+    vars[`${PREFIX}-hero-${kebab(name)}`] = scaleLength(value);
+  }
+  /* the stickers' type — sizes are design numbers the hero multiplies
+     by its own unit, so nothing here is scaled; the family and the
+     weight are resolved from the product's own sets */
+  for (const [role, t] of Object.entries(tokens.heroType)) {
+    const key = `${PREFIX}-hero-type-${kebab(role)}`;
+    vars[`${key}-family`] = tokens.fontFamily[t.family];
+    vars[`${key}-size`] = t.size;
+    vars[`${key}-weight`] = String(tokens.fontWeight[t.weight]);
+    vars[`${key}-leading`] = t.leading;
+    vars[`${key}-tracking`] = t.tracking;
+    vars[`${key}-transform`] = t.transform;
+  }
+
   // breakpoints and the scale steps ----------------------------
   for (const [name, value] of Object.entries(tokens.breakpoint)) {
     vars[`${PREFIX}-breakpoint-${kebab(name)}`] = value;

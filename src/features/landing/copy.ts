@@ -9,11 +9,15 @@
    between the two states would show.
    ============================================================ */
 
-/** the one claim the whole page rests on */
-export const HERO_HEADLINE = 'Your jump shot knows something about you.';
+/* THE HEADLINE IS NOT A STRING ANY MORE.
+   It names three things the product does, each of those words
+   switches, and each of them owns a scene — so the sentence and its
+   three keywords live together with the scenes they drive, in
+   `heroScenes.ts`. `HERO_SENTENCE` there is the whole line as one
+   piece of text, which is what a screen reader is given.
 
-export const HERO_SUB =
-  'Body sensors, a smart basketball, and an app that reads the patterns underneath your game.';
+   `HERO_SUB` went with the subline it named; the hero has a button
+   under its sentence now, not a paragraph. */
 
 /** the two lines held by the white card on the dark entry state */
 export const LOADING_COPY = [

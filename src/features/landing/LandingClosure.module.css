@@ -22,7 +22,6 @@
      bottom edge */
   height: 100dvh;
   padding-block: var(--aera-landing-nav-clear) var(--aera-landing-frame);
-  scroll-snap-align: start;
 }
 
 .block {

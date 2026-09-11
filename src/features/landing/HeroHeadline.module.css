@@ -1,0 +1,131 @@
+/* ============================================================
+   THE HEADLINE
+
+   One sentence at poster size, with three switchable words in it.
+   Every value here is a token; the only literals are structural.
+   ============================================================ */
+.headline {
+  margin: 0;
+  /* design numbers times the hero's unit — see hero.ts. The 1px
+     fallback is for anywhere it is rendered outside the hero. */
+  max-width: calc(var(--aera-hero-head-measure) * var(--u, 1px));
+  font-family: var(--aera-text-hero-display-family);
+  font-size: calc(var(--aera-hero-head-size) * var(--u, 1px));
+  line-height: var(--aera-text-hero-display-leading);
+  letter-spacing: var(--aera-text-hero-display-tracking);
+  font-weight: var(--aera-text-hero-display-weight);
+  color: var(--aera-color-hero-ink);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* the three words, on a line of their own — see the note in the
+   component. `display: block` rather than a width, so the line
+   break is structural and survives any measure. */
+.group {
+  display: block;
+}
+
+/* ---- one switchable word ----------------------------------------
+   `display: inline` so the word sits in the sentence's own line box
+   rather than in a box of its own — an inline-block would take the
+   baseline with it and the word would ride a fraction high. The rule
+   underneath is absolute, so the button is the containing block.
+   ------------------------------------------------------------------ */
+.word {
+  position: relative;
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: var(--aera-radius-xs);
+}
+
+.word:disabled {
+  cursor: default;
+}
+
+/* ---- the letters -------------------------------------------------
+   Each one carries its own colour and its own place in the run, and
+   the ONLY thing that changes when a word switches is whether the
+   letter is showing that colour or the ink. Both words animate at
+   once — the one going out and the one coming in are each just an
+   attribute flip — so the switch reads as a single move rather than
+   as a handover.
+
+   The delay is the letter's index times one step, so the colour
+   travels left to right across the word. `color` is one of the
+   three properties this page is allowed to animate.
+   ------------------------------------------------------------------ */
+.letter {
+  color: var(--aera-color-hero-ink);
+  transition: color var(--aera-hero-letter-fade) var(--aera-hero-ease-in);
+  transition-delay: calc(var(--aera-hero-letter-step) * var(--step));
+}
+
+.word[data-lit='true'] .letter {
+  color: var(--letter);
+}
+
+/* ---- the rule ----------------------------------------------------
+   Thickness, offset and inset are all in `em`, so the rule is a
+   property of the type and stays welded to the word at every size.
+
+   IT SWEEPS ONE WAY IN BOTH DIRECTIONS. Growing, the origin is the
+   left edge; retracting, it is the right — so the leading edge of
+   the rule always travels left to right, whichever word is which.
+   That is what makes a switch read as the underline MOVING from one
+   word to the next rather than as one fading out under another.
+   ------------------------------------------------------------------ */
+.rule {
+  position: absolute;
+  left: var(--aera-hero-rule-inset);
+  right: var(--aera-hero-rule-inset);
+  bottom: var(--aera-hero-rule-offset);
+  height: var(--aera-hero-rule-thickness);
+  border-radius: var(--aera-radius-pill);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--aera-hero-rule-sweep) var(--aera-hero-ease-in);
+  pointer-events: none;
+}
+
+.word[data-active='true'] .rule {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ---- the pointer letting go --------------------------------------
+   The word stays active — it keeps its rule and its scene — and only
+   the colour comes off, a little slower than a switch and with no
+   stagger. A staggered exit here would read as the page undoing the
+   reader's choice; this reads as the colour settling out of a word
+   that is still the one being shown.
+   ------------------------------------------------------------------ */
+.word[data-active='true'][data-lit='false'] .letter {
+  transition-duration: var(--aera-hero-hover-fade);
+  transition-delay: 0s;
+}
+
+/* ---- into the neutral beat ---------------------------------------
+   Letters and rule leave together and slightly quicker than they
+   arrived: the sentence settling rather than a fourth state
+   arriving. No stagger on the way out — a staggered exit into
+   nothing reads as the page losing its place.
+   ------------------------------------------------------------------ */
+.word[data-active='false'] .letter {
+  transition-duration: var(--aera-hero-neutral-fade);
+  transition-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter,
+  .rule {
+    transition: none;
+  }
+}

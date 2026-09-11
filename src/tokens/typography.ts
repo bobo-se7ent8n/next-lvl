@@ -27,6 +27,8 @@
    words always come out the same way.
    ============================================================ */
 
+import { hero } from './hero';
+
 /* Inter, written once. `heading` and `body` are the same face and
    deliberately two names: they are different ROLES, and the day the
    heading face changes again it has to be able to move without
@@ -44,6 +46,21 @@ export const fontFamily = {
   body: INTER,
   /** the annotation voice */
   mono: "'IBM Plex Mono', ui-monospace, monospace",
+  /* ---- THE PUBLIC PAGE'S POSTER FACE -------------------------
+     Open Sans, and it is the fifth family rather than a role name
+     on one of the four. The hero is a poster: one sentence at
+     114px with three of its words switching colour under the
+     pointer. Oswald is condensed and set in caps by every token
+     that uses it — a sentence-case headline is not a thing it can
+     do — and Inter at that size reads as an interface label blown
+     up. This face is used by the hero and by nothing else in the
+     product, which is why it is named for where it lives.
+     ------------------------------------------------------------ */
+  hero: "'Open Sans', system-ui, -apple-system, sans-serif",
+  /** Silkscreen — the pixel face, and it appears in exactly one
+   *  place: the bar's tool link once the pointer is on it. The tool
+   *  it opens draws with a dot matrix, so the label becomes one. */
+  pixel: "'Silkscreen', ui-monospace, monospace",
 } as const;
 
 export const fontWeight = {
@@ -245,6 +262,85 @@ export const textStyle = {
     letterSpacing: '0.12em',
     textTransform: 'uppercase',
     fontWeight: fontWeight.medium,
+  },
+
+  /* ---- hero · the public page's poster type ------------------
+     Nine tokens, all of them the landing hero's and none of them
+     reachable from the app. They are here rather than in the hero's
+     stylesheet for the reason every other size in this file is: a
+     component may not type a px font-size.
+
+     THE SIZE HERE IS THE DESIGN'S, FOR REFERENCE. The hero draws
+     the headline from `hero.headSize` times its own design unit
+     (see hero.ts), so it scales with the picture it is part of;
+     this entry records the size it was drawn at and carries the
+     face, weight and tracking the hero reads.
+     ------------------------------------------------------------ */
+  heroDisplay: {
+    fontFamily: fontFamily.hero,
+    fontSize: `${hero.headSize}px`,
+    lineHeight: '1',
+    letterSpacing: '-0.0546em',
+    fontWeight: fontWeight.bold,
+  },
+  /** the call to action under the headline */
+  heroAction: {
+    fontFamily: fontFamily.hero,
+    fontSize: '14px',
+    lineHeight: '1.64',
+    letterSpacing: '-0.01em',
+    fontWeight: fontWeight.medium,
+  },
+  /** the wordmark beside the mark */
+  heroWordmark: {
+    fontFamily: fontFamily.hero,
+    fontSize: '14px',
+    lineHeight: '1',
+    letterSpacing: '-0.04em',
+    fontWeight: fontWeight.semibold,
+  },
+  /** the bar's tool link, hovered — the pixel face at its own size */
+  heroTool: {
+    fontFamily: fontFamily.pixel,
+    /* 8, not something between: Silkscreen is drawn on an 8px grid
+       and anywhere else it is anti-aliased into mush */
+    fontSize: '8px',
+    lineHeight: '1',
+    letterSpacing: '-0.01em',
+    fontWeight: fontWeight.regular,
+  },
+  /** a pill in the hero's bar — at the type floor, since the pills
+   *  are half the height they were drawn at */
+  heroNav: {
+    fontFamily: fontFamily.hero,
+    fontSize: '12px',
+    lineHeight: '1',
+    letterSpacing: '-0.01em',
+    fontWeight: fontWeight.medium,
+  },
+  /** a mode's name in the handoff list — "Play", "Score", "Read" */
+  heroModeTitle: {
+    fontFamily: fontFamily.hero,
+    fontSize: '1.42rem',
+    lineHeight: '1.26',
+    letterSpacing: '-0.03em',
+    fontWeight: fontWeight.medium,
+  },
+  /** the one line under an open mode's name */
+  heroModeLead: {
+    fontFamily: fontFamily.hero,
+    fontSize: '0.93rem',
+    lineHeight: '1.64',
+    letterSpacing: '0',
+    fontWeight: fontWeight.semibold,
+  },
+  /** and the paragraph under that */
+  heroModeBody: {
+    fontFamily: fontFamily.hero,
+    fontSize: '0.93rem',
+    lineHeight: '1.64',
+    letterSpacing: '0',
+    fontWeight: fontWeight.regular,
   },
 } as const;
 

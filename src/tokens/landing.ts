@@ -88,8 +88,13 @@ export const landing = {
    *  14px glyph it circles, and clear of the pill's own height once
    *  the widest stroke on it is accounted for. */
   navArc: '14px',
-  /* THE BAR'S WHOLE IN-FLOW BAND — inset, padding, border, capsule
-     and the drop beneath it.
+  /* THE BAR'S WHOLE IN-FLOW BAND — its own height and the drop
+     beneath it.
+
+     The bar is the design's bar now: a flat 64 band with a wordmark
+     and three pills in it and no padding, border or capsule of its
+     own, so the sum is two terms rather than five. The drop is the
+     clearance a section leaves under it, not part of the bar.
 
      THE ONE LANDING TOKEN THAT REFERENCES ITS SIBLINGS, for the same
      reason `layout.columnHeight` does: it mixes lengths that must
@@ -102,8 +107,7 @@ export const landing = {
      There is no bare px in it, so the projection wraps it verbatim
      and each `var()` arrives already scaled. */
   navBand:
-    'calc(var(--aera-space-4) * 2 + var(--aera-border-hairline) * 2' +
-    ' + var(--aera-landing-nav-pill) + var(--aera-landing-nav-drop))',
+    'calc(var(--aera-hero-nav-height) + var(--aera-landing-nav-drop))',
 
   /** THE TOP CLEARANCE EVERY SECTION AFTER THE HERO CARRIES.
    *

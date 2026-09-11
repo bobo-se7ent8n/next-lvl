@@ -26,7 +26,6 @@
    ============================================================ */
 .track {
   /* every section on the page is a snap point — see global.css */
-  scroll-snap-align: start;
   position: relative;
   height: 300dvh;
 }

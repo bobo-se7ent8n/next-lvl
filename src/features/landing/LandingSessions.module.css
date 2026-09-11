@@ -18,7 +18,6 @@
    ============================================================ */
 .track {
   /* every section on the page is a snap point — see global.css */
-  scroll-snap-align: start;
   position: relative;
   /* the travel: one viewport pinned, plus the scroll it takes to
      read two paragraphs and cross-fade between them */

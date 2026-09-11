@@ -1,269 +1,126 @@
 /* ============================================================
-   THE FLOATING BAR
+   THE BAR
 
-   THERE IS NO BAR. The container draws nothing at all — no fill,
-   no border, no shadow, no blur — so what floats over the page is
-   the GROUP of pills rather than a band holding them. A bar was a
-   second surface between the page and three objects that already
-   read as objects, and on a page whose ground is paper it was a
-   panel drawn over paper for no reason.
-
-   Its GEOMETRY is untouched: still sticky at one frame margin from
-   the top, still on the nav layer, still carrying the same drop to
-   whatever is under it. Only the paint is gone.
-
-   Three groups on one row. The outer two are laid out with
-   `justify-content: space-between` and the middle one is centred
-   against the BAR rather than against what is left over — the
-   wordmark and the two links are different widths, and a capsule
-   centred in the remainder would sit off-centre by the difference.
+   Thirty-two tall — half the size it was drawn at — sticky at one
+   frame margin from the top, and it draws nothing at all: no fill,
+   no border, no shadow. The pills are 22 in a 32 band. The bar is
+   chrome, and every pixel it gives back goes to the first screen.
    ============================================================ */
-
 .nav {
   position: sticky;
-  /* stuck, it sits exactly one frame margin from the top of the
-     window — the same margin it has from both sides */
   top: var(--aera-landing-frame);
   z-index: var(--aera-z-nav);
-  /* FULL WIDTH INSIDE THE FRAME. The page column already carries the
-     margin down both sides, so the bar takes no inset of its own and
-     runs the whole width it is given. */
-  margin: 0 0 var(--aera-landing-nav-drop);
-  /* THE PADDING STAYS, AND SO DOES `navBand`.
-
-     The border is gone but the band the sections reserve above
-     themselves is not recalculated: it is a CLEARANCE, and the two
-     unscaled pixels the hairline used to occupy are two pixels of
-     slack rather than a layout error. Retuning it would move the top
-     padding of every section on the page to buy nothing. */
-  padding: var(--aera-space-4) var(--aera-space-5);
-  background: none;
-  border: 0;
-  box-shadow: none;
-  transition: opacity var(--aera-duration-base) var(--aera-ease-out);
-}
-
-.navHidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.bar {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--aera-space-8);
-  min-height: var(--aera-landing-nav-pill);
+  gap: var(--aera-hero-nav-gap);
+  height: var(--aera-hero-nav-height);
+  /* THE INSET IS MEASURED FROM THE WINDOW, NOT FROM THE COLUMN.
+     The design puts the bar 32px from the edge of the screen; this
+     page is a framed sheet and the frame is already carrying part
+     of that, so the bar's own padding is whatever is left. Written
+     as the difference rather than as 16 so the two move together. */
+  padding-inline: calc(var(--aera-hero-nav-pad-x) - var(--aera-landing-frame));
+  /* NO DROP OF ITS OWN. The hero puts its headline exactly one
+     `--aera-hero-head-top` under this, and every section below the
+     hero carries `--aera-landing-nav-clear` — which already has the
+     drop in it — so a margin here would be counted twice. */
+  margin: 0;
+  background: none;
+  border: 0;
 }
 
-/* ---- left · the wordmark, right · the two ways out -------------
-   THE PILLS ARE THE ONLY SURFACE UP HERE NOW.
+/* ---- left · the mark and the word ------------------------------ */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--aera-hero-nav-gap);
+  text-decoration: none;
+}
 
-   With the bar gone they sit directly on the page, and the page is
-   `surface-background` — so the fill they used to wear was the fill
-   they were standing on and the group disappeared. They carry the
-   nav-pill surface instead: a step clear of paper, so three objects
-   read as floating over the page from the first frame, at every
-   scroll position and over every section.
+.mark {
+  flex: none;
+  width: var(--aera-hero-mark-width);
+  height: var(--aera-hero-mark-height);
+  object-fit: contain;
+}
 
-   INK-PRIMARY ON ALL THREE. The two links used to drop to the
-   secondary ink to sit quieter than the wordmark; against a fill
-   this light that read as disabled rather than as quiet.
-   ---------------------------------------------------------------- */
-.brand,
-.action {
+.word {
+  color: var(--aera-color-hero-ink);
+  font-family: var(--aera-text-hero-wordmark-family);
+  font-size: var(--aera-text-hero-wordmark-size);
+  line-height: var(--aera-text-hero-wordmark-leading);
+  letter-spacing: var(--aera-text-hero-wordmark-tracking);
+  font-weight: var(--aera-text-hero-wordmark-weight);
+}
+
+/* ---- right · the three ways out -------------------------------- */
+.links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--aera-hero-nav-gap);
+}
+
+.pill {
   display: inline-flex;
   align-items: center;
-  height: var(--aera-landing-nav-pill);
-  padding-inline: var(--aera-space-8);
-  border-radius: var(--aera-radius-pill);
-  color: var(--aera-color-ink-primary);
-  text-decoration: none;
-  background: var(--aera-color-surface-nav-pill);
-  transition:
-    background-color var(--aera-duration-fast) var(--aera-ease-out),
-    color var(--aera-duration-fast) var(--aera-ease-out);
-}
-
-.brand:hover,
-.action:hover {
-  background: var(--aera-color-surface-inverse);
-  color: var(--aera-color-ink-on-inverse);
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: var(--aera-space-4);
-}
-
-/* ---- centre · the scroll capsule ------------------------------
-   Pinned to the middle of the BAR and taken out of the flex flow,
-   so widening it on the morph cannot push either neighbour. The
-   wrapper is what is pinned; the capsule inside it is what grows,
-   which keeps the growth symmetrical about the centre line.
-   ---------------------------------------------------------------- */
-.centre {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  display: flex;
   justify-content: center;
-  transform: translate(-50%, -50%);
-}
-
-/* A PILL, AND THE SAME OBJECT AS ITS NEIGHBOURS.
-
-   WIDER THAN TALL. It was square — one glyph in a box exactly the
-   height of the bar — which read as a button that had lost its
-   label rather than as the third object in a floating group. It is
-   the same height as the wordmark and the two links and comfortably
-   wider than either of them is tall, so the group reads as three
-   pills rather than as two pills and a chip.
-
-   THERE IS NO GAP IN IT. `gap` applied between the glyph and the
-   zero-width "To top" label, which is still a flex item at rest —
-   so half a gap was being paid to the right of the arrow and the
-   arrow sat half a gap left of centre. Nothing here offsets the
-   glyph, transforms it or nudges it: it is one flex box with
-   `justify-content: center` and `align-items: center`, and the
-   label contributes exactly nothing until the morph opens it.
-
-   It carries the same nav-pill surface as the wordmark and the two
-   links: with the bar gone, every object up here is on the page. */
-.capsule {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--aera-landing-nav-progress-w);
-  height: var(--aera-landing-nav-pill);
-  padding: 0;
+  min-height: var(--aera-hero-nav-pill-height);
+  padding-inline: var(--aera-hero-nav-pill-pad-x);
   border-radius: var(--aera-radius-pill);
-  background: var(--aera-color-surface-nav-pill);
-  color: var(--aera-color-ink-primary);
-  cursor: default;
-  /* RESISTANCE, AND NOTHING ELSE. The capsule widens on a firm
-     decelerating curve with no overshoot in it — a pill that sprang
-     open would be the product being pleased with itself. The radius
-     rides the same curve so the corner stays a true semicircle at
-     every width it passes through. */
-  transition: width var(--aera-duration-base) var(--aera-ease-firm);
-}
-
-/* THE GAP BELONGS TO THE MORPHED STATE AND NOWHERE ELSE.
-
-   Once the label is open the glyph and the words need air between
-   them; at rest the label is a zero-width flex item and the same gap
-   is half a step of dead space on the arrow's right, which is
-   exactly what was pushing it off the centre line. */
-.capsuleWide {
-  width: var(--aera-landing-nav-to-top-w);
-  padding-inline: var(--aera-space-8);
-  gap: var(--aera-space-5);
-  cursor: pointer;
-}
-
-/* ---- the progress arc -----------------------------------------
-   A ring around the glyph: total page scroll is how far round it
-   has got. The dash is written on every animation frame and nothing
-   here re-renders.
-
-   It is drawn in an SVG whose box is the arc's own diameter,
-   centred on the capsule and pinned there — so it stays concentric
-   while the capsule widens underneath it, and the ring does not
-   stretch into an ellipse as the button becomes a pill.
-
-   INSIDE THE PILL, NOW THAT THE PILL IS WIDER. The ring used to sit
-   a few pixels proud of a square capsule on all four sides. On a
-   pill two thirds wider than it is tall that same radius is outside
-   the top and bottom edges and inside the left and right ones — a
-   circle half-swallowed by a stadium. `navArc` is a radius that
-   clears the glyph and stays inside the pill's own height instead.
-
-   INK, NOT WHITE. The stroke was `ink-on-inverse` because it was
-   drawn on the bar's level1 ground and read as paper against it.
-   There is no bar: a white arc on white paper is no arc at all.
-   ---------------------------------------------------------------- */
-.arc {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: calc(var(--aera-landing-nav-arc) * 2);
-  height: calc(var(--aera-landing-nav-arc) * 2);
-  transform: translate(-50%, -50%);
-  overflow: visible;
-  pointer-events: none;
-}
-
-.arcTrack,
-.arcRun,
-.arcGlow {
-  fill: none;
-  /* the ring starts at twelve o'clock and runs clockwise — an arc
-     that began at three would read as having started late */
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
-}
-
-.arcTrack {
-  stroke: var(--aera-color-utility-hairline);
-  stroke-width: var(--aera-border-hairline);
-}
-
-.arcRun {
-  stroke: var(--aera-color-ink-primary);
-  stroke-width: var(--aera-border-base);
-  stroke-linecap: round;
-}
-
-.arcGlow {
-  stroke: var(--aera-color-ink-primary);
-  stroke-width: var(--aera-border-thick);
-  stroke-linecap: round;
-  filter: blur(var(--aera-landing-nav-glow));
-  opacity: 0.32;
-}
-
-/* ---- the glyph and the label ---------------------------------- */
-.glyph {
-  flex: none;
-  width: var(--aera-icon-md);
-  height: var(--aera-icon-md);
-  fill: currentColor;
-}
-
-.toTop {
-  overflow: hidden;
-  max-width: 0;
+  background: var(--aera-color-surface-level1);
+  color: var(--aera-color-hero-ink);
+  font-family: var(--aera-text-hero-nav-family);
+  font-size: var(--aera-text-hero-nav-size);
+  line-height: var(--aera-text-hero-nav-leading);
+  letter-spacing: var(--aera-text-hero-nav-tracking);
+  font-weight: var(--aera-text-hero-nav-weight);
   white-space: nowrap;
-  opacity: 0;
-  transition:
-    max-width var(--aera-duration-base) var(--aera-ease-firm),
-    opacity var(--aera-duration-fast) var(--aera-ease-out);
+  text-decoration: none;
+  transition: background-color var(--aera-duration-fast) var(--aera-ease-out);
 }
 
-.capsuleWide .toTop {
-  max-width: var(--aera-landing-nav-to-top-w);
-  opacity: 1;
+.pill:hover {
+  background: var(--aera-color-utility-hover);
 }
 
-/* ---- narrow windows -------------------------------------------
-   The capsule is absolutely centred, so on a narrow window the two
-   outer groups would run under it before anything else broke. The
-   links lose their padding first; the bar stays one row at every
-   width the page targets.
+/* ---- the tool link, which becomes what it opens ----------------
+   Both labels live in ONE grid cell, so the cell is as wide as the
+   wider of them and the pill never changes size: hovering swaps two
+   opacities and a fill and moves nothing.
    ---------------------------------------------------------------- */
-@media (max-width: 1100px) {
-  .action {
-    padding-inline: var(--aera-space-5);
-  }
+.tool {
+  display: inline-grid;
+  align-items: center;
+  justify-items: center;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .capsule,
-  .toTop {
-    transition: none;
-  }
+.tool:hover {
+  background: var(--aera-color-hero-nav-pill-hover);
+}
+
+.toolRest,
+.toolHover {
+  grid-area: 1 / 1;
+  transition: opacity var(--aera-duration-fast) var(--aera-ease-out);
+}
+
+.toolHover {
+  opacity: 0;
+  font-family: var(--aera-text-hero-tool-family);
+  font-size: var(--aera-text-hero-tool-size);
+  line-height: var(--aera-text-hero-tool-leading);
+  letter-spacing: var(--aera-text-hero-tool-tracking);
+  font-weight: var(--aera-text-hero-tool-weight);
+}
+
+.tool:hover .toolRest,
+.tool:focus-visible .toolRest {
+  opacity: 0;
+}
+
+.tool:hover .toolHover,
+.tool:focus-visible .toolHover {
+  opacity: 1;
 }

@@ -35,6 +35,38 @@
   height: 100%;
 }
 
+/* ---- THE REVEAL ---------------------------------------------------
+   The window rises into place the first time the section is reached,
+   on the hero's own arriving curve — a pure deceleration with both
+   control points inside the unit square, so there is no overshoot
+   and nothing bounces.
+
+   OPACITY AND ONE TRANSLATE, and nothing else: they are two of the
+   three properties this page animates, and both are free of layout.
+   The closed state is the default and the class latches on, so a
+   section that has never been reached is simply not drawn yet.
+   -------------------------------------------------------------------- */
+.frame {
+  opacity: 0;
+  transform: translateY(var(--aera-hero-open-rise));
+  transition:
+    opacity var(--aera-hero-open-duration) var(--aera-hero-ease-in),
+    transform var(--aera-hero-open-duration) var(--aera-hero-ease-in);
+}
+
+.shown {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 /* the arriving screen settles rather than swapping — the same move
    the app makes on a tab change, for the same reason */
 .settle {

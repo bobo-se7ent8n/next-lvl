@@ -121,9 +121,19 @@
   position: absolute;
   inset: 0;
   display: grid;
-  place-items: center;
+  /* THE HERO PUTS ITS HEADLINE AT THE TOP OF THE SCREEN, so this
+     one has to as well. It used to be centred in the window, which
+     was right when the hero was one centred sentence and nothing
+     else; the hero is a poster now — sentence, button, product —
+     and the sentence sits under the bar rather than in the middle.
+     The offset is the page frame, the bar's whole band and the
+     hero's own top padding, which is exactly what is above the
+     first line of the hero's headline. */
+  place-items: start center;
   padding-inline: var(--aera-landing-frame);
-  padding-top: var(--aera-landing-nav-band);
+  padding-top: calc(
+    var(--aera-landing-frame) + var(--aera-landing-nav-band) + var(--aera-hero-head-top)
+  );
   text-align: center;
   color: var(--aera-color-ink-primary);
   opacity: 0;
@@ -151,7 +161,9 @@
   flex-direction: column;
   align-items: center;
   gap: var(--aera-space-11);
-  max-width: var(--aera-layout-max-subhead-width);
+  width: 100%;
+  max-width: calc(var(--aera-hero-head-measure) + var(--aera-space-12) * 2);
+  padding-inline: var(--aera-space-12);
 }
 
 

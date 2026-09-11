@@ -1,10 +1,11 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { cx } from '../../lib/css';
 import { inkOn } from '../../lib/color';
-import { Display, Label } from '../../components/primitives/Text';
+import { Label } from '../../components/primitives/Text';
 import { prefersReducedMotion } from '../../lib/enter';
 import { duration, scatter } from '../../tokens';
-import { HERO_HEADLINE, LOADING_COPY } from './copy';
+import { LOADING_COPY } from './copy';
+import { HeroHeadline } from './HeroHeadline';
 import { markEntryPlayed } from './entryState';
 import { SCATTER_TAGS, tagFill } from './seed';
 import styles from './LoadingScreen.module.css';
@@ -130,9 +131,17 @@ export function LoadingScreen({ onDone }: LoadingScreenProps) {
           offset is matched in the stylesheet. */}
       <div className={styles.headline}>
         <div className={styles.headStack}>
-          <Display size="xl" as="p">
-            {HERO_HEADLINE}
-          </Display>
+          {/* THE HERO'S OWN HEADLINE, not a copy of it. The two used
+              to be one string rendered by two components; they are
+              one COMPONENT now, because the sentence grew a
+              structure — thirteen letter spans, three buttons and a
+              gradient rule — and two renderings of that would have
+              drifted the first time either was touched.
+
+              Inert and in neutral: nothing here is focusable and no
+              word is lit, which is exactly the state the live hero
+              underneath is holding at the moment of the handover. */}
+          <HeroHeadline as="p" inert />
         </div>
       </div>
 

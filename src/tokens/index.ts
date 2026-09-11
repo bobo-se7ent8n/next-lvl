@@ -19,6 +19,7 @@ export * from './zIndex';
 export * from './size';
 export * from './scale';
 export * from './landing';
+export * from './hero';
 
 import { color } from './color';
 import { space, layout } from './space';
@@ -42,6 +43,7 @@ import { zIndex } from './zIndex';
 import { iconSize, iconStroke, controlSpec, minTarget } from './size';
 import { breakpoint, breakpointHeight, scaleStep } from './scale';
 import { landing, scatter, trail, dotCanvas } from './landing';
+import { hero, heroType } from './hero';
 
 export const tokens = {
   color,
@@ -77,6 +79,8 @@ export const tokens = {
   breakpointHeight,
   scaleStep,
   landing,
+  hero,
+  heroType,
   scatter,
   trail,
   dotCanvas,

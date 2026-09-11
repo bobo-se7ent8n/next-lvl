@@ -41,10 +41,8 @@ import { VitalCard } from '../../features/home/VitalCard';
 import {
   LandingClosure,
   LandingFuture,
-  LandingHero,
   LandingNav,
   LandingPatterns,
-  LandingWorking,
   WireBox,
   WireSection,
   WireSlot,
@@ -656,24 +654,23 @@ export function LandingPage() {
 
       <BrowserSection title="The sticky bar — landing page only, never inside the product">
         <Note>
-          Three groups. The centre capsule traces total page scroll as a stroke on its own outline
-          with a lit dot at the head of it, and morphs into “To top” once the page is past its last
-          section. Here it is shown at rest.
+          Two groups and nothing drawn behind them: a wordmark, and three pills. The last of the
+          three opens the dot matrix tool, and under the pointer its fill steps down and its label
+          is set in the pixel face — both labels share one grid cell, so the pill is the width of
+          the wider of them and the hover moves nothing.
         </Note>
         <Demo>
-          <LandingNav atEnd={false} />
+          <LandingNav />
         </Demo>
       </BrowserSection>
 
       <BrowserSection title="The sections that hold real product">
         <Note>
-          The four scroll-driven sections — sessions, insights and the entry sequence — are not
-          shown here: they measure themselves against the window and pin to it, so a section
-          rendered inside a scrolling browser pane would be reading the wrong box. Open “/” to see
-          them.
+          The scroll-driven sections — the hero and the handoff it scrolls into, sessions and
+          insights — are not shown here: they measure themselves against the window and pin to it,
+          so a section rendered inside a scrolling browser pane would be reading the wrong box.
+          Open “/” to see them.
         </Note>
-        <LandingHero />
-        <LandingWorking />
         <LandingPatterns />
       </BrowserSection>
 

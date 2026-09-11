@@ -11,7 +11,7 @@ const meta: Meta<typeof LandingNav> = {
     docs: {
       description: {
         component:
-          'A window over the page rather than a band across it: full width inside the page’s frame margin, cut at the window radius, hairlined. Three groups — the wordmark, the scroll capsule, and the two ways out. The capsule is a square light pill holding one dot-matrix arrow centred on both axes, and TOTAL page scroll is a white arc travelling clockwise from twelve o’clock around the outside of it, drawn twice so the blurred copy underneath reads as a glow following the button’s edge. The ring is pinned to the capsule’s centre in a box of its own diameter, so it stays circular while the capsule widens underneath it. Past the last content section the ring closes and the capsule morphs into “To top”, on the firm curve with no overshoot in it: resistance, never a spring.',
+          'Two groups and nothing drawn behind them: the mark and wordmark on the left, three pills on the right. A flat 64px band holding 44px pills, sticky at one frame margin from the top, with no fill, border or shadow of its own — the page’s paper runs under it, so what floats is the group rather than a bar. The last pill opens the dot matrix tool: under the pointer its fill steps down and its label is set in Silkscreen, the pixel face, so the label becomes the thing it opens. Both labels share one grid cell, which makes the pill the width of the wider of the two at rest — the hover changes only a fill and two opacities and moves nothing. The scroll-progress capsule and its “To top” morph are gone; the wordmark is the link back to the top.',
       },
     },
   },
@@ -24,20 +24,9 @@ const meta: Meta<typeof LandingNav> = {
       </MemoryRouter>
     ),
   ],
-  args: { atEnd: false },
 };
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Scrolling: Story = {};
-
-export const Morphed: Story = {
-  name: 'Past the last section — “To top”',
-  args: { atEnd: true },
-};
-
-export const DuringEntry: Story = {
-  name: 'Held back while the entry plays',
-  args: { hidden: true },
-};
+export const Resting: Story = {};

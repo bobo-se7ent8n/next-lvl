@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { cx } from '../../lib/css';
 import { EnterContext } from '../../lib/enterContext';
 import { AppWindow } from './AppWindow';
 import { LandingSection } from './LandingSection';
@@ -28,10 +29,21 @@ import styles from './LandingWorking.module.css';
  * when you open the tab inside the app — and again the next time
  * you scroll back to it, which is what makes it read as running
  * rather than as a screenshot.
+ *
+ * AND IT ARRIVES, ONCE. The window itself rises into place the
+ * first time the section is reached, on the same decelerating
+ * curve everything in the hero above it arrives on. That is the
+ * whole of this section's motion and it is deliberately the whole
+ * of it: the hero is the screen with a cycle on it, and this one
+ * is the product standing still long enough to be looked at. The
+ * reveal is a class that latches — it never plays backwards and it
+ * never plays twice, because a window that re-animates every time
+ * it crosses the fold is a window nobody can read.
  */
 export function LandingWorking() {
   const host = useRef<HTMLDivElement>(null);
   const [visit, setVisit] = useState(0);
+  const [shown, setShown] = useState(false);
 
   useEffect(() => {
     const el = host.current;
@@ -41,7 +53,9 @@ export function LandingWorking() {
         /* only on the way IN. Bumping on every callback would
            re-animate the screen as it left the window too, which is
            motion nobody is looking at. */
-        if (entry.isIntersecting) setVisit((n) => n + 1);
+        if (!entry.isIntersecting) return;
+        setVisit((n) => n + 1);
+        setShown(true);
       },
       { threshold: 0.45 },
     );
@@ -51,7 +65,7 @@ export function LandingWorking() {
 
   return (
     <LandingSection heading="See it working" centred fit>
-      <div ref={host} className={styles.frame}>
+      <div ref={host} className={cx(styles.frame, shown && styles.shown)}>
         <AppWindow title="aera · /app/home">
           {/* keyed on the visit so the arriving screen settles in, and
               scoped on it so everything inside re-reads itself */}

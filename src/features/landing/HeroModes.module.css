@@ -1,0 +1,136 @@
+/* ============================================================
+   THE HANDOFF LIST
+
+   Three rows, one open. Every row is absolutely placed and moved
+   by `translate` alone, so a switch is three transforms and one
+   opacity — never a height.
+   ============================================================ */
+.modes {
+  position: relative;
+  width: 100%;
+  height: calc(var(--aera-hero-mode-row-height) * 3 + var(--open-h));
+}
+
+.row {
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  translate: 0 calc(var(--i) * var(--aera-hero-mode-row-height));
+  border-top: var(--aera-border-hairline) solid var(--aera-color-hero-row-line);
+  transition: translate var(--aera-hero-mode-swap) var(--aera-hero-ease-in);
+}
+
+/* the first row has nothing above it to be divided from */
+.row:first-child {
+  border-top-color: transparent;
+}
+
+/* a row under the open one makes room for the open one's copy */
+.row[data-below='true'] {
+  translate: 0 calc(var(--i) * var(--aera-hero-mode-row-height) + var(--open-h));
+}
+
+/* ---- the progress along the top of a row -----------------------
+   Written by the scroll loop as `--row-N`, 0 → 1 across that mode's
+   stretch of the handoff. A transform, from the left edge.
+   ---------------------------------------------------------------- */
+.rule {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(var(--aera-border-hairline) * -1);
+  height: var(--aera-border-hairline);
+  background: var(--aera-color-hero-progress);
+  transform-origin: left center;
+  transform: scaleX(var(--rp));
+  pointer-events: none;
+}
+
+.head {
+  margin: 0;
+  font: inherit;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--aera-hero-mode-row-height);
+  text-align: start;
+  color: var(--aera-color-hero-ink);
+  font-family: var(--aera-text-hero-mode-title-family);
+  font-size: var(--aera-text-hero-mode-title-size);
+  line-height: var(--aera-text-hero-mode-title-leading);
+  letter-spacing: var(--aera-text-hero-mode-title-tracking);
+  font-weight: var(--aera-text-hero-mode-title-weight);
+}
+
+.row[data-active='true'] .title {
+  cursor: default;
+}
+
+/* a closed title sits smaller than the open one — a scale, from its
+   leading edge, so the three names still start on one line */
+.titleText {
+  display: inline-block;
+  transform-origin: left center;
+  scale: var(--aera-hero-mode-title-rest);
+  transition: scale var(--aera-hero-mode-swap) var(--aera-hero-ease-in);
+}
+
+.row[data-active='true'] .titleText {
+  scale: 1;
+}
+
+/* ---- the open row's copy ---------------------------------------
+   In flow under the title so it can be measured; invisible and
+   unclickable on every row but the open one. It arrives a beat
+   after the rows have started to move, so it is never read while
+   something is still sliding under it.
+   ---------------------------------------------------------------- */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-hero-mode-body-gap);
+  max-width: var(--aera-hero-mode-body-measure);
+  padding-bottom: var(--aera-hero-mode-body-pad);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--aera-hero-mode-swap) var(--aera-hero-ease-out);
+}
+
+.row[data-active='true'] .body {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity var(--aera-hero-mode-swap) var(--aera-hero-ease-in)
+    calc(var(--aera-hero-mode-swap) / 3);
+}
+
+.lead,
+.copy {
+  margin: 0;
+}
+
+.lead {
+  color: var(--aera-color-hero-ink);
+  font-family: var(--aera-text-hero-mode-lead-family);
+  font-size: var(--aera-text-hero-mode-lead-size);
+  line-height: var(--aera-text-hero-mode-lead-leading);
+  font-weight: var(--aera-text-hero-mode-lead-weight);
+}
+
+.copy {
+  color: var(--aera-color-ink-secondary);
+  font-family: var(--aera-text-hero-mode-body-family);
+  font-size: var(--aera-text-hero-mode-body-size);
+  line-height: var(--aera-text-hero-mode-body-leading);
+  font-weight: var(--aera-text-hero-mode-body-weight);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row,
+  .titleText,
+  .body,
+  .row[data-active='true'] .body {
+    transition: none;
+  }
+}

@@ -36,6 +36,10 @@ const EPSILON = 0.0002;
 
 export type ProgressFn = (progress: number) => void;
 
+/** how far through itself a section is, 0 → 1 — for a section whose
+ *  pinned child is not one viewport tall at the top of the window */
+export type MeasureFn = (el: HTMLElement) => number;
+
 interface Sub {
   /** what to measure — a pinned section's outer track */
   el: HTMLElement;
@@ -46,6 +50,7 @@ interface Sub {
   fn: ProgressFn;
   /** has this subscriber been handed its first value yet */
   primed: boolean;
+  measure: MeasureFn;
 }
 
 const subs = new Set<Sub>();
@@ -72,7 +77,7 @@ function tick(): void {
   let moving = false;
 
   for (const sub of subs) {
-    sub.target = measure(sub.el);
+    sub.target = sub.measure(sub.el);
     const delta = sub.target - sub.prog;
 
     if (reduced || !sub.primed || Math.abs(delta) < EPSILON) {
@@ -128,18 +133,25 @@ function unlisten(): void {
 export function useSectionProgress(
   ref: React.RefObject<HTMLElement | null>,
   onProgress: ProgressFn,
+  /** OPTIONAL — the default assumes a one-viewport sticky child at
+   *  the top of the window, which is what the two pinned sections
+   *  are. The hero pins a shorter child in the MIDDLE of the window
+   *  and says so here. */
+  measureFn?: MeasureFn,
 ): void {
   /* the callback is read through a ref so a consumer may close over
      fresh values without resubscribing — and, more to the point, so
      an inline arrow in a component body does not tear the loop down
      and rebuild it on every render */
   const cb = useRef(onProgress);
+  const how = useRef(measureFn);
   /* the callback is refreshed from an effect rather than assigned
      during render — a ref written in the render body is a write to
      something React has not committed yet, and in a concurrent
      render it can be the wrong one */
   useEffect(() => {
     cb.current = onProgress;
+    how.current = measureFn;
   });
 
   useEffect(() => {
@@ -152,6 +164,7 @@ export function useSectionProgress(
       target: 0,
       primed: false,
       fn: (p) => cb.current(p),
+      measure: (target) => (how.current ?? measure)(target),
     };
 
     const first = subs.size === 0;

@@ -16,6 +16,15 @@ const SAMPLE: Record<TextStyleName, string> = {
   bodyStrong: 'Handling & movement',
   monoSM: 'apex 4.26 m',
   mono: 'what was measured',
+  /* the landing hero's own nine, none of which the app can reach */
+  heroDisplay: 'Now you can play, score & read yourself',
+  heroAction: 'Try it now',
+  heroWordmark: 'Aera',
+  heroTool: 'Dot matrix tool',
+  heroNav: 'Storybook',
+  heroModeTitle: 'Score',
+  heroModeLead: 'For the numbers that matter.',
+  heroModeBody: 'Shots, sessions, streaks — tracked automatically.',
 };
 
 const meta: Meta = {
@@ -25,7 +34,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Ten composed text tokens. `metricSM` is the stat reading on a session card and `bodyStrong` is the sentence-case group heading inside a card — neither one is mono, because neither one is an annotation.  The two label sizes, the chart tick and the old mono all became one `mono` token — the mono family keeps the uppercase annotation voice, so a caption still reads as a caption. Display sizes carry per-letter weight variation hashed from the string itself.',
+          'Twelve composed text tokens for the product, and ten more that belong to the public page\'s hero and are used nowhere else. `metricSM` is the stat reading on a session card and `bodyStrong` is the sentence-case group heading inside a card — neither one is mono, because neither one is an annotation.  The two label sizes, the chart tick and the old mono all became one `mono` token — the mono family keeps the uppercase annotation voice, so a caption still reads as a caption. Display sizes carry per-letter weight variation hashed from the string itself.',
       },
     },
   },

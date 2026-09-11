@@ -18,6 +18,10 @@ import { colorUtility } from './color';
 
 export const elevation = {
   none: 'none',
+  /** THE HERO'S PRODUCT SHOT — flatter and wider than the card
+   *  ramp, because it is a poster object rather than a card
+   *  resting on paper: one soft drop, no contact shadow under it. */
+  heroShot: '0 8px 28px rgba(0, 0, 0, 0.078)',
   /** a record resting on the page */
   low: '0 10px 26px -18px rgba(40,36,28,0.42), 0 2px 5px -3px rgba(40,36,28,0.10)',
   /** the default card */

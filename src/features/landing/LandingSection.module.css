@@ -10,22 +10,18 @@
    between these three rows are the whole layout and `gap` on a
    block box does nothing at all.
 
-   EVERY SECTION IS A SNAP POINT. The page sets
-   `scroll-snap-type: y mandatory` on the document while the landing
-   is mounted, and each section aligns its own start to it. A section
-   TALLER than the window — the two pinned, scroll-driven ones — is
-   a snap area larger than the snapport, and the spec lets the
-   snapport rest anywhere inside such an area: so snapping catches
-   the edges of those sections and leaves the scroll through them
-   completely free. That is why mandatory snapping and the pinned
-   sections can coexist.
+   THE PAGE SCROLLS NATIVELY. There is no snapping on this page and
+   nothing anywhere on it moves the scroll position: the wheel and
+   the trackpad go exactly where they are pointed. The two pinned,
+   scroll-driven sections still work the way they always did —
+   they READ the scroll position and draw from it, which is a
+   different thing entirely from steering it.
    ============================================================ */
 .section {
   display: flex;
   flex-direction: column;
   gap: var(--aera-space-12);
   padding-block: var(--aera-landing-nav-clear) var(--aera-space-12);
-  scroll-snap-align: start;
 }
 
 .head {
