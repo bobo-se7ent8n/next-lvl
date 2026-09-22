@@ -6,12 +6,23 @@ import styles from './LandingGame.module.css';
    in design pixels at the 2046-wide window they are drawn at. A word
    is placed by its centre relative to the middle of the window and
    by its top; a tile by its top-left corner. Frozen at module load.
+
+   ONE STYLE FOR ALL FOUR WORDS. "you" used to be set in italic, which
+   made the last word read as a different voice from the three before
+   it. It is one sentence, so it is one weight and one posture.
+
+   THE WEIGHT IS BOLD, AND BOLD IS WIDER. A word placed by its centre
+   grows out of both sides, so "that" and "knows" — each with a
+   photograph just off its left edge — were 30 and 35 design px closer
+   to it than drawn, down to a sliver. Their centres move right by
+   exactly that much, which puts the air to their left back to the
+   design's 45-47px.
    ------------------------------------------------------------ */
 const LINES = Object.freeze([
   { text: 'A game', cx: 0, y: 0 },
-  { text: 'that', cx: 433.5, y: 300 },
-  { text: 'knows', cx: 326.5, y: 607 },
-  { text: 'you', cx: -326.5, y: 847.7, italic: true },
+  { text: 'that', cx: 463.5, y: 300 },
+  { text: 'knows', cx: 361.5, y: 607 },
+  { text: 'you', cx: -326.5, y: 847.7 },
 ]);
 
 const TILES = Object.freeze([
@@ -71,7 +82,6 @@ export function LandingGame() {
               key={line.text}
               aria-hidden="true"
               className={styles.line}
-              data-italic={line.italic ? true : undefined}
               style={{ '--cx': line.cx, '--y': line.y, '--i': i + 1 } as CSSProperties}
             >
               {line.text}

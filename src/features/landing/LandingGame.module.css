@@ -44,13 +44,11 @@
   color: var(--aera-color-hero-ink);
   font-family: var(--aera-font-hero);
   font-size: calc(var(--aera-story-game-size) * var(--u));
-  font-weight: var(--aera-weight-regular);
+  /* bold, and the same for all four words — no italic "you" */
+  font-weight: var(--aera-weight-bold);
+  font-style: normal;
   line-height: 1;
   letter-spacing: var(--aera-story-game-tracking);
-}
-
-.line[data-italic] {
-  font-style: italic;
 }
 
 .tile {
