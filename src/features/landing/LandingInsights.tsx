@@ -9,15 +9,15 @@ import styles from './LandingInsights.module.css';
 
 /* THE STAGES, AS WINDOWS OF THE SECTION'S SCROLL.
 
-   1  0.00 → 0.04   the empty bubble, alone in the middle
-   2  0.04 → 0.26   the question types itself in; the stroke closes
+   1  0.00 → 0.05   the empty bubble, alone in the middle
+   2  0.05 → 0.32   the question types itself in; the stroke closes
                     round the bubble with the dot at its head
-   3  0.26 → 0.27   held: the question asked, the outline whole
-   4  0.27 → 0.32   the bubble lifts and fades — gone at 0.32
-      0.34 → 0.42   and only then does the line rise into its place
-   5  0.40 → 0.79   the library lands round it, card after card
-   6  0.80 → 1.00   everything has landed; the cards hold still and
-                    the line alone scrolls on up and out
+   3  0.32 → 0.34   held: the question asked, the outline whole
+   4  0.34 → 0.40   the bubble lifts and fades — gone at 0.40
+      0.42 → 0.52   and only then does the line rise into its place
+   5  0.50 → 0.99   the library lands round it, card after card
+   6  1.00          the pin lets go, and the line and the cards leave
+                    together as one block
 
    THE BUBBLE AND THE LINE NEVER SHARE THE SCREEN. They stand in the
    same grid cell, so any stretch of scroll where both are visible is a
@@ -27,15 +27,21 @@ import styles from './LandingInsights.module.css';
    lags the wheel, the two are never both above zero opacity in one
    frame — both read the same eased value.
 
+   THE LINE HAS NO EXIT OF ITS OWN. It used to let go at 0.8 and scroll
+   on up alone while the cards held still, which read as the headline
+   floating over the section rather than belonging to it. It sits in
+   its place in the block now and leaves when the block does, with the
+   cards round it. The track lost the fifth of its length that exit
+   took, and everything before it was rescaled to fit — each card still
+   lands over the same distance of scroll it always did.
+
    Everything comes out of one progress value, so scrolling back runs
    the same arithmetic backwards and nothing has to be reset. */
-const TYPE = [0.04, 0.26] as const;
-const LEAVE = [0.27, 0.32] as const;
-const ARRIVE = [0.34, 0.42] as const;
+const TYPE = [0.05, 0.32] as const;
+const LEAVE = [0.34, 0.4] as const;
+const ARRIVE = [0.42, 0.52] as const;
 /** how much of the section one card takes to land */
-const LAND = 0.11;
-/** where the line lets go and scrolls with the page */
-const LINE_GOES = 0.8;
+const LAND = 0.14;
 
 /* ------------------------------------------------------------
    THE LIBRARY, FALLING INTO A WELL.
@@ -51,7 +57,7 @@ const LINE_GOES = 0.8;
    A card that falls later lands ON TOP of the ones already down: the
    stacking is the arrival order, so the pile builds as the page
    scrolls, and scrolling back lifts the cards out again in reverse.
-   The last one is down before the line starts to go.
+   The last one is down just before the pin lets go.
 
    Frozen at module load; nothing here is built during a render.
    ------------------------------------------------------------ */
@@ -68,14 +74,14 @@ interface Drop {
 const DROPS = Object.freeze(
   (
     [
-      { x: 0.15, y: 0.27, scale: 0.66, start: 0.4 },
-      { x: 0.85, y: 0.25, scale: 0.64, start: 0.44 },
-      { x: 0.26, y: 0.77, scale: 0.6, start: 0.48 },
-      { x: 0.74, y: 0.79, scale: 0.64, start: 0.52 },
-      { x: 0.07, y: 0.63, scale: 0.56, start: 0.56 },
-      { x: 0.93, y: 0.65, scale: 0.58, start: 0.6 },
-      { x: 0.36, y: 0.13, scale: 0.5, start: 0.64 },
-      { x: 0.64, y: 0.11, scale: 0.52, start: 0.68 },
+      { x: 0.15, y: 0.27, scale: 0.66, start: 0.5 },
+      { x: 0.85, y: 0.25, scale: 0.64, start: 0.55 },
+      { x: 0.26, y: 0.77, scale: 0.6, start: 0.6 },
+      { x: 0.74, y: 0.79, scale: 0.64, start: 0.65 },
+      { x: 0.07, y: 0.63, scale: 0.56, start: 0.7 },
+      { x: 0.93, y: 0.65, scale: 0.58, start: 0.75 },
+      { x: 0.36, y: 0.13, scale: 0.5, start: 0.8 },
+      { x: 0.64, y: 0.11, scale: 0.52, start: 0.85 },
     ] satisfies Drop[]
   ).map((d) => Object.freeze(d)),
 );
@@ -90,8 +96,8 @@ const DROPS = Object.freeze(
  * away and a line takes its place, and the library the question is
  * answered from falls into the scene round it — as if down a well —
  * card by card, each landing on top of the last.
- * Once the last card is down they hold still and the line scrolls on
- * up and out on its own.
+ * Once the last card is down the pin lets go, and the line and the
+ * library scroll up and out together.
  *
  * THE ONLY REACT STATE IS THE CHARACTER COUNT, and it changes about
  * thirty times across the whole section — once per character. The
@@ -119,8 +125,6 @@ export function LandingInsights() {
   useSectionProgress(
     track,
     useCallback((p: number) => {
-      /* read before anything is written, so this frame lays out once */
-      const travel = (track.current?.offsetHeight ?? 0) - window.innerHeight;
       const fill = span(p, TYPE[0], TYPE[1]);
 
       const node = stage.current;
@@ -128,10 +132,6 @@ export function LandingInsights() {
         node.style.setProperty('--fill', fill.toFixed(4));
         node.style.setProperty('--leave', span(p, LEAVE[0], LEAVE[1]).toFixed(4));
         node.style.setProperty('--arrive', span(p, ARRIVE[0], ARRIVE[1]).toFixed(4));
-        /* THE LINE LETS GO. From here it is moved up by exactly as
-           much as the page has scrolled since, so it reads as scrolling
-           with the page while the cards round it stay where they are */
-        node.style.setProperty('--gone', Math.max(0, (p - LINE_GOES) * travel).toFixed(1));
       }
 
       /* the border closing round the bubble as the question fills */

@@ -3,17 +3,16 @@
 
    A pinned window holding three things: the library drifting up
    behind, the Ask bubble in the middle, and the line that takes the
-   bubble's place. Four custom properties drive the middle —
+   bubble's place. Three custom properties drive the middle —
 
      --fill    how much of the question has been typed, 0 → 1
      --leave   the bubble lifting away, 0 → 1
      --arrive  the line rising into its place, 0 → 1
-     --gone    how far the line has scrolled away once the cards are
-               all down, in px
 
    `--leave` reaches 1 before `--arrive` leaves 0, so the bubble and
    the line are never on screen together (see the stage table in
-   LandingInsights.tsx).
+   LandingInsights.tsx). The line has no exit of its own: it leaves
+   when the pin does, with the cards round it.
 
    — and each card carries its own `--e`, 0 above the window to 1
    landed. All of them are written by the page's one scroll
@@ -23,7 +22,9 @@
    ============================================================ */
 .track {
   position: relative;
-  height: 400dvh;
+  /* one window of pin plus 240 of travel. It was 400: the last fifth
+     of it was the line scrolling out alone, which is gone */
+  height: 340dvh;
 }
 
 .pin {
@@ -69,7 +70,6 @@
   --fill: 0;
   --leave: 0;
   --arrive: 0;
-  --gone: 0;
   position: relative;
   /* above every card in the stack */
   z-index: 20;
@@ -174,8 +174,7 @@
   line-height: var(--aera-text-landing-phrase-leading);
   letter-spacing: var(--aera-text-landing-phrase-tracking);
   font-weight: var(--aera-text-landing-phrase-weight);
-  /* rising into place, and later scrolling away: `--gone` is the
-     pixels the page has travelled since the last card landed */
-  translate: 0 calc((1 - var(--arrive)) * var(--aera-landing-phrase-rise) - var(--gone) * 1px);
+  /* rising into place, and staying there: it leaves with the block */
+  translate: 0 calc((1 - var(--arrive)) * var(--aera-landing-phrase-rise));
   opacity: var(--arrive);
 }
