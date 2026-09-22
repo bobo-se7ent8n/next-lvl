@@ -48,6 +48,12 @@ export const MIN_STEP = 72;
  * Everything below that is a length now goes through this. The
  * ratios — the step as a share of card width, the rotation per
  * step — are already relative and are left alone.
+ *
+ * IT READS A NUMBER BECAUSE `--aera-scale` IS REGISTERED AS ONE
+ * (`@property`, global.css). Unregistered, the computed value was the
+ * text "min(0.94, 0.8)", which parses to NaN — and this fell back to
+ * 1 at every window, so the hand never actually scaled. It follows
+ * the app's continuous height track now, like everything else.
  */
 export function layoutScale(): number {
   if (typeof document === 'undefined') return 1;

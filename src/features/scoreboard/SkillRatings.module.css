@@ -50,10 +50,17 @@
    hierarchy — the list stops reading as two groups. Composed from
    both tokens so it stays the larger of the two however the row
    rhythm is tuned. */
+/* The groups sit one card-gap apart. That still beats the gap inside
+   a group — heading to first row is `space-4` plus the heading's own
+   `space-2`, row to row is `space-4` — so the list reads as two groups
+   and not as one run of ten. It was the card gap PLUS a row's padding,
+   a rhythm sized for a board that was allowed to scroll; on a board
+   that has to stand in one window it was height the ratings could not
+   spare. */
 .groups {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--aera-card-gap) + var(--aera-card-row-padding));
+  gap: var(--aera-card-gap);
 }
 
 /* ROW TO ROW IS ONE TOKEN, AND IT IS SMALL.
@@ -74,15 +81,12 @@
   gap: var(--aera-space-4);
 }
 
+/* the heading's own extra step, so heading-to-row is a little more
+   than row-to-row and the heading reads as the group's, not a row */
 .group > :first-child {
-  margin-bottom: calc(var(--aera-card-row-padding) * 2 - var(--aera-space-4));
+  margin-bottom: var(--aera-space-2);
 }
 
-/* scoped to `.group` on purpose: "where to work next" uses the same
-   row component and keeps its own padding untouched */
-.group .ratingRow {
-  padding-block: 0;
-}
 
 /* ---- where to work next: its OWN card now ----
 
@@ -116,8 +120,14 @@
   gap: var(--aera-card-tight-gap);
 }
 
-/* every rating row breathes the same amount, in both cards */
+/* EVERY RATING ROW BREATHES THE SAME AMOUNT, IN BOTH CARDS — and it
+   is the ratings list's amount now. The two work-next rows used to
+   carry a row padding above and below that no row in the list above
+   them had, so the same component sat looser in the second card than
+   in the first; on a board that stands in one window that was the
+   margin the column did not have. An entry is its row, the tight gap,
+   and its reason — and entries are a card-gap apart. */
 .ratingRow {
-  padding-block: var(--aera-card-row-padding);
+  padding-block: 0;
 }
 

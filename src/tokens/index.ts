@@ -42,7 +42,7 @@ import { cardSpec, innerSpec, surfaceEffect } from './surface';
 import { borderWidth } from './border';
 import { zIndex } from './zIndex';
 import { iconSize, iconStroke, controlSpec, minTarget } from './size';
-import { breakpoint, breakpointHeight, scaleStep } from './scale';
+import { breakpoint, breakpointHeight, scaleStep, appHeightTrack } from './scale';
 import { landing, scatter, trail, dotCanvas } from './landing';
 import { hero, heroType } from './hero';
 import { story } from './story';
@@ -80,6 +80,7 @@ export const tokens = {
   breakpoint,
   breakpointHeight,
   scaleStep,
+  appHeightTrack,
   landing,
   hero,
   heroType,

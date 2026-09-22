@@ -28,7 +28,11 @@ export function ScreenFrame({ active, onNavigate, background, children }: Screen
     <>
       <BackgroundLayers settings={background ?? BACKGROUND_DEFAULTS} />
       <NavBar items={NAV} value={active} onChange={(next) => onNavigate?.(next)} />
-      <main className={appStyles.main}>{children}</main>
+      {/* `data-surface` switches on the app's own height track — see
+          global.css and scale.ts */}
+      <main className={appStyles.main} data-surface="app">
+        {children}
+      </main>
     </>
   );
 }

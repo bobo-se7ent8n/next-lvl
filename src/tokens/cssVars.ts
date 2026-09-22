@@ -233,6 +233,16 @@ export function buildCssVars(): Record<string, string> {
   for (const [name, value] of Object.entries(tokens.scaleStep)) {
     vars[`${PREFIX}-scale-${kebab(name)}`] = String(value);
   }
+  /* THE APP'S OWN HEIGHT TRACK — a line, not steps (see scale.ts).
+     Its three inputs are projected as they are, NOT scaled: they are
+     measured against the window, and scaling them would feed the scale
+     back into itself. `tan(atan2(a, b))` is a / b as a plain number. */
+  for (const [name, value] of Object.entries(tokens.appHeightTrack)) {
+    vars[`${PREFIX}-app-h-${kebab(name)}`] = value;
+  }
+  vars[`${PREFIX}-scale-app-h`] =
+    `clamp(var(${PREFIX}-app-h-floor), ` +
+    `tan(atan2(calc(100dvh - var(${PREFIX}-app-h-offset)), var(${PREFIX}-app-h-span))), 1)`;
 
   return vars;
 }

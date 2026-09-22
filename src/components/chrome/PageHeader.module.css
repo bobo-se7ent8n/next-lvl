@@ -18,6 +18,13 @@
      three screens with a left column all subtract exactly this from
      the viewport to size that column */
   min-height: var(--aera-layout-header-block);
+  /* A HEADER NEVER GIVES. On the one-window screens it is a flex item
+     in a column of fixed height, and a shrinkable header shrank by
+     however much the split under it happened to overflow — a few px
+     on one screen, none on another — so three headers with identical
+     contents came out three different heights, and so did the panels
+     hung under them. It is always exactly as tall as what is in it. */
+  flex-shrink: 0;
   padding-top: var(--aera-layout-header-title-offset);
   /* the reserved band — the only thing between the subhead and
      whatever the screen puts underneath it */

@@ -1,32 +1,45 @@
 /* ============================================================
-   SESSIONS — the same shape as Home: a tall sticky panel on the
-   left, and the thing you actually scroll on the right. Full
-   bleed, with no trailing band of padding under the last card.
+   SESSIONS — ONE WINDOW. The calendar on the left, the log on the
+   right, and the page does not scroll: the screen is exactly one
+   viewport less the nav's band, the header takes what it takes, and
+   the split takes the rest. Full bleed.
    ============================================================ */
 .screen {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: var(--aera-layout-screen-height);
 }
 
+/* THE SPLIT IS THE REST OF THE WINDOW. One row, `minmax(0, 1fr)`,
+   so its height is the screen's less the header's — definite — and
+   both columns stretch to it. */
 .split {
   display: grid;
   grid-template-columns: var(--aera-layout-left-column) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   gap: var(--aera-layout-split-gap);
-  align-items: start;
+  align-items: stretch;
+  /* basis 0: the split is the remainder of the screen, whatever its
+     content would like to be */
+  flex: 1 1 0;
+  min-height: 0;
   width: 100%;
 }
 
-/* the calendar is pinned and never scrolls — it is the frame the
-   sessions are read against, not a list. Same width and same height
-   as Focus on Home and Ask AERA on Insights: one column, three
-   screens. */
+/* THE CALENDAR RUNS FROM UNDER THE HEADER TO ABOVE THE NAV — the
+   split's own height, so it is the same height as Ask AERA on
+   Insights and the shot field on the Scoreboard by construction.
+   Nothing to pin: the page does not move under it any more. */
 .aside {
-  position: sticky;
-  top: var(--aera-layout-column-top);
-  align-self: start;
-  height: var(--aera-layout-column-height);
+  display: flex;
   min-width: 0;
+  min-height: 0;
+}
+
+.aside > * {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 /* BENTO PACKING — uniform column widths, independently packed.
@@ -51,15 +64,18 @@
    A session log is an unbounded list — twelve sessions today, forty
    next month — so no amount of scaling makes it a fixed height. It
    is bounded to the column it shares with the calendar beside it and
-   scrolls inside that, which is what the calendar has always done by
-   being `position: sticky`. Nothing is cropped; the scrollbar just
-   belongs to the list rather than to the document. */
+   scrolls inside that, rather than the page. Nothing is cropped —
+   whatever does not fit is a scroll away — and at every target window
+   today the whole log fits without one. */
 .log {
   display: flex;
   align-items: flex-start;
   gap: var(--aera-card-gap);
   min-width: 0;
+  min-height: 0;
   width: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   /* THE STROKE NEEDS ROOM, AND THE BAR NEEDS TO BE OFF THE CARD.
 
      A non-clickable card wears its 2px stroke as a spread
@@ -100,13 +116,41 @@
     grid-template-rows: auto minmax(0, 1fr);
     gap: var(--aera-space-10);
   }
-  .log {
-    min-height: 0;
-  }
-  .aside {
-    position: static;
+  /* stacked, the screen is a column of content again and the page
+     scrolls: two panels one above the other do not fit one window */
+  .screen {
     height: auto;
+  }
+  .log {
+    overflow-y: visible;
   }
 }
 
 
+
+/* BELOW THE APP TRACK'S FLOOR (`appHeightTrack.minFit`, 700px) the
+   screen is no longer one window: the scale has stopped shrinking, so
+   the content is sized by what is in it and the page scrolls — a
+   window this short gets a longer page, never panels drawn over each
+   other. */
+@media (max-height: 699px) {
+  .screen {
+    height: auto;
+  }
+  .split {
+    flex: none;
+    grid-template-rows: none;
+    align-items: start;
+  }
+  /* the calendar goes back to being pinned while the log scrolls
+     past it with the page — how this screen worked before it was one
+     window */
+  .aside {
+    position: sticky;
+    top: var(--aera-layout-column-top);
+    height: var(--aera-layout-column-height);
+  }
+  .log {
+    overflow-y: visible;
+  }
+}

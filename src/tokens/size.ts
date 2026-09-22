@@ -80,6 +80,15 @@ export const controlSpec = {
   rulerCaret: '13px',
   /** the rating row's two fixed columns */
   ratingLabel: '132px',
+  /** THE LABEL COLUMN'S FLOOR, in the label's own type. The column is
+   *  a length and scales with the window; the label's type is floored
+   *  at 12px and does not, so on a small scale step "Catch-and-shoot"
+   *  outgrew its column and broke onto two lines — a row twice as tall
+   *  as its neighbours. `em` follows the type actually drawn, so the
+   *  longest label — "Catch-and-shoot", 8.1em — always fits on one
+   *  line, with room to spare. Not a px value, so the
+   *  projection leaves it unscaled. */
+  ratingLabelFloor: '9em',
   ratingValue: '36px',
   /* the history row, in the expanded pattern card: a fixed label
      column, the bar between them, and a fixed value column. The

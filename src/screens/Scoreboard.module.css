@@ -1,29 +1,33 @@
 /* ============================================================
-   BENTO — three columns, and every card HUGS ITS CONTENT.
+   BENTO — three columns, ONE WINDOW, and nothing cut.
 
-   The grid used to stand exactly one shared column tall so the
-   whole screen fit one viewport. That cap is gone: it was doing
-   the clipping. Skill ratings lost its entire second group and
-   the shot arc collapsed to a sliver, because both were being
-   squeezed into a height chosen before anyone knew what was in
-   them. Cards size to what they hold and the page scrolls if the
-   sum of them is taller than the screen — a card that hides half
-   its rows is worse than a page that scrolls.
+   The screen is exactly one viewport less the nav's band and the
+   bento is what the header leaves of it, so the shot field runs from
+   under the header to above the nav — the same height as Ask AERA
+   and the calendar. The last card of each of the other two columns
+   takes that column's slack.
+
+   An earlier cap on this grid did the fitting by clipping: Skill
+   ratings lost its second group and the arc collapsed to a sliver.
+   That is not what happens here. Every row and every reading is
+   drawn in full; what makes it fit is the app's scale step for a
+   short window (scale.ts) and the two drawings, which are the only
+   parts of the board that give.
    ============================================================ */
 .screen {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: var(--aera-layout-screen-height);
 }
 
 .bento {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   gap: var(--aera-layout-split-gap);
-  /* the bento takes what the header leaves and scrolls if the sum of
-     its cards is still taller — the cards keep hugging their content,
-     so nothing loses a row the way the old hard cap made it */
-  flex: 1 1 auto;
+  /* basis 0: the bento is the remainder of the screen */
+  flex: 1 1 0;
   min-height: 0;
   /* the row is content-sized again; the three columns stretch to
      the tallest of them, which is what puts their bottoms on one
@@ -36,24 +40,14 @@
 }
 
 /* the centre column: the ratings, and the conclusion drawn from them
-   as its own card underneath */
-/* THE RATINGS COLUMN, AND THE ONE PLACE THE BOARD RUNS LONG.
-
-   Ten ratings and two work-next entries fit the column outright at
-   1440 and above, once the two groups sit side by side. At 1024 the
-   column is ~280px wide — too narrow to carry two rating rows
-   across — so the groups stack and the content is about four rows
-   taller than the screen.
-
-   It scrolls there rather than being cut. Nothing is removed and
-   nothing is hidden: at the one viewport where the full board does
-   not fit, the last rows are still reachable. Flagged rather than
-   solved by deleting ratings. */
+   as its own card underneath. THE COLUMN WITH NOTHING TO GIVE — ten
+   rating rows and two reasons, all type, no drawing — so it is the
+   one that decides whether the board fits a window, and every rhythm
+   in it is the tight one (see SkillRatings.module.css). */
 .ratings {
   display: flex;
   flex-direction: column;
   gap: var(--aera-space-8);
-  min-width: 0;
   min-width: 0;
 }
 
@@ -99,9 +93,29 @@
    the window. With the layout scale the three columns still have
    ~310px each at 1024, which these cards read fine at. This is a
    LAYOUT breakpoint, not a size one: the scale handles size. */
+/* ON A NARROW WINDOW THE RATINGS COLUMN TAKES THE WIDE SHARE.
+
+   At 1024 the three columns are under 300px each, and at that width
+   each work-next reason breaks onto a third line — two lines of height
+   in the one column with no drawing in it to give. The shot field's
+   drawing scales to whatever box it is given, so it hands the ratings
+   the extra share instead; nothing in the board changes but the
+   widths. A layout breakpoint, not a size one. */
+@media (max-width: 1100px) {
+  .bento {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+}
+
 @media (max-width: 900px) {
+  /* two columns, then one: a board that no longer fits a window
+     scrolls with the page rather than squeezing */
+  .screen {
+    height: auto;
+  }
   .bento {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
   }
   .zones {
     grid-column: 1 / -1;
@@ -115,5 +129,20 @@
   .zones,
   .ratings {
     grid-column: 1;
+  }
+}
+
+/* BELOW THE APP TRACK'S FLOOR (`appHeightTrack.minFit`, 700px) the
+   screen is no longer one window: the scale has stopped shrinking, so
+   the content is sized by what is in it and the page scrolls — a
+   window this short gets a longer page, never panels drawn over each
+   other. */
+@media (max-height: 699px) {
+  .screen {
+    height: auto;
+  }
+  .bento {
+    flex: none;
+    grid-template-rows: none;
   }
 }

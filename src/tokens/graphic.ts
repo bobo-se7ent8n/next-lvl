@@ -57,9 +57,9 @@ export const graphicWell = {
    ------------------------------------------------------------ */
 export const wellFloor = {
   /** the half court — the taller of the two drawings */
-  court: 'min(38svh, 320px)',
+  court: 'min(38dvh, 320px)',
   /** the shot arc, which is landscape and needs less */
-  arc: 'min(22svh, 180px)',
+  arc: 'min(22dvh, 180px)',
 } as const;
 
 /** the rows each density step draws */

@@ -119,14 +119,14 @@ export const layout = {
   /* THE ONLY LAYOUT TOKEN THAT REFERENCES ITS OWN SIBLINGS.
    *
    *  It has to. Every other length here is projected through
-   *  `--aera-scale`, but this one mixes `100svh` — which must NOT
+   *  `--aera-scale`, but this one mixes `100dvh` — which must NOT
    *  scale, it is the window — with three lengths that must. Written
    *  as literals it would be wrapped whole and the viewport would
    *  shrink with the type. Written as `var()` references it composes
    *  from the already-scaled values, and the projection leaves it
    *  alone because there is no bare px in it. */
   columnHeight:
-    'calc(100svh - var(--aera-layout-header-block)' +
+    'calc(100dvh - var(--aera-layout-header-block)' +
     ' - var(--aera-layout-nav-height) - var(--aera-space-12))',
 
   /** THE HEIGHT ONE VIEW GETS, and it is not `columnHeight`.
@@ -143,10 +143,24 @@ export const layout = {
    *  so they cannot share one token.
    *
    *  Composed from `var()` references for the same reason
-   *  `columnHeight` is: `100svh` is the window and must not be scaled,
+   *  `columnHeight` is: `100dvh` is the window and must not be scaled,
    *  the rest already is. No bare px, so the projection in
    *  `cssVars.ts` leaves it alone. */
   viewHeight:
-    'calc(100svh - var(--aera-layout-header-block)' +
+    'calc(100dvh - var(--aera-layout-header-block)' +
     ' - var(--aera-layout-nav-reserve))',
+
+  /** THE WHOLE SCREEN, FOR A SCREEN THAT DOES NOT SCROLL.
+   *
+   *  Sessions, Insights and the Scoreboard are one window each: the
+   *  screen is exactly this tall, the header takes what it takes, and
+   *  the split under it takes the rest — so the three left-hand panels
+   *  (Ask AERA, the calendar, the shot field) run from under the header
+   *  to above the nav and are the same height by construction, not by
+   *  three screens each subtracting the same guess. With the nav band
+   *  the page reserves under it, the document is exactly one viewport.
+   *
+   *  `dvh`, and composed from `var()` like the two above so the window
+   *  is not scaled while the reserve is. */
+  screenHeight: 'calc(100dvh - var(--aera-layout-nav-reserve))',
 } as const;

@@ -1,33 +1,38 @@
 /* ============================================================
-   INSIGHTS — full bleed. The Ask panel holds the left column and
-   the library scrolls on the right. The grid runs to the gutter;
-   it used to stop several hundred pixels short of it.
+   INSIGHTS — full bleed, and ONE WINDOW, like Sessions and the
+   Scoreboard: the Ask panel holds the left column at the split's
+   full height and the library scrolls on the right, inside itself.
+   The grid runs to the gutter.
    ============================================================ */
 .screen {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: var(--aera-layout-screen-height);
 }
 
 .split {
   display: grid;
   grid-template-columns: var(--aera-layout-left-column) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   gap: var(--aera-layout-split-gap);
-  align-items: start;
+  align-items: stretch;
+  /* basis 0: the split is the remainder of the screen, whatever its
+     content would like to be */
+  flex: 1 1 0;
+  min-height: 0;
   width: 100%;
 }
 
-/* The Ask panel is pinned, and it is exactly one shared column tall —
-   the same width and height as Focus on Home and Activity on
-   Sessions. It used to stretch to the full scroll height of the
-   library beside it, which pushed the input and the suggestion chips
-   about fourteen hundred pixels off the bottom of the screen. */
+/* THE ASK PANEL RUNS FROM UNDER THE HEADER TO ABOVE THE NAV — the
+   split's height, which is also the calendar's on Sessions and the
+   shot field's on the Scoreboard. It used to stretch to the full
+   scroll height of the library beside it, which pushed the input and
+   the suggestion chips off the bottom of the screen; bounded by the
+   split, the input is always on screen. */
 .aside {
-  position: sticky;
-  top: var(--aera-layout-column-top);
-  align-self: start;
   min-width: 0;
-  height: var(--aera-layout-column-height);
+  min-height: 0;
   display: flex;
 }
 
@@ -66,8 +71,14 @@
   gap: var(--aera-card-gap);
   width: 100%;
   min-width: 0;
-  /* no pane scroll and no clip: the library renders at its full
-     height and the PAGE scrolls if there is more of it than fits */
+  /* THE LIBRARY IS THE ONE THING HERE THAT SCROLLS, and it scrolls
+     inside its own column: the page is one window and the Ask panel
+     beside it stays put. Nothing is clipped — every card is a scroll
+     away — and the padding is the card stroke's room, so the
+     scroll box never shaves the stroke off a card's edge. */
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--aera-border-base);
 }
 
@@ -88,13 +99,38 @@
     grid-template-rows: auto minmax(0, 1fr);
     gap: var(--aera-space-10);
   }
-  .grid {
-    min-height: 0;
-  }
-  .aside {
-    position: static;
+  .screen {
     height: auto;
+  }
+  .grid {
+    overflow-y: visible;
   }
 }
 
 
+
+/* BELOW THE APP TRACK'S FLOOR (`appHeightTrack.minFit`, 700px) the
+   screen is no longer one window: the scale has stopped shrinking, so
+   the content is sized by what is in it and the page scrolls — a
+   window this short gets a longer page, never panels drawn over each
+   other. */
+@media (max-height: 699px) {
+  .screen {
+    height: auto;
+  }
+  .split {
+    flex: none;
+    grid-template-rows: none;
+    align-items: start;
+  }
+  /* the Ask panel goes back to being pinned while the library scrolls
+     past it with the page */
+  .aside {
+    position: sticky;
+    top: var(--aera-layout-column-top);
+    height: var(--aera-layout-column-height);
+  }
+  .grid {
+    overflow-y: visible;
+  }
+}

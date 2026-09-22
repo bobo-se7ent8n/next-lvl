@@ -75,6 +75,8 @@ const GROUPS: Array<[prefix: string, title: string]> = [
   ['--aera-min-target-', 'min target'],
   ['--aera-breakpoint-', 'breakpoint'],
   ['--aera-scale-', 'scale'],
+  /* the three inputs of the app's continuous height track (scale.ts) */
+  ['--aera-app-h-', 'scale · app height'],
 ];
 
 /* ------------------------------------------------------------

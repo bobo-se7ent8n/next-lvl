@@ -177,7 +177,7 @@
 }
 
 .progressRowName {
-  width: var(--aera-control-rating-label);
+  width: max(var(--aera-control-rating-label), var(--aera-control-rating-label-floor));
   flex: 0 0 auto;
 }
 

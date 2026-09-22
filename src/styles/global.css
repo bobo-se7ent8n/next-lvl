@@ -39,6 +39,22 @@ body,
    Type does not follow this all the way down: body text floors at
    12px and the annotation sizes below it do not shrink at all.
    ============================================================ */
+/* THE SCALE IS A NUMBER, NOT A STRING.
+
+   Unregistered, `--aera-scale` computes to the TEXT
+   "min(0.94, 0.8)" — every length token still resolves (it is
+   substituted into a calc() before it is used), but anything that
+   READS the scale gets that string back. The fan's geometry reads it
+   (fanGeometry.ts, `layoutScale`), parsed it to NaN, and quietly fell
+   back to 1: the hand never scaled with the page it was drawn on.
+   Registered as a <number>, the min() is resolved at :root and what
+   is read back is the number itself. */
+@property --aera-scale {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
 :root {
   --aera-scale-w: var(--aera-scale-full);
   --aera-scale-h: var(--aera-scale-full);
@@ -87,6 +103,24 @@ body,
   :root {
     --aera-scale-h: var(--aera-scale-tablet);
   }
+}
+
+/* ---- THE APP'S OWN HEIGHT TRACK --------------------------------
+   Sessions, Insights and the Scoreboard stand in one window each, and
+   on a short one the track above left the Scoreboard's ratings column
+   taller than its room. Under the app shell the height track is a
+   continuous line instead of steps (scale.ts has the line, and why).
+   It only ever REPLACES `--aera-scale-h`: the scale is still the
+   smaller of the two tracks, so a narrow window still scales on its
+   width.
+
+   `:root:has(...)` rather than a class toggled from script: the shell
+   marks itself with `data-surface`, and the rule is true exactly as
+   long as the shell is in the document — the landing page and the
+   component browser never see it. The extra specificity is what lets
+   it win over the plain `:root` height track above. */
+:root:has([data-surface='app']) {
+  --aera-scale-h: var(--aera-scale-app-h);
 }
 
 html {
