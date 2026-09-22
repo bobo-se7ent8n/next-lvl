@@ -67,9 +67,19 @@
   display: contents;
 }
 
+/* the landing's headline face — the hero's display token, as every
+   other headline on the page wears it — at the size this line has
+   always had, the display XL step. Sentence case, like the others. */
 .line {
   grid-row: 2;
+  margin: 0;
   text-align: center;
+  color: var(--aera-color-hero-ink);
+  font-family: var(--aera-text-hero-display-family);
+  font-size: var(--aera-text-display-xl-size);
+  font-weight: var(--aera-text-hero-display-weight);
+  line-height: var(--aera-text-hero-display-leading);
+  letter-spacing: var(--aera-text-hero-display-tracking);
 }
 
 .cta {

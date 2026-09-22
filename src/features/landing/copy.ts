@@ -134,15 +134,15 @@ export const ASK_FOUND =
 
 /* ---- the closing block's footer ------------------------------ */
 
-/* Four ways to reach a project that does not have a support desk.
-   The last one is a page rather than a channel: somebody who has
-   read this far and still wants the long version should not have to
-   ask a person for it. */
+/* Three ways to reach the person who made this. The external two open
+   in a new tab (see LandingClosure); mail hands off to the mail app.
+   There used to be a fourth, "What is AERA", pointing at the component
+   browser — a page rather than a channel, and not a way to reach
+   anybody, so it is gone. */
 export const FOOTER_LINKS = [
-  { label: 'Telegram', href: 'https://t.me/aera' },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/aera' },
-  { label: 'Email', href: 'mailto:hello@aera.build' },
-  { label: 'What is AERA', href: '/storybook' },
+  { label: 'Telegram', href: 'https://t.me/basolntsev' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/bogdan-solntsev-604388334' },
+  { label: 'Email', href: 'mailto:basolntsev@gmail.com' },
 ] as const;
 
 export const FOOTER_COPYRIGHT = '© AERA 2026';

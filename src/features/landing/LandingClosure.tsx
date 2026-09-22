@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { cx } from '../../lib/css';
-import { Display, Label } from '../../components/primitives/Text';
+import { Label } from '../../components/primitives/Text';
 import { ROUTES } from '../../app/routes';
 import { DotCanvas } from './DotCanvas';
 import { FOOTER_COPYRIGHT, FOOTER_LINKS } from './copy';
@@ -67,9 +67,14 @@ export function LandingClosure() {
               the footer stands on the block's bottom padding and
               shifts neither — see the stylesheet. */}
           <div className={styles.lead}>
-            <Display size="xl" as="p" className={styles.line}>
-              Built to be outgrown.
-            </Display>
+            {/* IN THE LANDING'S OWN FACE. Every other headline on this
+                page — the hero, the full picture, a game that knows you —
+                is set in the hero's Open Sans, and this was the one line
+                still in the app's condensed Oswald, so the page ended in
+                a different voice from the one it spoke in. Plain text
+                rather than `Display`: the per-letter ink variation is an
+                Oswald device and does not belong on this face. */}
+            <p className={styles.line}>Built to be outgrown.</p>
 
             <Link to={ROUTES.home} className={styles.cta}>
               <Label tone="inherit">Open the prototype</Label>
@@ -91,10 +96,11 @@ export function LandingClosure() {
                   <a
                     className={styles.link}
                     href={link.href}
-                    /* the three that leave the site say so; the one
-                       that does not is an internal route */
+                    /* the two that leave the site open in a new tab
+                       and cannot reach back into this one; mail is a
+                       hand-off to the mail app, not a page */
                     target={link.href.startsWith('http') ? '_blank' : undefined}
-                    rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
+                    rel={link.href.startsWith('http') ? 'noopener' : undefined}
                   >
                     <Label tone="inherit">{link.label}</Label>
                   </a>
@@ -102,9 +108,12 @@ export function LandingClosure() {
               ))}
             </ul>
 
-            <p className={styles.meta}>
+            {/* THE BUILD, AS A NUMBER A PERSON CAN SAY. The commit
+                count of this bundle, zero-padded — see vite.config.ts,
+                which also records how the count was reached. */}
+            <p className={styles.meta} data-build-source={__AERA_BUILD_SOURCE__}>
               <Label tone="inherit">{FOOTER_COPYRIGHT}</Label>
-              <Label tone="inherit">build {__AERA_BUILD__}</Label>
+              <Label tone="inherit">Claude build {__AERA_BUILD__}</Label>
             </p>
           </div>
         </div>
