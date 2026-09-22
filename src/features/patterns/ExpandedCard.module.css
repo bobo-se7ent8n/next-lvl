@@ -129,7 +129,8 @@
   --stack-gap: var(--aera-space-11);
   --column-gap: var(--aera-space-12);
   --row-gap: var(--aera-space-9);
-  --history-gap: var(--aera-space-9);
+  --history-head-gap: var(--aera-space-9);
+  --history-gap: var(--aera-space-6);
   --measured-pad: var(--aera-space-7) var(--aera-space-8);
 }
 
@@ -139,7 +140,8 @@
   --stack-gap: var(--aera-space-9);
   --column-gap: var(--aera-space-11);
   --row-gap: var(--aera-space-7);
-  --history-gap: var(--aera-space-7);
+  --history-head-gap: var(--aera-space-7);
+  --history-gap: var(--aera-space-5);
   --measured-pad: var(--aera-space-5) var(--aera-space-7);
 }
 
@@ -149,7 +151,8 @@
   --stack-gap: var(--aera-space-5);
   --column-gap: var(--aera-space-8);
   --row-gap: var(--aera-space-4);
-  --history-gap: var(--aera-space-5);
+  --history-head-gap: var(--aera-space-5);
+  --history-gap: var(--aera-space-4);
   --measured-pad: var(--aera-space-4) var(--aera-space-6);
 }
 
@@ -160,10 +163,6 @@
   /* the close control is absolutely placed in this corner, so the
      heading block reserves its width plus its own inset */
   padding-right: calc(var(--aera-min-target-tap) + var(--aera-space-8));
-}
-
-.context {
-  opacity: 0.78;
 }
 
 /* the section headers read as headers, not as ghosts — 0.7 over a
@@ -190,13 +189,40 @@
 
    ONE ROW GAP AND ONE COLUMN GAP, both from the density step. No
    block below sets a margin of its own — every gap in this grid is
-   this declaration. */
+   this declaration.
+
+   AND THE MIDDLE ROW IS THE ONE THAT GIVES.
+
+   The panel opens into a box of a height the flight decides, not a
+   height this content asks for, so there is nearly always slack in
+   it — and with the trend line, the source tag, the caption and two
+   history rows taken out there is a great deal of it. It used to
+   collect at the foot of the panel as a band of bare card face.
+
+   It collects in the chart well instead. Row two holds the source
+   recess and the lower half of the chart; the recess is a fixed
+   block that stays where it is put, the well is the one thing on
+   the panel with no reading in it, and a well growing into spare
+   height is what every other card in this product does with it.
+   Rows one and three are words and numbers, and they hold. */
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: var(--row-gap) var(--column-gap);
   align-items: start;
+  /* GROW INTO THE INNER BOX, NEVER SHRINK INSIDE IT.
+
+     Growing is what moves the panel's slack into the chart well
+     instead of leaving it at the foot of the card. Not shrinking is
+     what keeps the fit plan honest: a shrinkable grid answers an
+     overflow by crushing its own rows into one another — in the
+     stacked layout the history list was drawn straight over the
+     chart — and because it then measures as fitting, the ladder in
+     ExpandedCard.tsx never learns it has to step down. Rigid, the
+     overflow reaches `.inner`, the observer sees it, and the rhythm
+     tightens the way it is supposed to. */
+  flex: 1 0 auto;
   min-height: 0;
 }
 
@@ -228,13 +254,19 @@
   min-width: 0;
 }
 
+/* THE HEADING IS SEPARATED FROM THE LIST BY MORE THAN THE LIST
+   SEPARATES ITSELF. It was one token doing both jobs, which put
+   "last four sessions" exactly as far from Session 11 as Session 11
+   is from Session 12 — so the heading read as a fifth row of the
+   list rather than as its title. Two tokens, and the row gap is the
+   tighter of the two at every density. */
 .cellHistory {
   grid-column: 2;
   grid-row: 3;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--history-gap);
+  gap: var(--history-head-gap);
 }
 
 /* THE LINKED SESSION BLOCK — a recess cut into the panel's face,
@@ -486,25 +518,6 @@
   .inner {
     padding: var(--pad-y) var(--pad-x);
   }
-}
-
-/* ============================================================
-   CHIPS IN HERE ARE WHITE
-
-   The chip's palette tone still decides what the block MEANS — the
-   resolver in patternSource.ts sets it, and it drives the label and
-   the destination. Inside the expanded card it does not decide what
-   the chip LOOKS like: on a face that is already a saturated colour,
-   a second saturated colour reads as a second subject. White is the
-   one fill that sits on every face the set can take, so the chip
-   reads as a tag rather than as another coloured thing.
-
-   The ink is the panel's own, which is chosen against that face, so
-   the text stays legible on the white regardless of the card.
-   ============================================================ */
-.sourceTag {
-  background: var(--aera-color-surface-background);
-  color: var(--aera-color-ink-primary);
 }
 
 /* ============================================================

@@ -1,11 +1,16 @@
+/* IN FLOW, NOT PINNED TO THE CORNER.
+
+   This was `position: fixed` in the bottom-right, hung off a small
+   button opposite the token panel's, with the nav capsule between
+   the two. Both were tuning affordances and the tuning is done —
+   the values this found are the shipped defaults in settings.ts —
+   so the button went and the panel came out of the corner with it.
+   It renders in flow now, where the component browser and the
+   stories document it. */
 .panel {
-  position: fixed;
-  right: var(--aera-space-9);
-  bottom: var(--aera-space-9);
-  z-index: var(--aera-z-panel);
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: var(--aera-space-5);
 }
 
@@ -27,30 +32,6 @@
   gap: var(--aera-space-8);
 }
 
-/* the same square the token panel's button is — one number, in
-   size.ts, so the two cannot drift apart */
-.toggleButton {
-  width: var(--aera-control-panel-button);
-  height: var(--aera-control-panel-button);
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--aera-radius-lg);
-  background: var(--aera-color-surface-background);
-  color: var(--aera-color-ink-secondary);
-  box-shadow: var(--aera-elevation-high);
-  transition: color var(--aera-duration-fast) var(--aera-ease-out);
-}
-
-.toggleButton:hover {
-  color: var(--aera-color-ink-primary);
-}
-
-.toggleButton svg {
-  width: var(--aera-icon-xl);
-  height: var(--aera-icon-xl);
-}
 
 .group {
   display: flex;

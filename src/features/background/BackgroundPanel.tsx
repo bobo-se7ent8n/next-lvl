@@ -1,25 +1,37 @@
-import { useState } from 'react';
 import { cx } from '../../lib/css';
 import { Card } from '../../components/primitives/Card';
 import { Slider, Toggle } from '../../components/primitives/Controls';
 import { Label } from '../../components/primitives/Text';
 import type { BackgroundSettings } from './settings';
 import styles from './BackgroundPanel.module.css';
-import { iconStroke } from '../../tokens';
 
 export interface BackgroundPanelProps {
   settings: BackgroundSettings;
   onChange: (next: BackgroundSettings) => void;
-  /** render in flow instead of pinned to the corner — used by stories */
-  inline?: boolean;
   className?: string;
 }
 
+/* ============================================================
+   DISPLAY SETTINGS — and the app no longer carries a control for
+   them.
+
+   This used to hang off a small button in the bottom-right corner,
+   opposite the token panel's, with the nav capsule between the
+   two. Both were tuning affordances, and the tuning is done: the
+   settings this panel found are the defaults the app ships with
+   (see settings.ts). A permanent control for a finished job is a
+   permanent mark on every screen — two of them, framing the nav.
+
+   The panel itself stays, and stays wired: it is a real piece of
+   the system, it is documented in the component browser, and the
+   settings it writes are still the ones BackgroundLayers reads.
+   What went is the floating button, and with it the panel's own
+   open/closed state — in flow there is nothing to open.
+   ============================================================ */
+
 /** the display settings panel. Sliders write straight into the layer
  *  state — there is no apply step. */
-export function BackgroundPanel({ settings, onChange, inline, className }: BackgroundPanelProps) {
-  const [open, setOpen] = useState(inline ?? false);
-
+export function BackgroundPanel({ settings, onChange, className }: BackgroundPanelProps) {
   const patch = <K extends keyof BackgroundSettings>(
     key: K,
     value: Partial<BackgroundSettings[K]>,
@@ -141,24 +153,5 @@ export function BackgroundPanel({ settings, onChange, inline, className }: Backg
     </Card>
   );
 
-  if (inline) return <div className={className}>{body}</div>;
-
-  return (
-    <div className={cx(styles.panel, className)}>
-      {open ? body : null}
-      <button
-        type="button"
-        className={styles.toggleButton}
-        aria-expanded={open}
-        aria-label="Display settings"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={iconStroke.thin} strokeLinecap="round">
-          <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
-          <circle cx="16" cy="7" r="2" />
-          <circle cx="10" cy="17" r="2" />
-        </svg>
-      </button>
-    </div>
-  );
+  return <div className={cx(styles.panel, className)}>{body}</div>;
 }

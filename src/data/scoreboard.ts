@@ -134,9 +134,9 @@ export const SKILL_SOURCE = 'on-device pose, ball and inertial data · sessions 
 
    NOT WIRED TO ANYTHING. The card on screen does not read this: it
    reads `derive()` in period.ts, which sorts the ten rated skills
-   and takes the two lowest for the window, with the sentences from
-   WORK_NOTE. This array is the shape that pre-dated that, kept in
-   step with SKILLS by hand. If you are changing a rating, the one
+   and takes the three lowest for the window, with the sentences
+   from WORK_NOTE. This array is the shape that pre-dated that, kept
+   in step with SKILLS by hand. If you are changing a rating, the one
    that matters is SKILLS above — this one follows it so the two
    never disagree, and nothing renders if it drifts.
    ------------------------------------------------------------ */
@@ -150,12 +150,17 @@ export const WHERE_NEXT: WorkNextEntry[] = [
   {
     label: 'Balance',
     value: 55,
-    note: 'The lowest movement rating. It moves with late-session fatigue, not with anything technical.',
+    note: 'Moves with late-session fatigue, not with anything technical.',
   },
   {
     label: 'Three-point',
     value: 61,
-    note: 'The lowest shooting rating. It sits lower on right-wing attempts than anywhere else on the floor.',
+    note: 'Sits lower on right-wing attempts than anywhere else on the floor.',
+  },
+  {
+    label: 'Off-dribble',
+    value: 62,
+    note: 'Separates from the catch-and-shoot number as the shot clock drops.',
   },
 ];
 

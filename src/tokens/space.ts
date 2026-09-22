@@ -63,6 +63,40 @@ export const layout = {
   /** the widest an insight bubble gets before its text wraps */
   insightBubble: '500px',
 
+  /** THE SMALLEST A VITAL CARD MAY BE DRAWN.
+   *
+   *  The six vitals share two rows of one pane, and those rows are
+   *  `1fr` — they split whatever the split has, and the wells inside
+   *  the cards give as that shrinks. This is where the giving stops.
+   *
+   *  It exists because the alternative floor, `min-content`, is
+   *  wrong here by about a hundred pixels: the graphic in the well is
+   *  a canvas with an intrinsic aspect ratio, so its natural height
+   *  follows from the column width and counts toward the card's
+   *  min-content whether or not the design wants it to. That made
+   *  every window scroll by a hair — six cards that fit in one pane
+   *  reported themselves as not fitting.
+   *
+   *  This number is the card with its well at the well's own floor:
+   *  the head row, the reading, two lines of description, the legend,
+   *  the gaps between them and `space-14` of graphic. Below it the
+   *  words start to go, so below it the pane scrolls instead. */
+  vitalRow: '264px',
+
+  /** HOW FAR A SCROLL PANE'S EDGE DISSOLVES.
+   *
+   *  The library on Insights, the log on Sessions and the vitals on
+   *  Home scroll inside themselves while the header and the column
+   *  beside them stay put. A scroll box clips, and a hard clip
+   *  through the middle of a card reads as a fault rather than as a
+   *  list continuing. This is the band the mask fades over — and it
+   *  is painted only on an edge that has content beyond it. See
+   *  lib/scrollEdges.ts and the `[data-edge]` rules in global.css.
+   *
+   *  Deep enough to read as a dissolve rather than as a soft crop:
+   *  at 16 it looked like an anti-aliased cut. */
+  scrollFade: '44px',
+
   /* ---- THE INSIGHT BAND, AS A RHYTHM -----------------------------
      The band the bubble opens into used to be one number picked to
      be comfortably taller than the bubble, which meant the space

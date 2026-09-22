@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
 import { chartInk, inkOn } from '../../lib/color';
 import { Card } from '../primitives/Card';
-import { Display, Text } from '../primitives/Text';
+import { Display } from '../primitives/Text';
 import { Metric } from '../primitives/Metric';
 import { PatternChart } from '../../features/patterns/PatternChart';
 import { CardViz } from '../viz/CardViz';
@@ -21,9 +21,9 @@ export interface PatternCardProps {
 }
 
 /** the fan card front — a header row carrying the name and the kind
- *  tag, the headline reading under it, one line of context, and then
- *  the chart block taking every pixel the three rows above it leave.
- *  No links here: those exist only in the expanded state. */
+ *  tag, the headline reading under it, and then the chart block
+ *  taking every pixel the two rows above it leave. No links here:
+ *  those exist only in the expanded state. */
 export function PatternCard({
   pattern,
   hovered,
@@ -69,12 +69,13 @@ export function PatternCard({
           unit riding beside it at label size */}
       <Metric value={pattern.hero} unit={pattern.unit} size="lg" inherit />
 
-      {/* 3 — one line of context under it, quieter than the numeral */}
-      <Text variant="bodySM" tone="inherit" className={styles.trend}>
-        {pattern.trend}
-      </Text>
+      {/* 3 — THE GRAPHIC, and it takes everything left.
 
-      {/* 4 — THE GRAPHIC, and it takes everything left.
+          A LINE OF TREND COPY USED TO SIT BETWEEN THIS AND THE
+          NUMERAL — "up six points over six sessions" — and it said
+          in a sentence what the chart under it draws. Two readings
+          of the same movement, one of them in a fourth type style on
+          a card that already carries three. The chart keeps it.
 
           BY DEFAULT, THE SAME CHART THE OPENED PANEL DRAWS, from the
           same series, with its annotations off. It fills the block

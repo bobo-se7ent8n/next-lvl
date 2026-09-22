@@ -4,6 +4,7 @@ import { PatternFan } from '../features/patterns/PatternFan';
 import { FocusPanel } from '../features/home/FocusPanel';
 import { VitalCard } from '../features/home/VitalCard';
 import { EnterContext } from '../lib/enterContext';
+import { useScrollEdges } from '../lib/scrollEdges';
 import { PATTERNS, VITALS } from '../data';
 import styles from './Home.module.css';
 
@@ -51,6 +52,13 @@ export function Home() {
    *  someone clicks, not sixty times a second. */
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
+  /* FOCUS & VITALS IS A SPLIT LIKE THE OTHER TWO: the focus card
+     holds the left column at the split's own height and the six
+     vitals are what scrolls, inside their own pane. The edges of
+     that pane dissolve where the grid carries on past them rather
+     than cutting a card in half — see lib/scrollEdges.ts. */
+  const vitals = useScrollEdges<HTMLDivElement>();
+
   return (
     <section className={styles.screen}>
       <PageHeader views={VIEWS} activeView={view} onView={setView} />
@@ -70,7 +78,7 @@ export function Home() {
           ) : (
             <div className={styles.grid}>
               <FocusPanel />
-              <div className={styles.vitals}>
+              <div ref={vitals} className={styles.vitals}>
                 {VITALS.map((vital) => (
                   <VitalCard key={vital.id} vital={vital} />
                 ))}

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { cx } from '../lib/css';
-import { iconStroke } from '../tokens';
 import styles from './TweakPanel.module.css';
 
 /* ============================================================
@@ -12,19 +11,20 @@ import styles from './TweakPanel.module.css';
    the changed set to the dev server, which edits the token
    SOURCE on disk (see vite-plugins/token-writer.js).
 
-   IT IS CLOSED BY DEFAULT AND IT LIVES BEHIND A BUTTON.
+   IT IS CLOSED BY DEFAULT AND IT LIVES ON THE BACKTICK KEY.
 
    It used to mount open, pinned to the top-right corner, over
    whatever was being looked at — which made every screenshot of
-   this product a screenshot of a debug panel. It is now the same
-   affordance the display settings are: one small button on the
-   bottom edge, and a panel that exists only while it is asked
-   for. Backtick still shows and hides it, so the keyboard route
-   is unchanged.
+   this product a screenshot of a debug panel. Then it lived behind
+   a small button in the bottom-left corner, which was better and
+   still not right: the tuning is finished, the values it found are
+   in the token source on disk, and a permanent control for a
+   finished job is a permanent mark on every screen. The button is
+   gone. Backtick opens and closes the panel — the route the tuning
+   was actually done through — and nothing stands beside the nav.
 
    THE PANEL ITSELF IS DELIBERATELY NOT STYLED WITH AERA TOKENS —
    it is Tweakpane's own light theme, and the stylesheet says why.
-   The BUTTON is: it sits on the page, so it is the product's.
 
    Everything here is loaded through a dynamic import behind
    `import.meta.env.DEV`, so neither this module nor Tweakpane
@@ -243,27 +243,6 @@ export function TweakPanel() {
           would drop every folder's expanded state and — worse —
           every unsaved edit sitting in `dirty`. */}
       <div ref={host} className={cx(styles.pane, !open && styles.paneOff)} />
-
-      <button
-        type="button"
-        className={styles.toggleButton}
-        aria-expanded={open}
-        aria-label="Token panel"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={iconStroke.thin}
-          strokeLinecap="round"
-        >
-          <path d="M5 6h6M15 6h4M5 12h10M19 12h0M5 18h3M12 18h7" />
-          <circle cx="13" cy="6" r="2" />
-          <circle cx="17" cy="12" r="2" />
-          <circle cx="10" cy="18" r="2" />
-        </svg>
-      </button>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { InsightCard } from '../components/composed/InsightCard';
 import { askAera } from '../features/insights/askAera';
 import { ASK_SEEDS, INSIGHTS } from '../data';
 import { columnize, columnCountFor } from '../lib/columns';
+import { useScrollEdges } from '../lib/scrollEdges';
 import styles from './Insights.module.css';
 
 const OPENING: ChatMessage = {
@@ -25,6 +26,13 @@ export function Insights() {
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
   }, []);
+
+  /* the library's edges dissolve where it carries on past them. The
+     header and the Ask panel do not move — that is the whole point of
+     scrolling this column rather than the page — but the boundary
+     that bought it was cutting cards in half, so it is masked at
+     whichever end has something beyond it. */
+  const library = useScrollEdges<HTMLDivElement>();
 
   const [messages, setMessages] = useState<ChatMessage[]>([OPENING]);
 
@@ -56,7 +64,7 @@ export function Insights() {
             rather than waiting for the tallest card in a grid row.
             That is what lets a card hug its content — see the note
             in the stylesheet. */}
-        <div className={styles.grid}>
+        <div ref={library} className={styles.grid}>
           {columnize(INSIGHTS, columns).map((column, i) => (
             <div key={i} className={styles.column}>
               {column.map((insight) => (

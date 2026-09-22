@@ -4,7 +4,6 @@ import { cx } from '../../lib/css';
 import { inkOn, mix, tintOf } from '../../lib/color';
 import { Link } from 'react-router-dom';
 import { Card } from '../../components/primitives/Card';
-import { Chip } from '../../components/primitives/Chip';
 import { StatSet } from '../../components/primitives/StatRow';
 import { Counted, Metric } from '../../components/primitives/Metric';
 import { useEnterKey } from '../../lib/enterContext';
@@ -131,8 +130,8 @@ export function ExpandedCard({
      flight, and everything that animates in here reads it */
   const enterKey = useEnterKey();
   /* where this pattern came from — a session, a scoreboard block or
-     the library. One resolver so the chip, the name, the button and
-     the route can never say different things. */
+     the library. One resolver so the name, the button and the route
+     can never say different things. */
   const source = patternSource(pattern);
 
   return (
@@ -188,6 +187,14 @@ export function ExpandedCard({
           } as CSSProperties
         }
       >
+        {/* A KICKER AND A NAME, AND THAT IS THE WHOLE HEADING.
+
+            A line of trend copy used to sit under the name — "up six
+            points over six sessions" — restating in a sentence what
+            the chart to the right of it draws and the history under
+            that lists row by row. Three tellings of one movement, and
+            the sentence was the only one of the three that could not
+            be checked. */}
         <div className={styles.top}>
           <Label tone="inherit">
             {pattern.kind} · {STATE_LABEL[pattern.state]}
@@ -195,9 +202,6 @@ export function ExpandedCard({
           <Display size="lg" as="h2" tone="inherit">
             {pattern.name}
           </Display>
-          <Text variant="bodySM" tone="inherit" className={styles.context}>
-            {pattern.trend}
-          </Text>
         </div>
 
         {/* FIVE CELLS ON THREE SHARED ROWS.
@@ -237,12 +241,18 @@ export function ExpandedCard({
           <div className={cx(styles.cellMeasured, styles.linked)}>
             {/* THE SOURCE, WHATEVER KIND IT IS.
 
-                One block, one order, four facts that cannot disagree:
-                the chip's words and colour, the name under it, the
-                button's words and where it goes all come from the
-                same resolver. See patternSource.ts. */}
-            <Chip tone={source.tone} className={styles.sourceTag}>{source.label}</Chip>
+                One block, one order, three facts that cannot
+                disagree: the name at the top, the button's words and
+                where it goes all come from the same resolver. See
+                patternSource.ts.
 
+                THE WHITE TAG IS GONE. "On the scoreboard" sat in a
+                white pill directly above a button reading "Open the
+                scoreboard" — a label naming the thing the control
+                under it already names, in the one treatment on this
+                panel that belongs to no other element. The resolver
+                still decides what this block MEANS; the button is
+                where it says so. */}
             <Label tone="inherit" className={styles.quiet}>
               {source.date ? `${source.date} · ${source.name}` : source.name}
             </Label>
@@ -268,10 +278,6 @@ export function ExpandedCard({
                 <path d="M7 17L17 7M9 7h8v8" />
               </svg>
             </Link>
-
-            <Label tone="inherit" className={styles.quiet}>
-              {source.caption}
-            </Label>
           </div>
 
           <Text variant="bodySM" tone="inherit" className={cx(styles.cellBody, styles.body)}>

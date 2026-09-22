@@ -4,6 +4,7 @@ import { SessionCard } from '../components/composed/SessionCard';
 import { ActivityCalendar } from '../features/sessions/ActivityCalendar';
 import { SESSIONS } from '../data';
 import { columnize, columnCountFor } from '../lib/columns';
+import { useScrollEdges } from '../lib/scrollEdges';
 import { useEffect, useMemo, useState } from 'react';
 import { sessionPath } from '../app/routes';
 import styles from './Sessions.module.css';
@@ -31,6 +32,10 @@ export function Sessions() {
     return () => window.removeEventListener('resize', measure);
   }, []);
 
+  /* the log's edges dissolve where the list carries on past them,
+     rather than cutting a card in half against a hard boundary */
+  const log = useScrollEdges<HTMLDivElement>();
+
   return (
     <section className={styles.screen}>
       <PageHeader
@@ -43,7 +48,7 @@ export function Sessions() {
           <ActivityCalendar />
         </div>
 
-        <div className={styles.log}>
+        <div ref={log} className={styles.log}>
           {columnize(SESSIONS, columns).map((column, i) => (
             <div key={i} className={styles.column}>
               {column.map((session) => (

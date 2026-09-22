@@ -1,16 +1,25 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { BackgroundPanel } from '../features/background/BackgroundPanel';
 import { BACKGROUND_DEFAULTS, type BackgroundSettings } from '../features/background/settings';
 import { ScreenFrame } from '../screens/ScreenFrame';
 import { EnterContext } from '../lib/enterContext';
 import { SCREEN_PATH, screenFromPath, type ScreenName } from './routes';
 import styles from './App.module.css';
 
-/** the app shell — paper, nav, content column, background controls.
+/** the app shell — paper, nav, content column.
  *  Everything under `/app/*` renders inside it; the landing page does not. */
 export function AppLayout() {
-  const [background, setBackground] = useState<BackgroundSettings>(BACKGROUND_DEFAULTS);
+  /* THE SETTINGS ARE READ, NOT EDITED, AND THERE IS NO LONGER A
+     CONTROL FOR THEM IN THE APP.
+
+     Display settings used to hang off a fixed button in the
+     bottom-right corner, opposite the token panel's in the
+     bottom-left, with the nav capsule between the two. Both were
+     tuning affordances; the tuning is finished and its answers are
+     the shipped defaults. The panel itself is still a real
+     component and is still documented in the browser — see
+     features/background/BackgroundPanel.tsx. */
+  const [background] = useState<BackgroundSettings>(BACKGROUND_DEFAULTS);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -38,8 +47,6 @@ export function AppLayout() {
           </EnterContext.Provider>
         </div>
       </ScreenFrame>
-
-      <BackgroundPanel settings={background} onChange={setBackground} />
     </>
   );
 }

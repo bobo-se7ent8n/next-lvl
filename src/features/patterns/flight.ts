@@ -44,9 +44,18 @@ const PANEL_HEAD_GAP = 22;
 const PANEL_MIN_TOP = 20;
 /** what it leaves below itself */
 const PANEL_FOOT = 84;
-/** the panel's height floor and ceiling */
+/** the panel's height floor and ceiling.
+ *
+ *  THE CEILING CAME DOWN WITH THE COPY. The panel used to reach 640
+ *  because it held a trend line, a source tag, a caption under the
+ *  button, six history rows and a paragraph twice this length. All
+ *  of that is gone and the tallest card in the set now stands at
+ *  470 at its most generous spacing — against a 640 ceiling that is
+ *  a sixth of the panel left as bare card face under the content.
+ *  520 is the tallest card plus enough slack for the chart well to
+ *  read as a well rather than as a strip. */
 const PANEL_MIN_H = 340;
-const PANEL_MAX_H = 640;
+const PANEL_MAX_H = 520;
 
 /** the box to assume before a window has been measured — a server
  *  render, a first paint, a test. It is the panel at its ceiling,

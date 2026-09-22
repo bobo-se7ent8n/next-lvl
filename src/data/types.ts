@@ -23,8 +23,6 @@ export interface Pattern {
   tone: DataTone;
   /** the card face colour */
   fill: string;
-  /** one neutral sentence about direction. Never praise, never blame. */
-  trend: string;
   /** what the sensors actually recorded */
   measured: string;
   /** the longer read, shown only in the expanded state */

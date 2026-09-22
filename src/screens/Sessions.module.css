@@ -66,7 +66,13 @@
    is bounded to the column it shares with the calendar beside it and
    scrolls inside that, rather than the page. Nothing is cropped —
    whatever does not fit is a scroll away — and at every target window
-   today the whole log fits without one. */
+   today the whole log fits without one.
+
+   AND THE EDGE IS MASKED RATHER THAN CUT. A scroll box clips; a
+   hard line drawn through the middle of a session card reads as a
+   fault rather than as a log carrying on. The fade is painted only
+   on an end that has cards past it — see lib/scrollEdges.ts and the
+   `[data-edge]` rules in global.css. */
 .log {
   display: flex;
   align-items: flex-start;

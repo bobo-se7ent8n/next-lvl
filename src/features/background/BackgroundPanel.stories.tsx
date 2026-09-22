@@ -18,8 +18,7 @@ const meta = {
       },
     },
   },
-  argTypes: { inline: { control: 'boolean' } },
-  args: { settings: BACKGROUND_DEFAULTS, inline: true, onChange: () => {} },
+  args: { settings: BACKGROUND_DEFAULTS, onChange: () => {} },
   render: function Render(args) {
     const [settings, setSettings] = useState<BackgroundSettings>(args.settings);
     return (

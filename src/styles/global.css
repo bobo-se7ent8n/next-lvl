@@ -244,3 +244,48 @@ button:not(:disabled):active {
     transform: none;
   }
 }
+
+/* ============================================================
+   A SCROLL PANE DISSOLVES AT ITS LIVE EDGES — IT DOES NOT CUT
+
+   Three screens hold a pane that scrolls inside itself while the
+   header and the column beside it stay exactly where they are:
+   the library on Insights, the log on Sessions, the vitals on
+   Home. That is the behaviour to keep. What had to go is the edge
+   it was bought with — a scroll box clips, and a hard clip through
+   the middle of a card reads as a rendering fault rather than as a
+   list carrying on past the pane.
+
+   The mask is painted only on an edge that HAS something beyond
+   it. A permanent fade on both sides is the same fault inside
+   out: at the top of the list the first card's own top edge
+   dissolves into the paper for no reason at all. `lib/scrollEdges.ts`
+   watches the pane and publishes which edges are live as one
+   attribute; these four rules are the whole visual half of it.
+
+   `mask-image` costs a compositing layer and nothing else — no
+   layout, no repaint on scroll — and `data-edge="none"` declares no
+   mask whatsoever, so a pane with nothing to scroll is not paying
+   for one.
+   ============================================================ */
+[data-edge] {
+  --scroll-fade: var(--aera-layout-scroll-fade);
+}
+
+[data-edge='top'] {
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--scroll-fade));
+}
+
+[data-edge='bottom'] {
+  mask-image: linear-gradient(to top, transparent 0, #000 var(--scroll-fade));
+}
+
+[data-edge='both'] {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--scroll-fade),
+    #000 calc(100% - var(--scroll-fade)),
+    transparent 100%
+  );
+}

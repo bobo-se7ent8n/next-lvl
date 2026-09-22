@@ -4,12 +4,11 @@
    Two halves, and they are styled by two different rulebooks on
    purpose.
 
-   THE DOCK AND ITS BUTTON are the product's: they sit on the page
-   the visitor is looking at, so they use AERA tokens and they are
-   the same object as the background-settings button — same size,
-   same corner, same shadow, same hover. A dev affordance that
-   looked like a third kind of button would be a third kind of
-   button.
+   THE DOCK is the product's: it sits on the page the visitor is
+   looking at, so it uses AERA tokens. It used to carry a small
+   button beside the nav; that button is gone — the tuning is
+   finished and a permanent control for a finished job is a
+   permanent mark on every screen. Backtick opens the panel.
 
    THE PANEL ITSELF is Tweakpane's. The block at the bottom of this
    file is Tweakpane 4's documented LIGHT theme, verbatim, and it
@@ -33,33 +32,6 @@
   gap: var(--aera-space-5);
 }
 
-/* the same button as the display-settings one, to the pixel */
-.toggleButton {
-  width: var(--aera-control-panel-button);
-  height: var(--aera-control-panel-button);
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--aera-radius-lg);
-  background: var(--aera-color-surface-background);
-  color: var(--aera-color-ink-secondary);
-  box-shadow: var(--aera-elevation-high);
-  transition: color var(--aera-duration-fast) var(--aera-ease-out);
-}
-
-.toggleButton:hover {
-  color: var(--aera-color-ink-primary);
-}
-
-.toggleButton[aria-expanded='true'] {
-  color: var(--aera-color-ink-primary);
-}
-
-.toggleButton svg {
-  width: var(--aera-icon-xl);
-  height: var(--aera-icon-xl);
-}
 
 /* ---- the pane's host -------------------------------------------
    `display: none` when closed rather than `opacity: 0`: a hidden

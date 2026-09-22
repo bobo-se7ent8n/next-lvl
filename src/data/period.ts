@@ -94,24 +94,24 @@ export interface PeriodData {
 
 /* the sentence attached to a rating when it surfaces as the thing
    worth working on. Written per skill rather than generated, so the
-   copy stays specific and stays neutral. */
+   copy stays specific and stays neutral.
+
+   EVERY ONE OF THESE USED TO OPEN "The lowest shooting rating." —
+   which was already false on the second row of a two-row block and
+   is three times false now the block holds three. The card's own
+   heading says what the list is; each line says the one thing that
+   is true only of its own rating, and stops. */
 const WORK_NOTE: Record<string, string> = {
-  Balance:
-    'The lowest movement rating. It moves with late-session fatigue, not with anything technical.',
-  'Three-point':
-    'The lowest shooting rating. It sits lower on right-wing attempts than anywhere else on the floor.',
-  'Off-dribble':
-    'The lowest shooting rating. It separates from the catch-and-shoot number as the shot clock drops.',
-  'Ball handling':
-    'The lowest movement rating. It tracks with possession length rather than with defensive pressure.',
-  'First step':
-    'The lowest movement rating. It is steadiest early and drifts across the second half of a session.',
-  Finishing: 'The lowest shooting rating. It holds at the rim and falls away through the short mid-range.',
-  'Mid-range': 'The lowest shooting rating. It moves with how set the feet are rather than with distance.',
-  Agility: 'The lowest movement rating. It is closest to baseline on the first possession after a rest.',
-  'Free throw': 'The lowest shooting rating. It varies least of any reading here, and it varies late.',
-  'Catch-and-shoot':
-    'The lowest shooting rating. It sits lower when the pass arrives behind the shooting shoulder.',
+  Balance: 'Moves with late-session fatigue, not with anything technical.',
+  'Three-point': 'Sits lower on right-wing attempts than anywhere else on the floor.',
+  'Off-dribble': 'Separates from the catch-and-shoot number as the shot clock drops.',
+  'Ball handling': 'Tracks with possession length rather than with defensive pressure.',
+  'First step': 'Steadiest early, and drifts across the second half of a session.',
+  Finishing: 'Holds at the rim and falls away through the short mid-range.',
+  'Mid-range': 'Moves with how set the feet are rather than with distance.',
+  Agility: 'Closest to baseline on the first possession after a rest.',
+  'Free throw': 'Varies least of any reading here, and it varies late.',
+  'Catch-and-shoot': 'Sits lower when the pass arrives behind the shooting shoulder.',
 };
 
 /** every reading on the scoreboard, for one window */
@@ -151,15 +151,23 @@ export function periodData(id: PeriodId): PeriodData {
   const all = [...shooting, ...handling];
   const average = Math.round(all.reduce((a, s) => a + s.value, 0) / all.length);
 
-  /* the two lowest ratings are the two worth working on — which
-     ones those are changes with the window, because the numbers do */
+  /* THE THREE LOWEST RATINGS ARE THE THREE WORTH WORKING ON —
+     which ones those are changes with the window, because the
+     numbers do.
+
+     Three rather than two, and the card is why. It is the last one
+     in the ratings column, so it is handed whatever height the
+     tallest of the three columns has spare; with two entries in it
+     that left a band of empty card under the second one on every
+     window wide enough to matter. A third reading fills it with
+     the one thing the card is for. */
   const workNext = [...all]
     .sort((a, b) => a.value - b.value)
-    .slice(0, 2)
+    .slice(0, 3)
     .map((s) => ({
       label: s.label,
       value: s.value,
-      note: WORK_NOTE[s.label] ?? 'The lowest rating in this window. It has not yet repeated enough to read as a pattern.',
+      note: WORK_NOTE[s.label] ?? 'Has not yet repeated enough to read as a pattern.',
     }));
 
   return {

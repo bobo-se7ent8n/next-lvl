@@ -22,9 +22,25 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  /* ONE WINDOW, DECLARED, the way Sessions and Insights declare it.
+     This used to be an `auto` box whose height happened to come out
+     near the viewport, and "near" cost it: the header band and the
+     view's own ceiling were two independent subtractions of the same
+     numbers, and the rounding between them left a three-pixel page
+     scroll on half the target windows. One height, and the view
+     under the header takes whatever is left of it. */
+  height: var(--aera-layout-screen-height);
 }
 
-/* the arriving view — one row, taking whatever the header leaves */
+/* the arriving view — one row, taking whatever the header leaves.
+
+   BASIS AUTO, NOT 0, and the stacked layout is why. Below the split
+   this screen goes back to being a column of content with the page
+   scrolling, and a flex item with a zero basis inside an `auto`
+   container resolves to zero — the view collapsed and the fan drew
+   itself up over the header. `auto` grows into the remainder when
+   the screen has a definite height and reports its content when it
+   does not, which is both cases. */
 .view {
   flex: 1 1 auto;
   min-height: 0;
@@ -37,67 +53,119 @@
   width: 100%;
 }
 
-/* the grid fills the page: the focus column and the six vitals run
-   from gutter to gutter with nothing capping them, and stand exactly
-   one shared column height tall — the same height Activity and Ask
-   AERA stand at on the other two screens */
+/* THE SAME SPLIT AS INSIGHTS AND SESSIONS, AND THE SAME DIVISION
+   OF LABOUR IN IT.
+
+   Focus on the left, the six vitals on the right, and one row
+   exactly `viewHeight` tall — so the focus card stands at the same
+   height Ask AERA stands at on Insights and the calendar on
+   Sessions. Those three are one column on three screens and this is
+   what makes that true by construction rather than by three screens
+   each subtracting the same guess.
+
+   A HEIGHT, NOT A CEILING, AND THAT IS THE CHANGE. Under a ceiling
+   the row was an `auto` track, which sizes to its CONTENT and only
+   then gets capped — so a card whose min-content ran past the cap
+   simply overflowed it, out of the grid, down the page and under the
+   nav. That overflow is what was cutting the last beat off the focus
+   card. A definite row hands both columns a definite height, the
+   focus card's own elastic block (its well) gives way inside it, and
+   the vitals beside it scroll rather than run off the page. */
 .grid {
-  /* hug: the tiles are as tall as what is in them. A fixed column
-     height left dead space under the shorter ones. */
   display: grid;
   grid-template-columns: var(--aera-layout-left-column) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   gap: var(--aera-layout-split-gap);
   align-items: stretch;
   width: 100%;
-
-  /* THE CEILING. A MAXIMUM, NOT A HEIGHT — the distinction is the
-     whole reason this can go back in after a fixed height was taken
-     out. The row still hugs its content wherever the content fits,
-     so no window gets the dead band under the shorter column that
-     the fixed height left. It binds only where it has to, and where
-     it binds it is the difference between this view being one screen
-     and being a scroll.
-
-     The row is an `auto` track under a definite ceiling, which sizes
-     to the smaller of its content and the space available. What
-     gives when it binds is named in the two rules below: the wells,
-     which are texture, and never the readings, which are words and
-     numbers. */
-  max-height: var(--aera-layout-view-height);
+  /* the remainder of the view, which is the remainder of the screen
+     less the header — the same row Sessions and Insights hand their
+     splits, arrived at the same way. Basis auto for the reason the
+     view above carries: this stacks below 1080 and a zero basis
+     inside an `auto` column is a zero-height box. */
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
+/* THE VITALS ARE THE THING THAT SCROLLS — the library's job on
+   Insights, the log's on Sessions.
+
+   TWO ROWS THAT SHARE THE HEIGHT UNTIL THEY CANNOT. `1fr` splits
+   whatever the split has and the wells inside the cards give as it
+   shrinks; `layout.vitalRow` is where the giving stops. Under a `0`
+   floor the rows compressed indefinitely and the cards were paying
+   for the fit out of their own words. Under a `min-content` floor
+   they refused to compress at all — the canvas in each well has an
+   intrinsic aspect ratio, so a hundred pixels of pure texture
+   counted as content that could not be given up, and six cards that
+   fit in the pane reported themselves as not fitting.
+
+   With a real floor the six fill the pane on any window that can
+   hold them and the pane scrolls on one that cannot, which is the
+   same answer the library gives on Insights and the log on
+   Sessions.
+
+   The padding is the card stroke's room: a non-clickable card wears
+   its stroke as a spread shadow outside its own edge, and a scroll
+   box clips that first. The live edges are masked rather than cut —
+   see lib/scrollEdges.ts and the `[data-edge]` rules in global.css. */
 .vitals {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  /* TWO ROWS THAT SHARE WHAT THE CEILING LEAVES. `auto` rows size to
-     their tallest card and hand the overflow to the page; `1fr` rows
-     split the height the grid actually has. The `0` floor is what
-     lets them go below their content — without it the six cards
-     refuse to compress and the ceiling above is decorative. */
-  grid-template-rows: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(var(--aera-layout-vital-row), 1fr));
   gap: var(--aera-card-gap);
   min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--aera-border-base);
 }
 
 /* below the split the two halves stack, and one screen is no longer
    possible or desirable — the stage goes back to scrolling */
 @media (max-width: 1080px) {
+  /* stacked, the screen is a column of content again and the page
+     scrolls: two panels one above the other do not fit one window */
+  .screen {
+    height: auto;
+  }
   .grid {
     grid-template-columns: 1fr;
-    height: auto;
+    grid-template-rows: none;
     gap: var(--aera-space-10);
-    /* the ceiling comes off with the split: one column of eight
+    /* the fixed row comes off with the split: one column of eight
        cards is a scroll by definition, and capping it would only
        crush the wells to no purpose */
-    max-height: none;
+    flex: none;
   }
   .vitals {
     grid-template-rows: auto;
+    overflow-y: visible;
   }
 }
 
 @media (max-width: 680px) {
   .vitals {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+
+/* BELOW THE APP TRACK'S FLOOR (`appHeightTrack.minFit`, 700px) this
+   view stops being one window, exactly as Sessions and Insights do:
+   the scale has stopped shrinking, so the content is sized by what is
+   in it and the page scrolls. A window this short gets a longer page,
+   never a panel drawn over the nav. */
+@media (max-height: 699px) {
+  .screen {
+    height: auto;
+  }
+  .grid {
+    flex: none;
+    grid-template-rows: none;
+    align-items: start;
+  }
+  .vitals {
+    grid-template-rows: auto;
+    overflow-y: visible;
   }
 }

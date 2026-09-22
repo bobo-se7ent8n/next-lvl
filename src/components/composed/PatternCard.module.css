@@ -44,11 +44,7 @@
   white-space: nowrap;
 }
 
-.trend {
-  opacity: 0.72;
-}
-
-/* 4 — THE GRAPHIC SLOT.
+/* 3 — THE GRAPHIC SLOT.
 
    The dominant element on the card: it takes every pixel the three
    text rows above it leave. It used to be a strip pinned to the
