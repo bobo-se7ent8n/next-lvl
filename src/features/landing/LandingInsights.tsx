@@ -12,18 +12,26 @@ import styles from './LandingInsights.module.css';
    1  0.00 → 0.04   the empty bubble, alone in the middle
    2  0.04 → 0.26   the question types itself in; the stroke closes
                     round the bubble with the dot at its head
-   3  0.26 → 0.30   held: the question asked, the outline whole
-   4  0.30 → 0.38   the bubble lifts and fades
-      0.33 → 0.41   and the line rises into its place
+   3  0.26 → 0.27   held: the question asked, the outline whole
+   4  0.27 → 0.32   the bubble lifts and fades — gone at 0.32
+      0.34 → 0.42   and only then does the line rise into its place
    5  0.40 → 0.79   the library lands round it, card after card
    6  0.80 → 1.00   everything has landed; the cards hold still and
                     the line alone scrolls on up and out
 
+   THE BUBBLE AND THE LINE NEVER SHARE THE SCREEN. They stand in the
+   same grid cell, so any stretch of scroll where both are visible is a
+   stretch where the line is drawn over the bubble. The bubble's fade
+   therefore ENDS before the line's begins, with a beat of empty stage
+   between: whatever the window's size, and however the damped progress
+   lags the wheel, the two are never both above zero opacity in one
+   frame — both read the same eased value.
+
    Everything comes out of one progress value, so scrolling back runs
    the same arithmetic backwards and nothing has to be reset. */
 const TYPE = [0.04, 0.26] as const;
-const LEAVE = [0.3, 0.38] as const;
-const ARRIVE = [0.33, 0.41] as const;
+const LEAVE = [0.27, 0.32] as const;
+const ARRIVE = [0.34, 0.42] as const;
 /** how much of the section one card takes to land */
 const LAND = 0.11;
 /** where the line lets go and scrolls with the page */

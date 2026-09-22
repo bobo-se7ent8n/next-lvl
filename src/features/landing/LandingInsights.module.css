@@ -11,6 +11,10 @@
      --gone    how far the line has scrolled away once the cards are
                all down, in px
 
+   `--leave` reaches 1 before `--arrive` leaves 0, so the bubble and
+   the line are never on screen together (see the stage table in
+   LandingInsights.tsx).
+
    — and each card carries its own `--e`, 0 above the window to 1
    landed. All of them are written by the page's one scroll
    loop, and only transform and opacity move. Nothing here reads the
