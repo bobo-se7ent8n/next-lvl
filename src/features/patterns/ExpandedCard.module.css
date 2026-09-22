@@ -299,6 +299,12 @@
   gap: var(--aera-space-3);
 }
 
+/* THE CHART WELL IS THE CARD'S WELL. It was a translucent wash of
+   the card's own face; the dot matrix is drawn on `surface-level1`,
+   the recessed ground every graphic slot in the product uses, and the
+   card in the hand draws it on exactly that. Same ground, same inner
+   glow, so the canvas's own background is the well and there is no
+   seam round the chart. */
 .viz {
   display: flex;
   flex-direction: column;
@@ -307,7 +313,77 @@
   overflow: hidden;
   padding: var(--aera-space-6);
   border-radius: var(--aera-radius-md);
-  background: var(--viz-well);
+  background: var(--aera-color-surface-level1);
+  box-shadow: var(--aera-surface-inner-glow);
+}
+
+/* the matrix takes the whole well: the field above, a bar pattern's
+   annotations under it. Its canvas is out of flow, so the drawing never
+   sizes the grid row it sits in — the text beside it does, exactly as
+   before — and the fit plan's chart height is the floor the well cannot
+   go below, as it was for the old chart (annotations included, as the
+   bar set's were). */
+.matrix {
+  flex: 1 1 auto;
+  min-height: var(--viz-h);
+  display: flex;
+  flex-direction: column;
+  gap: var(--aera-space-4);
+}
+
+.matrixField {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* the full width of the well, standing on its floor: the recipe is
+   picked as the most rows that fit (ExpandedMatrix), so the height
+   that follows from the width never overruns the field. Uniform
+   scaling only — the dots stay square. */
+.matrixCanvas {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ---- the words the bar set carried -------------------------------
+   Every mark shares one grid cell and is pushed along it by its own
+   share of the width, so the row is exactly as tall as its tallest
+   annotation and each sits centred on the bar the engine drew. */
+.matrixMarks {
+  display: grid;
+}
+
+.mark {
+  grid-area: 1 / 1;
+  justify-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--aera-space-1);
+  margin-inline-start: calc(var(--at) * 100%);
+  translate: -50% 0;
+  white-space: nowrap;
+}
+
+.mark[data-align='start'] {
+  align-items: flex-start;
+  margin-inline-start: 0;
+  translate: none;
+}
+
+.mark[data-align='end'] {
+  justify-self: end;
+  align-items: flex-end;
+  margin-inline-start: 0;
+  translate: none;
 }
 
 .history {

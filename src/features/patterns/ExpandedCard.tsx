@@ -1,7 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { cx } from '../../lib/css';
-import { inkOn, mix, tintOf, vizWell } from '../../lib/color';
+import { inkOn, mix, tintOf } from '../../lib/color';
 import { Link } from 'react-router-dom';
 import { Card } from '../../components/primitives/Card';
 import { Chip } from '../../components/primitives/Chip';
@@ -11,6 +11,7 @@ import { useEnterKey } from '../../lib/enterContext';
 import { duration, iconStroke } from '../../tokens';
 import { Display, Label, Text } from '../../components/primitives/Text';
 import { PatternChart } from './PatternChart';
+import { ExpandedMatrix } from './ExpandedMatrix';
 import { buildLadder, historyLabel } from './fitPlan';
 import { STATE_LABEL } from '../../data/patterns';
 import { patternSource } from './patternSource';
@@ -98,6 +99,21 @@ export function ExpandedCard({
     if (!el) return;
     const check = () => {
       if (stepping.current) return;
+      /* NOT WHILE IT IS STILL GROWING. The box relays itself out as
+         the panel grows out of the hand, and at every size short of
+         the final one the content overflows — so a check made in the
+         air counted each of those frames as a reason to step down, and
+         the ladder, which never climbs back, landed wherever the race
+         with the flight happened to leave it. Two opens of the same
+         card on the same screen could show different history. The
+         verdict is taken against the box the popup will actually
+         occupy: the observer fires again when it gets there. */
+      if (
+        (maxHeight && el.clientHeight + 1 < maxHeight) ||
+        (maxWidth && el.clientWidth + 1 < maxWidth)
+      ) {
+        return;
+      }
       /* 1px of tolerance: sub-pixel layout should not cost a row */
       if (el.scrollHeight <= el.clientHeight + 1) return;
       stepping.current = true;
@@ -107,7 +123,7 @@ export function ExpandedCard({
     ro.observe(el);
     for (const kid of Array.from(el.children)) ro.observe(kid);
     return () => ro.disconnect();
-  }, [ladder.length, signature]);
+  }, [ladder.length, signature, maxHeight, maxWidth]);
 
   const plan = ladder[Math.min(rung, ladder.length - 1)];
   const rows = pattern.history.slice(-plan.historyRows);
@@ -264,12 +280,17 @@ export function ExpandedCard({
 
           <div
             className={cx(styles.cellChart, styles.viz)}
-            style={{ '--viz-well': vizWell(pattern.fill) } as CSSProperties}
+            style={{ '--viz-h': `${plan.vizHeight}px` } as CSSProperties}
           >
-            {/* THE SAME CHART THE CARD IN THE HAND DRAWS, at the
-                height the fit plan has budgeted and with its
-                annotations on */}
-            <PatternChart pattern={pattern} color={mark} height={plan.vizHeight} inherit area />
+            {/* THE SAME CHART THE CARD IN THE HAND DRAWS — its dot
+                matrix, same data, colours and chart type, cut for this
+                well rather than stretched from the card's (see
+                ExpandedMatrix). The fit plan's height is the well's
+                floor, as it was the old chart's. A pattern with no
+                matrix keeps the chart it drew before. */}
+            <ExpandedMatrix pattern={pattern}>
+              <PatternChart pattern={pattern} color={mark} height={plan.vizHeight} inherit area />
+            </ExpandedMatrix>
           </div>
 
           <div className={styles.cellHistory}>
