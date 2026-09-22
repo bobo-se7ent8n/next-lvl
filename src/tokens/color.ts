@@ -64,6 +64,17 @@ export const colorInk = {
   tertiary: '#96928B',
   /** text on an inverse surface */
   onInverse: '#FFFFFC',
+  /**
+   * THE QUIET INK ON AN INVERSE SURFACE — not a fifth ink.
+   *
+   * `onInverse` itself, at reduced alpha, so it is the same light ink
+   * set back rather than a new grey: over `ink.primary` it lands at
+   * about 8:1, readable at label size and still clearly a step below
+   * the full-strength ink next to it. It exists for the bottom nav,
+   * whose track is `ink.primary` and whose inactive items have to read
+   * as present-but-not-current on it.
+   */
+  onInverseMuted: 'rgba(255,255,252,0.64)',
 } as const;
 
 /** the AERA palette — five hues, and nothing outside them */
@@ -273,6 +284,14 @@ export const colorUtility = {
   press: 'rgba(20,19,16,0.085)',
   /** the keyboard focus ring — never used for hover, only for tab */
   focus: '#111111',
+  /* ---- THE SAME TWO GESTURES, ON AN INVERSE SURFACE ----------
+     `hover` is a dark wash and `focus` is near-black, and on a black
+     track both vanish. These are their light twins — the paper, as a
+     wash and as a ring — for controls standing on `ink.primary`. */
+  /** the fill shift under the pointer, on an inverse surface */
+  hoverInverse: 'rgba(255,255,252,0.1)',
+  /** the keyboard focus ring, on an inverse surface */
+  focusInverse: SURFACE.background,
 
   /* ---- THE DARK ENTRY STATE ---------------------------------
      The loading screen is the one dark surface a visitor sees, and

@@ -12,6 +12,14 @@
    contrast alone, which is the same rule the rest of the product
    follows now that cards and paper share a colour.
 
+   THE TRACK IS INK. It was `level2` on paper, one step off the page
+   it floats over, and it read as part of the page rather than as the
+   one control that moves you between screens. It is the product's
+   own near-black now: the inactive items are the light ink set back,
+   the current one is a paper pill with dark type, and hover and focus
+   use the inverse twins of the usual wash and ring so they stay
+   visible on black. Nothing with a size changed.
+
    Padding is equal on all four sides. It used to be roughly half
    as much horizontally as vertically, which made the track look
    pinched around the first and last item.
@@ -33,7 +41,7 @@
   display: flex;
   align-items: center;
   gap: var(--aera-space-2);
-  background: var(--aera-color-surface-level2);
+  background: var(--aera-color-ink-primary);
   border-radius: var(--aera-radius-pill);
   padding: var(--aera-space-3);
 }
@@ -51,7 +59,7 @@
   font-family: var(--aera-text-body-family);
   font-size: var(--aera-text-body-sm-size);
   font-weight: var(--aera-weight-medium);
-  color: var(--aera-color-ink-secondary);
+  color: var(--aera-color-ink-on-inverse-muted);
   white-space: nowrap;
   transition:
     color var(--aera-duration-fast) var(--aera-ease-out),
@@ -63,10 +71,12 @@
   grid-area: label;
 }
 
-/* the fill shifts under the pointer, and the item lifts a little */
+/* the fill shifts under the pointer, and the item lifts a little —
+   on the black track the label comes up to full light ink and the
+   wash is the paper's, not the page's dark one */
 .item:hover {
-  color: var(--aera-color-ink-primary);
-  background: var(--aera-color-utility-hover);
+  color: var(--aera-color-ink-on-inverse);
+  background: var(--aera-color-utility-hover-inverse);
   transform: translateY(calc(var(--aera-space-1) * -1));
 }
 
@@ -76,8 +86,11 @@
   transition-duration: var(--aera-duration-press);
 }
 
+/* the ring is the paper's colour: the near-black one every other
+   control wears would be drawn on a near-black track */
 .item:focus-visible {
-  outline: var(--aera-border-base) solid var(--aera-color-utility-focus);
+  color: var(--aera-color-ink-on-inverse);
+  outline: var(--aera-border-base) solid var(--aera-color-utility-focus-inverse);
   outline-offset: 2px;
 }
 
@@ -91,7 +104,8 @@
    against the track, which is the same rule every other surface in
    the product follows. */
 .itemOn,
-.itemOn:hover {
+.itemOn:hover,
+.itemOn:focus-visible {
   background: var(--aera-color-surface-background);
   color: var(--aera-color-ink-primary);
 }
