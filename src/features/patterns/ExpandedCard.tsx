@@ -1,51 +1,70 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
+import { useLayoutEffect } from 'react';
+import type { CSSProperties, RefObject } from 'react';
+import { createPortal } from 'react-dom';
 import { cx } from '../../lib/css';
 import { inkOn, mix, tintOf } from '../../lib/color';
 import { Link } from 'react-router-dom';
 import { Card } from '../../components/primitives/Card';
-import { StatSet } from '../../components/primitives/StatRow';
+import { Chip } from '../../components/primitives/Chip';
 import { Counted, Metric } from '../../components/primitives/Metric';
 import { useEnterKey } from '../../lib/enterContext';
 import { duration, iconStroke } from '../../tokens';
 import { Display, Label, Text } from '../../components/primitives/Text';
 import { PatternChart } from './PatternChart';
 import { ExpandedMatrix } from './ExpandedMatrix';
-import { buildLadder, historyLabel } from './fitPlan';
-import { STATE_LABEL } from '../../data/patterns';
 import { patternSource } from './patternSource';
+import { PATTERNS } from '../../data/patterns';
 import type { Pattern } from '../../data/types';
 import styles from './ExpandedCard.module.css';
 
+/** four readings show a direction; a fifth only lengthens the list */
+const HISTORY_ROWS = 4;
+
+/** the height the fallback chart draws at, for a pattern the dot
+ *  matrix has no recipe for */
+const FALLBACK_VIZ_H = 120;
+
 export interface ExpandedCardProps {
   pattern: Pattern;
-  /** clicking the card itself dismisses it — there is no close button */
+  /** clicking the card itself dismisses it */
   onDismiss?: () => void;
   /** the host owns the corner and the shadow. The fan sets this while
    *  the card is growing out of the hand, because those two values are
    *  part of what is animating and cannot be on two elements at once. */
   bare?: boolean;
-  /** the box the popup has to stand inside, in px. Everything that
-   *  gives — the rhythm, the chart, the history — is derived from it. */
-  maxHeight?: number;
-  maxWidth?: number;
-  /** true below the two-column breakpoint, where the columns stack */
+  /** true below the two-column width, where the columns stack */
   stacked?: boolean;
+  /** laid out for measuring only — no chart, nothing live. See
+   *  `PanelProbe`. */
+  probe?: boolean;
   className?: string;
   style?: CSSProperties;
 }
 
-/** The opened pattern. A DETAIL VIEW and nothing more: everything the
- *  card front leaves out lives here — the full viz, what was measured,
- *  the longer read and the confirmed history. No links out, no close
- *  button, no modal chrome. Depth comes from scale and contrast. */
+/** The opened pattern — Paper's pattern popup.
+ *
+ *  Four rows, and every pattern fills the same four:
+ *
+ *    1. the NAME, with how it was arrived at in a white chip
+ *    2. the NUMERAL
+ *    3. the SOURCE beside the CHART — the session, block or item the
+ *       claim was measured on and a way to go there, and the card's
+ *       own dot matrix cut for the well
+ *    4. the last four readings
+ *
+ *  THE LONG READ IS GONE. A paragraph under the numeral restated what
+ *  the chart draws and the history lists, and it was the one block
+ *  whose length varied from pattern to pattern — which is what made
+ *  the twelve cards open at twelve different heights. With it gone
+ *  every row is the same height on every pattern, so the card is too:
+ *  the source block's sentence is held to two lines and the history to
+ *  four readings, and nothing else on the card has a length. */
 export function ExpandedCard({
   pattern,
   onDismiss,
   bare,
-  maxHeight,
-  maxWidth,
   stacked = false,
+  probe = false,
   className,
   style,
 }: ExpandedCardProps) {
@@ -53,79 +72,7 @@ export function ExpandedCard({
   const mark = mix(pattern.fill, ink, 0.45);
   const tint = tintOf(pattern.fill);
 
-  /* WHAT HAS TO GIVE, measured rather than predicted.
-
-     The popup renders at the most generous plan on the ladder, then
-     steps down a rung whenever its content is taller than its box,
-     until it fits or the ladder runs out. Measuring is the only way
-     to be right here: how tall this popup is depends on how many
-     lines its body text wraps to, which depends on the width, the
-     face, and the sentence — none of which a formula knows. */
-  const inner = useRef<HTMLDivElement>(null);
-  const ladder = useMemo(() => buildLadder(pattern.history.length), [pattern.history.length]);
-  const [rung, setRung] = useState(0);
-
-  /* a new pattern, or a new box, is a fresh climb from the top of the
-     ladder — adjusted during render, which is the supported way to
-     reset state when a prop changes */
-  const signature = `${pattern.id}:${maxHeight}:${maxWidth}:${stacked}`;
-  const [seen, setSeen] = useState(signature);
-  if (seen !== signature) {
-    setSeen(signature);
-    setRung(0);
-  }
-
-  /* The step-down is driven by a ResizeObserver rather than by the
-     effect body: the observer fires once when it starts watching and
-     again every time a step changes the content's size, so the popup
-     settles on the first rung that fits and then stops.
-
-     ONE STEP PER COMMIT. The observer watches the box and each of its
-     children, so a single layout delivers several callbacks — all of
-     them measuring the same, not-yet-re-rendered DOM. Without this
-     gate every one of them counted as a separate overflow and the
-     popup fell straight to the bottom of the ladder, which is why a
-     stacked layout showed three history rows when it had room for
-     six. The gate is released once the new rung has been painted. */
-  const stepping = useRef(false);
-
-  useLayoutEffect(() => {
-    stepping.current = false;
-  });
-
-  useLayoutEffect(() => {
-    const el = inner.current;
-    if (!el) return;
-    const check = () => {
-      if (stepping.current) return;
-      /* NOT WHILE IT IS STILL GROWING. The box relays itself out as
-         the panel grows out of the hand, and at every size short of
-         the final one the content overflows — so a check made in the
-         air counted each of those frames as a reason to step down, and
-         the ladder, which never climbs back, landed wherever the race
-         with the flight happened to leave it. Two opens of the same
-         card on the same screen could show different history. The
-         verdict is taken against the box the popup will actually
-         occupy: the observer fires again when it gets there. */
-      if (
-        (maxHeight && el.clientHeight + 1 < maxHeight) ||
-        (maxWidth && el.clientWidth + 1 < maxWidth)
-      ) {
-        return;
-      }
-      /* 1px of tolerance: sub-pixel layout should not cost a row */
-      if (el.scrollHeight <= el.clientHeight + 1) return;
-      stepping.current = true;
-      setRung((r) => Math.min(r + 1, ladder.length - 1));
-    };
-    const ro = new ResizeObserver(check);
-    ro.observe(el);
-    for (const kid of Array.from(el.children)) ro.observe(kid);
-    return () => ro.disconnect();
-  }, [ladder.length, signature, maxHeight, maxWidth]);
-
-  const plan = ladder[Math.min(rung, ladder.length - 1)];
-  const rows = pattern.history.slice(-plan.historyRows);
+  const rows = pattern.history.slice(-HISTORY_ROWS);
   /* the recalc's own trigger — the fan re-scopes this 140ms into the
      flight, and everything that animates in here reads it */
   const enterKey = useEnterKey();
@@ -137,31 +84,15 @@ export function ExpandedCard({
   return (
     <Card
       face={pattern.fill}
-      radius={bare ? 'none' : 'card'}
+      radius={bare ? 'none' : 'window'}
       elevation={bare ? 'none' : 'overlay'}
       padding="0"
       onClick={onDismiss}
-      className={cx(styles.panel, className)}
+      className={cx(styles.panel, bare && styles.bare, className)}
       style={{ color: ink, ...style }}
     >
-      {/* the density lands on the inner box rather than on the Card:
-          Card has a closed prop list and does not forward data-* */}
-      {/* The inner box is pinned to the popup's FINAL geometry rather
-          than to 100% of the panel. The panel's width and height are
-          what animate as the card grows out of the fan, and a ladder
-          measuring against a box still in flight sees the content
-          overflow at every rung and walks all the way to the bottom —
-          which is why a 1440×1080 screen was being served the compact
-          layout. Pinned, the fit is decided once, against the box the
-          popup is actually going to occupy. */}
-      {/* THE CLOSE CONTROL. It replaces a line of helper text that
-          told you the whole panel was a dismiss target — which was
-          true, and is still true, but a sentence explaining an
-          affordance is a sentence admitting the affordance is not
-          visible. An X in the corner is the affordance. */}
-      {/* THE ONLY CONTROL. The "..." that sat beside this opened
-          nothing and did nothing — an affordance promising an action
-          that did not exist. */}
+      {/* THE CLOSE CONTROL. The whole panel is a dismiss target, and
+          an X in the corner is what says so. */}
       <button
         type="button"
         className={styles.close}
@@ -176,101 +107,76 @@ export function ExpandedCard({
         </svg>
       </button>
 
-      <div
-        ref={inner}
-        className={styles.inner}
-        data-density={plan.density}
-        style={
-          {
-            '--fit-h': maxHeight ? `${maxHeight}px` : undefined,
-            '--fit-w': maxWidth ? `${maxWidth}px` : undefined,
-          } as CSSProperties
-        }
-      >
-        {/* A KICKER AND A NAME, AND THAT IS THE WHOLE HEADING.
-
-            A line of trend copy used to sit under the name — "up six
-            points over six sessions" — restating in a sentence what
-            the chart to the right of it draws and the history under
-            that lists row by row. Three tellings of one movement, and
-            the sentence was the only one of the three that could not
-            be checked. */}
-        <div className={styles.top}>
-          <Label tone="inherit">
-            {pattern.kind} · {STATE_LABEL[pattern.state]}
-          </Label>
-          <Display size="lg" as="h2" tone="inherit">
+      {/* the layout lands on the inner box rather than on the Card:
+          Card has a closed prop list and does not forward data-* */}
+      <div className={styles.inner} data-stacked={stacked ? '' : undefined}>
+        {/* 1 — THE NAME, AND HOW IT WAS ARRIVED AT. The state word
+            ("declining") that used to lead the heading is gone: the
+            history at the foot of the card draws the direction, and
+            draws it with numbers. */}
+        <div className={styles.head}>
+          <Display size="md" as="h2" tone="inherit">
             {pattern.name}
           </Display>
+          {/* the neutral chip on the paper ground: a white pill on the
+              card face, as Paper draws it */}
+          <Chip style={{ '--chip-bg': 'var(--aera-color-surface-background)' } as CSSProperties}>
+            {pattern.kind}
+          </Chip>
         </div>
 
-        {/* FIVE CELLS ON THREE SHARED ROWS.
+        {/* 2 — THE NUMERAL, with nothing under it. "Current value" was
+            a caption naming the only number on the card that could be
+            the current value. */}
+        <Metric
+          className={styles.hero}
+          value={pattern.hero}
+          unit={pattern.unit}
+          size="lg"
+          inherit
+          /* the panel's numbers start while the box is still flying,
+             so they run shorter than a page-enter count */
+          countOver={duration.countQuick}
+        />
 
-            Both columns used to be flex stacks, which is why nothing
-            lined up: each one packed its own blocks at its own
-            heights, so the two body paragraphs started at different
-            y positions and the panel read as two unrelated columns
-            side by side. On a real grid the row starts are the same
-            line on both sides by construction.
-
-            The chart spans rows one and two, so its bottom edge and
-            the bottom of "what was measured" land together — which
-            is what puts the paragraph and the history heading on one
-            line. One row gap and one column gap, both from the
-            density steps; no block carries a margin of its own. */}
-        <div className={styles.grid}>
-          <Metric
-            className={styles.cellHero}
-            value={pattern.hero}
-            unit={pattern.unit}
-            size="lg"
-            caption="current value"
-            inherit
-            /* the panel's numbers start while the box is still
-               flying, so they run shorter than a page-enter count */
-            countOver={duration.countQuick}
-          />
-
-          {/* WHERE THE PATTERN CAME FROM.
-
-              A pattern is a claim about your own sessions, and until
-              this block existed the panel made the claim without
-              showing its source. The tinted recess holds the session
-              it was measured on, what that session was, and a way to
-              go and look at it. */}
-          <div className={cx(styles.cellMeasured, styles.linked)}>
-            {/* THE SOURCE, WHATEVER KIND IT IS.
-
-                One block, one order, three facts that cannot
-                disagree: the name at the top, the button's words and
-                where it goes all come from the same resolver. See
-                patternSource.ts.
-
-                THE WHITE TAG IS GONE. "On the scoreboard" sat in a
-                white pill directly above a button reading "Open the
-                scoreboard" — a label naming the thing the control
-                under it already names, in the one treatment on this
-                panel that belongs to no other element. The resolver
-                still decides what this block MEANS; the button is
-                where it says so. */}
-            <Label tone="inherit" className={styles.quiet}>
+        {/* 3 — THE SOURCE BESIDE THE CHART, on one row of one height */}
+        <div className={styles.middle}>
+          {/* WHERE THE PATTERN CAME FROM. A pattern is a claim about
+              your own sessions; this block holds what it was measured
+              on, what was measured, and a way to go and look. Its
+              readings come before the sentence — a session is known
+              first by what happened in it. See patternSource.ts. */}
+          <div className={styles.source}>
+            <Label tone="inherit">
               {source.date ? `${source.date} · ${source.name}` : source.name}
             </Label>
 
-            <Text variant="bodySM" tone="inherit">
+            {/* omitted when the source carries no readings — the order
+                of the block never changes, only what is in it */}
+            {source.stats ? (
+              <div className={styles.stats}>
+                {source.stats.map((stat) => (
+                  <span key={stat.label} className={styles.stat}>
+                    <Text as="b" variant="figure" tone="inherit" numeric>
+                      <Counted value={stat.value} over={duration.countQuick} />
+                    </Text>
+                    <Text as="span" variant="figureUnit" tone="inherit">
+                      {stat.label}
+                    </Text>
+                  </span>
+                ))}
+              </div>
+            ) : null}
+
+            <Text variant="bodySM" tone="inherit" lines={2} className={styles.measured}>
               {pattern.measured}
             </Text>
-
-            {/* omitted when the source carries no readings — the
-                order of the block never changes, only what is in it */}
-            {source.stats ? (
-              <StatSet inherit className={styles.linkedStats} stats={source.stats} />
-            ) : null}
 
             <Link
               to={source.to}
               className={styles.openSource}
               aria-label={`${source.action}: ${source.name}`}
+              tabIndex={probe ? -1 : undefined}
               onClick={(e) => e.stopPropagation()}
             >
               {source.action}
@@ -280,84 +186,120 @@ export function ExpandedCard({
             </Link>
           </div>
 
-          <Text variant="bodySM" tone="inherit" className={cx(styles.cellBody, styles.body)}>
-            {pattern.body}
-          </Text>
-
-          <div
-            className={cx(styles.cellChart, styles.viz)}
-            style={{ '--viz-h': `${plan.vizHeight}px` } as CSSProperties}
-          >
+          <div className={styles.well}>
             {/* THE SAME CHART THE CARD IN THE HAND DRAWS — its dot
                 matrix, same data, colours and chart type, cut for this
                 well rather than stretched from the card's (see
-                ExpandedMatrix). The fit plan's height is the well's
-                floor, as it was the old chart's. A pattern with no
-                matrix keeps the chart it drew before. */}
-            <ExpandedMatrix pattern={pattern}>
-              <PatternChart pattern={pattern} color={mark} height={plan.vizHeight} inherit area />
-            </ExpandedMatrix>
-          </div>
-
-          <div className={styles.cellHistory}>
-            <Label tone="inherit" className={styles.quiet}>
-              {historyLabel(rows.length, pattern.history.length)}
-            </Label>
-            {/* KEYED ON THE ENTER KEY so the rows' CSS entrance
-                restarts when the panel recalculates 140ms into the
-                flight. A custom property change cannot re-fire an
-                animation; a remount can, and the count-up beside it
-                follows the same key through its own hook. */}
-            <div key={String(enterKey)} className={styles.history}>
-              {rows.map((row, i) => (
-                <div
-                  key={row.label}
-                  className={styles.historyRow}
-                  style={
-                    {
-                      '--row-delay': `calc(var(--aera-duration-history-delay) + var(--aera-duration-history-step) * ${i})`,
-                    } as CSSProperties
-                  }
-                >
-                  <Text
-                    as="span"
-                    variant="metricSM"
-                    tone="inherit"
-                    className={styles.historyName}
-                  >
-                    {row.label}
-                  </Text>
-                  <span className={styles.historyBar}>
-                    <i
-                      className={styles.historyFill}
-                      style={
-                        {
-                          '--w': `${Math.max(4, Math.min(100, row.pct))}%`,
-                          '--fill': tint,
-                        } as CSSProperties
-                      }
-                    />
-                  </span>
-                  {/* the value counts up and the label does not — and
-                      it is tabular, in a slot of a fixed width, so
-                      the row cannot reflow while it runs */}
-                  <Text
-                    as="span"
-                    variant="metricSM"
-                    tone="inherit"
-                    numeric
-                    className={styles.historyValue}
-                  >
-                    <Counted value={row.value} over={duration.countRow} />
-                  </Text>
-                </div>
-              ))}
-            </div>
+                ExpandedMatrix). The probe draws nothing here: the well
+                has no content height, and the canvas is not free. */}
+            {probe ? null : (
+              <ExpandedMatrix pattern={pattern}>
+                <PatternChart pattern={pattern} color={mark} height={FALLBACK_VIZ_H} inherit area />
+              </ExpandedMatrix>
+            )}
           </div>
         </div>
 
-
+        {/* 4 — THE LAST FOUR READINGS */}
+        <div className={styles.historyBlock}>
+          <Label tone="inherit" className={styles.quiet}>
+            Last {rows.length} sessions
+          </Label>
+          {/* KEYED ON THE ENTER KEY so the rows' CSS entrance restarts
+              when the panel recalculates 140ms into the flight. A
+              custom property change cannot re-fire an animation; a
+              remount can, and the count-up beside it follows the same
+              key through its own hook. */}
+          <div key={String(enterKey)} className={styles.history}>
+            {rows.map((row, i) => (
+              <div
+                key={row.label}
+                className={styles.historyRow}
+                style={
+                  {
+                    '--row-delay': `calc(var(--aera-duration-history-delay) + var(--aera-duration-history-step) * ${i})`,
+                  } as CSSProperties
+                }
+              >
+                <Text as="span" variant="metricSM" tone="inherit" className={styles.historyName}>
+                  {row.label}
+                </Text>
+                <span className={styles.historyBar}>
+                  <i
+                    className={styles.historyFill}
+                    style={
+                      {
+                        '--w': `${Math.max(4, Math.min(100, row.pct))}%`,
+                        '--fill': tint,
+                      } as CSSProperties
+                    }
+                  />
+                </span>
+                {/* the value counts up and the label does not — and it
+                    is tabular, in a slot of a fixed width, so the row
+                    cannot reflow while it runs */}
+                <Text as="span" variant="metricSM" tone="inherit" numeric className={styles.historyValue}>
+                  <Counted value={row.value} over={duration.countRow} />
+                </Text>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </Card>
+  );
+}
+
+/* ============================================================
+   THE PROBE — how tall an opened pattern is on this window.
+
+   Every opened pattern is the same four rows, so they share one
+   height; what that height IS depends on the window, because lengths
+   scale with it and small type does not. Predicting it would mean
+   re-deriving the type floors, the line heights and the scale in
+   script, and being wrong by a line whenever a face loads late. So it
+   is measured: one card, laid out at the panel's own width with its
+   height left to its content, off screen and inert.
+
+   THE TALLEST KIND OF CARD. A pattern measured on a session carries
+   a row of readings the others do not; the probe is one of those, and
+   every other pattern opens into the same box with its chart well
+   taking the difference. The sentence in the block reserves its two
+   lines whatever it wraps to, so which session pattern is the probe
+   does not matter.
+
+   Portalled to the body so no ancestor's transform or clip can reach
+   it, and re-measured by a ResizeObserver — the width changes with
+   the window, and the fonts arriving change the height. The observer
+   keeps the resting box current; the flight does not rely on it, and
+   reads the probe itself at the moment a card opens.
+   ============================================================ */
+const PROBE_PATTERN = PATTERNS.find((p) => patternSource(p).stats) ?? PATTERNS[0];
+
+export interface PanelProbeProps {
+  width: number;
+  stacked: boolean;
+  onHeight: (height: number) => void;
+  /** the probe's box, for a host that has to read the height at the
+   *  instant it needs it — see `usePanelBox` */
+  host: RefObject<HTMLDivElement | null>;
+}
+
+export function PanelProbe({ width, stacked, onHeight, host }: PanelProbeProps) {
+  useLayoutEffect(() => {
+    const el = host.current;
+    if (!el) return;
+    const report = () => onHeight(Math.ceil(el.getBoundingClientRect().height));
+    report();
+    const ro = new ResizeObserver(report);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [onHeight, host]);
+
+  return createPortal(
+    <div ref={host} className={styles.probe} style={{ width }} aria-hidden="true" inert>
+      <ExpandedCard pattern={PROBE_PATTERN} stacked={stacked} bare probe />
+    </div>,
+    document.body,
   );
 }

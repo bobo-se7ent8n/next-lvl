@@ -19,24 +19,26 @@
 
 /* THE NUMERAL ROW, AND IT NEVER WRAPS.
 
-   `grid-auto-flow: column` with `minmax(0, 1fr)` tracks: every
-   reading gets an equal share of the width and the row stays one
-   line at two readings or at five, which is what the reference
-   shows. A flex row with `wrap` did the opposite — at four it broke
-   to a second line and the card grew a row nobody designed.
+   The readings sit one after another at `space-8`, which scales with
+   the rest of the layout, so the gap between two numerals is the same
+   step at every window rather than whatever half the card came to.
+   The row used to be a grid of equal `1fr` tracks: every reading got
+   an equal share of the card's width, which on a wide card put the
+   second numeral half a card away from the first.
 
-   `minmax(0, …)` rather than plain `1fr` so a long value can shrink
-   its own track instead of forcing the grid wider than the card.
+   `nowrap` so four or five readings stay one line — a row that broke
+   to a second line would grow the card a row nobody designed — and
+   `min-width: 0` on each reading so a long value shrinks its own box
+   instead of forcing the row wider than the card.
 
    The numerals themselves are `metricLG`, whose size is a clamp on
    the viewport, so five readings on a narrow card scale down
    together rather than colliding. */
 .readings {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  gap: var(--aera-card-gap);
-  align-items: end;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--aera-space-8);
+  align-items: flex-end;
   min-width: 0;
 }
 

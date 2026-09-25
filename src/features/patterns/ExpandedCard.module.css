@@ -1,31 +1,42 @@
 /* ============================================================
-   THE OPENED CARD
+   THE OPENED CARD — Paper's pattern popup
 
    A detail view, not a modal. The panel carries its own face
    colour at full saturation and sits above the dim; there is no
    backdrop panel behind it, no blur on it, and no chrome.
 
-   AND IT DOES NOT SCROLL. There is no scroll container in here at
-   any size — the popup is given a height and its contents adapt to
-   it: the rhythm tightens first, then the chart shortens, then the
-   history sheds its oldest rows and says so. Type never shrinks to
-   make room. See fitPlan.ts, which owns those decisions; the three
-   density steps below are the spacing half of that plan.
+   FOUR ROWS AND ONE HEIGHT. The name and its chip, the numeral, the
+   source block beside the chart well, the last four readings. Every
+   pattern fills the same four, so every pattern opens at the same
+   height (see `PanelProbe` in ExpandedCard.tsx). Every value below
+   is Paper's at full scale, through the token that carries it.
+
+   AND IT DOES NOT SCROLL. The one row that gives is the source and
+   chart: it is `patternWell` tall or as tall as the source block
+   needs, whichever is more, and it takes whatever the panel has
+   over — the well is the one thing on the card with no reading in
+   it. Type never shrinks to make room.
    ============================================================ */
 .panel {
-  /* THE CORNER COMES FROM THE PANEL AND HAS TO SURVIVE THE STACK.
-
-     The flight owns the radius and animates it; this Card is drawn
-     `bare` on top of it and was declaring `radius: none`, so it
-     painted a square face over a rounded box and the expanded card
-     showed sharp corners. Inheriting means the surface carries
-     whatever the panel's corner is at that instant. */
-  border-radius: inherit;
+  /* the one inset, shared by the content and the close control */
+  --pad: var(--aera-space-9);
   width: 100%;
   height: 100%;
   padding: 0;
   cursor: default;
   text-align: left;
+}
+
+/* THE CORNER COMES FROM THE FLIGHT AND HAS TO SURVIVE THE STACK.
+
+   The flight owns the radius and animates it; this Card is drawn
+   `bare` on top of it and was declaring `radius: none`, so it
+   painted a square face over a rounded box and the expanded card
+   showed sharp corners. Inheriting means the surface carries
+   whatever the flight's corner is at that instant. Only when bare:
+   a card standing on its own keeps the corner it asked for. */
+.bare {
+  border-radius: inherit;
 }
 
 /* NO WHITE RING ROUND THE OPENED CARD.
@@ -50,14 +61,15 @@
   box-shadow: var(--card-shadow, none);
 }
 
-/* THE CLOSE CONTROL — top right, above the content, on every
-   expanded pattern. It sits on the panel rather than inside the
-   scrolling inner box so it cannot drift with the content, and it
-   carries the tap floor like every other control. */
+/* THE CLOSE CONTROL — top right, on the panel's own inset, so its
+   corner lines up with the heading's first line and the history's
+   last value. It sits on the panel rather than inside the inner box
+   so it cannot drift with the content, and it carries the tap floor
+   like every other control. */
 .close {
   position: absolute;
-  top: var(--aera-space-8);
-  right: var(--aera-space-8);
+  top: var(--pad);
+  right: var(--pad);
   z-index: var(--aera-z-menu);
   display: inline-flex;
   align-items: center;
@@ -86,208 +98,105 @@
 .inner {
   /* THE BOX IT IS ACTUALLY IN, NOT THE ONE IT WILL BE IN.
 
-     This was pinned to the popup's FINAL geometry and clipped to it,
-     which is what made the flight look like a window sliding over a
-     finished layout: the content was already full size and the box
-     was just uncovering it. Following the panel's current size means
-     the content relays out as the panel grows — the graphic holds
-     the top and the rest comes in under it.
+     Following the panel's current size means the content relays out
+     as the panel grows out of the hand — the heading holds the top
+     and the rest comes in under it. At rest the panel IS its final
+     geometry, so the settled card is exactly the layout below.
 
-     At rest the panel IS its final geometry, so the settled card is
-     pixel-identical to what it was. */
+     CLIPPED HERE, AND ONLY HERE. While the panel is still card-sized
+     the layout is taller than it, and unclipped that tail rendered
+     outside the card, across the page and over the nav. This is the
+     card's own box, not an ancestor of it — nothing above the flight
+     clips. */
   height: 100%;
   width: 100%;
-  /* THE CARD HOLDS ITS OWN CONTENT.
-
-     This is the card's own box, not an ancestor of it — nothing
-     above the flight clips, which is what used to cut the card off
-     mid-air. What it does do is keep the reflow inside the card:
-     at the moment the panel is still card-sized the expanded layout
-     is taller than it, and unclipped that tail rendered outside the
-     card, across the page and over the nav.
-
-     Clipping HERE is not the old bug. The old bug pinned the content
-     to the final geometry and slid a window over a finished layout.
-     The content is laid out for the box it is in now, so the growing
-     card reveals more of a layout that is relaying itself — the
-     graphic holds the top and the rest comes in underneath it. */
   overflow: hidden;
-  padding: var(--pad-y) var(--pad-x);
+  padding: var(--pad);
   display: flex;
   flex-direction: column;
-  gap: var(--stack-gap);
+  gap: var(--aera-space-8);
   text-align: left;
 }
 
-/* ---- the three density steps ---- */
-.inner {
-  --pad-y: var(--aera-space-11);
-  --pad-x: var(--aera-space-12);
-  /* MORE AIR BETWEEN GROUPS. The panel is the one place in the
-     product with room to spare — it opens into a box sized for it —
-     and it was running the same gaps as a card a third its size. */
-  --stack-gap: var(--aera-space-11);
-  --column-gap: var(--aera-space-12);
-  --row-gap: var(--aera-space-9);
-  --history-head-gap: var(--aera-space-9);
-  --history-gap: var(--aera-space-6);
-  --measured-pad: var(--aera-space-7) var(--aera-space-8);
-}
-
-.inner[data-density='tight'] {
-  --pad-y: var(--aera-space-9);
-  --pad-x: var(--aera-space-11);
-  --stack-gap: var(--aera-space-9);
-  --column-gap: var(--aera-space-11);
-  --row-gap: var(--aera-space-7);
-  --history-head-gap: var(--aera-space-7);
-  --history-gap: var(--aera-space-5);
-  --measured-pad: var(--aera-space-5) var(--aera-space-7);
-}
-
-.inner[data-density='compact'] {
-  --pad-y: var(--aera-space-7);
-  --pad-x: var(--aera-space-9);
-  --stack-gap: var(--aera-space-5);
-  --column-gap: var(--aera-space-8);
-  --row-gap: var(--aera-space-4);
-  --history-head-gap: var(--aera-space-5);
-  --history-gap: var(--aera-space-4);
-  --measured-pad: var(--aera-space-4) var(--aera-space-6);
-}
-
-.top {
+/* ---- 1 · the name, and how it was arrived at ------------------- */
+.head {
+  flex: none;
   display: flex;
-  flex-direction: column;
-  gap: var(--aera-space-4);
-  /* the close control is absolutely placed in this corner, so the
-     heading block reserves its width plus its own inset */
-  padding-right: calc(var(--aera-min-target-tap) + var(--aera-space-8));
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--aera-space-4) var(--aera-space-6);
+  /* the close control stands in this corner, so the heading row
+     stops short of it by its width and one gap */
+  padding-right: calc(var(--aera-min-target-tap) + var(--aera-space-6));
 }
 
-/* the section headers read as headers, not as ghosts — 0.7 over a
-   saturated card face was under 3:1 against the body beside it */
-.quiet {
-  opacity: 0.85;
+/* ---- 2 · the numeral ------------------------------------------- */
+.hero {
+  flex: none;
 }
 
-.body {
-  opacity: 0.94;
-}
+/* ---- 3 · the source beside the chart ---------------------------
 
-/* THE SHARED GRID — three rows, and both columns start on them.
+   ONE ROW, TWO BLOCKS, ONE HEIGHT. Paper's proportions, 309 to 395,
+   as a ratio rather than a width, so the split holds on a panel that
+   has stopped scaling and is simply taking the window.
 
-   This was two flex stacks side by side, each packing its own blocks
-   at its own heights, which is why the left column's paragraph and
-   the right column's history heading began at different y positions
-   and the whole panel read as two unrelated columns.
-
-   Row starts are now the same line on both sides by construction.
-   The chart spans rows one and two so its bottom edge lands with the
-   bottom of "what was measured", which is what puts the paragraph
-   and the history heading on one line.
-
-   ONE ROW GAP AND ONE COLUMN GAP, both from the density step. No
-   block below sets a margin of its own — every gap in this grid is
-   this declaration.
-
-   AND THE MIDDLE ROW IS THE ONE THAT GIVES.
-
-   The panel opens into a box of a height the flight decides, not a
-   height this content asks for, so there is nearly always slack in
-   it — and with the trend line, the source tag, the caption and two
-   history rows taken out there is a great deal of it. It used to
-   collect at the foot of the panel as a band of bare card face.
-
-   It collects in the chart well instead. Row two holds the source
-   recess and the lower half of the chart; the recess is a fixed
-   block that stays where it is put, the well is the one thing on
-   the panel with no reading in it, and a well growing into spare
-   height is what every other card in this product does with it.
-   Rows one and three are words and numbers, and they hold. */
-.grid {
+   THE ROW IS THE ONE THAT GIVES. Its basis is `patternWell`; its
+   floor is the source block's own content, so on a narrow or small
+   window where the block's words need more than the well, the row
+   is as tall as the words; and it takes whatever the panel has over,
+   which is how a pattern with no session readings opens into the
+   same box as one with them. The well stretches with it; the block
+   keeps its words together under the label and stands the button on
+   its floor (see `.openSource`). */
+.middle {
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  gap: var(--row-gap) var(--column-gap);
-  align-items: start;
-  /* GROW INTO THE INNER BOX, NEVER SHRINK INSIDE IT.
-
-     Growing is what moves the panel's slack into the chart well
-     instead of leaving it at the foot of the card. Not shrinking is
-     what keeps the fit plan honest: a shrinkable grid answers an
-     overflow by crushing its own rows into one another — in the
-     stacked layout the history list was drawn straight over the
-     chart — and because it then measures as fitting, the ladder in
-     ExpandedCard.tsx never learns it has to step down. Rigid, the
-     overflow reaches `.inner`, the observer sees it, and the rhythm
-     tightens the way it is supposed to. */
-  flex: 1 0 auto;
-  min-height: 0;
+  grid-template-columns: minmax(0, 309fr) minmax(0, 395fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: var(--aera-space-4);
+  flex: 1 1 var(--aera-control-pattern-well);
+  min-height: min-content;
 }
 
-.cellHero {
-  grid-column: 1;
-  grid-row: 1;
-  min-width: 0;
-}
-
-.cellMeasured {
-  grid-column: 1;
-  grid-row: 2;
-  min-width: 0;
-}
-
-.cellBody {
-  grid-column: 1;
-  grid-row: 3;
-  min-width: 0;
-}
-
-/* the chart takes both of the rows beside it, and stretches to them:
-   the well is the full height of hero-plus-measured and the chart
-   sits on its floor, the way every well in the product works */
-.cellChart {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  align-self: stretch;
-  min-width: 0;
-}
-
-/* THE HEADING IS SEPARATED FROM THE LIST BY MORE THAN THE LIST
-   SEPARATES ITSELF. It was one token doing both jobs, which put
-   "last four sessions" exactly as far from Session 11 as Session 11
-   is from Session 12 — so the heading read as a fifth row of the
-   list rather than as its title. Two tokens, and the row gap is the
-   tighter of the two at every density. */
-.cellHistory {
-  grid-column: 2;
-  grid-row: 3;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--history-head-gap);
-}
-
-/* THE LINKED SESSION BLOCK — a recess cut into the panel's face,
-   holding the source of the claim the panel is making. */
-.linked {
+.source {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--aera-space-6);
-  padding: var(--measured-pad);
-  border-radius: var(--aera-radius-md);
+  min-width: 0;
+  padding: var(--aera-space-8);
+  border-radius: var(--aera-radius-lg);
   background: var(--aera-color-on-face-wash);
 }
 
-.linkedStats {
-  padding-block: var(--aera-space-2);
+/* the session's own readings, in the body face */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--aera-space-4) var(--aera-space-8);
 }
 
-/* the filled pill that goes to the session. It is the one action on
-   the panel, so it is the one filled control on it. */
+.stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--aera-space-2);
+}
+
+/* TWO LINES, ALWAYS. The sentence reserves both whatever it wraps
+   to, so every source block of a kind is the same height and the
+   probe's measurement holds for all of them; and it is clamped at
+   two, as a guard — the copy itself is written to fit. */
+.measured {
+  min-height: 2lh;
+}
+
+/* the filled pill that goes to the source. It is the one action on
+   the panel, so it is the one filled control on it — and it stands
+   on the block's floor, so a block with no readings in it keeps its
+   sentence under its label rather than floating it in the middle. */
 .openSource {
+  margin-top: auto;
   display: inline-flex;
   align-items: center;
   gap: var(--aera-space-4);
@@ -322,57 +231,47 @@
   flex: 0 0 auto;
 }
 
-.measured {
-  padding: var(--measured-pad);
-  border-radius: var(--aera-radius-md);
-  background: var(--aera-color-on-face-wash);
-  display: flex;
-  flex-direction: column;
-  gap: var(--aera-space-3);
-}
-
-/* THE CHART WELL IS THE CARD'S WELL. It was a translucent wash of
-   the card's own face; the dot matrix is drawn on `surface-level1`,
-   the recessed ground every graphic slot in the product uses, and the
-   card in the hand draws it on exactly that. Same ground, same inner
-   glow, so the canvas's own background is the well and there is no
-   seam round the chart. */
-.viz {
+/* THE CHART WELL IS THE CARD'S WELL — `surface-level1`, the recessed
+   ground every graphic slot in the product uses and the card in the
+   hand draws its matrix on, so the canvas's own background is the
+   well and there is no seam round the chart. */
+.well {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  min-width: 0;
   min-height: 0;
   overflow: hidden;
-  padding: var(--aera-space-6);
-  border-radius: var(--aera-radius-md);
+  padding: var(--aera-space-8);
+  border-radius: var(--aera-radius-lg);
   background: var(--aera-color-surface-level1);
   box-shadow: var(--aera-surface-inner-glow);
 }
 
-/* the matrix takes the whole well: the field above, a bar pattern's
-   annotations under it. Its canvas is out of flow, so the drawing never
-   sizes the grid row it sits in — the text beside it does, exactly as
-   before — and the fit plan's chart height is the floor the well cannot
-   go below, as it was for the old chart (annotations included, as the
-   bar set's were). */
+/* the matrix takes the whole well. Its canvas is out of flow, so the
+   drawing never sizes the row it sits in — the source block beside
+   it does. */
 .matrix {
   flex: 1 1 auto;
-  min-height: var(--viz-h);
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--aera-space-4);
 }
 
 .matrixField {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
+  /* Paper's cut is taller than the field on most windows and is
+     cropped at its top — the rows above the chart are bare ground,
+     and the crop is what lets a low chart fill half the well */
+  overflow: hidden;
 }
 
-/* the full width of the well, standing on its floor: the recipe is
-   picked as the most rows that fit (ExpandedMatrix), so the height
-   that follows from the width never overruns the field. Uniform
-   scaling only — the dots stay square. */
+/* the full width of the well, standing on its floor. Uniform scaling
+   only — the dots stay square. The recipe is either Paper's cut,
+   cropped at the top by the field, or the most rows that fit (see
+   ExpandedMatrix). */
 .matrixCanvas {
   position: absolute;
   left: 0;
@@ -385,43 +284,27 @@
   image-rendering: crisp-edges;
 }
 
-/* ---- the words the bar set carried -------------------------------
-   Every mark shares one grid cell and is pushed along it by its own
-   share of the width, so the row is exactly as tall as its tallest
-   annotation and each sits centred on the bar the engine drew. */
-.matrixMarks {
-  display: grid;
-}
+/* ---- 4 · the last four readings --------------------------------
 
-.mark {
-  grid-area: 1 / 1;
-  justify-self: start;
+   THE HEADING IS SEPARATED FROM THE LIST BY LESS THAN THE LIST
+   SEPARATES ITSELF — Paper sets the label 10 over the first row and
+   the rows 12 apart, so the label reads as sitting on the list. */
+.historyBlock {
+  flex: none;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--aera-space-1);
-  margin-inline-start: calc(var(--at) * 100%);
-  translate: -50% 0;
-  white-space: nowrap;
+  gap: var(--aera-space-5);
 }
 
-.mark[data-align='start'] {
-  align-items: flex-start;
-  margin-inline-start: 0;
-  translate: none;
-}
-
-.mark[data-align='end'] {
-  justify-self: end;
-  align-items: flex-end;
-  margin-inline-start: 0;
-  translate: none;
+/* the section header reads as a header, not as a ghost */
+.quiet {
+  opacity: 0.85;
 }
 
 .history {
   display: flex;
   flex-direction: column;
-  gap: var(--history-gap);
+  gap: var(--aera-space-6);
 }
 
 .historyRow {
@@ -430,9 +313,8 @@
   gap: var(--aera-space-6);
 }
 
-/* the label and the value are the same type token — see the note on
-   the five styles in ExpandedCard.tsx. The label is quieter, and that
-   is opacity rather than a sixth size. */
+/* the label and the value are the same type token; the label is
+   quieter, and that is opacity rather than a second size */
 .historyName {
   width: var(--aera-control-history-label);
   flex: 0 0 auto;
@@ -490,34 +372,40 @@
   font-variant-numeric: var(--aera-numeric-tabular);
 }
 
-/* THE PROTOTYPE'S OWN BREAKPOINT. It was 860, which the panel can
-   no longer reach: the flight is capped at 760 wide now, so an 860
-   threshold meant every opened card stacked, always. */
-@media (max-width: 720px) {
-  /* STACKED, THE EXPLICIT PLACEMENTS COME OFF.
+/* ---- stacked: a phone -------------------------------------------
+   Below `STACK_WIDTH` (flight.ts) the source and the chart stand one
+   above the other. The host decides and says so through the prop,
+   rather than this sheet running a media query of its own, so the
+   probe that measures the card and the card that is drawn can never
+   be laid out for two different layouts. The well keeps its basis
+   and is what gives on a short window, down to a floor that still
+   reads as a chart. */
+.inner[data-stacked] .middle {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: auto;
+}
 
-     They have to: the chart is placed at `1 / span 2`, and in a
-     single-column grid that puts it straight on top of the hero and
-     the measured block. Released to `auto`, the five cells fall into
-     document order down one column — which is the reading order the
-     grid was expressing sideways anyway. */
-  .grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: none;
-    gap: var(--row-gap);
-  }
-  .cellHero,
-  .cellMeasured,
-  .cellBody,
-  .cellChart,
-  .cellHistory {
-    grid-column: 1;
-    grid-row: auto;
-    align-self: auto;
-  }
-  .inner {
-    padding: var(--pad-y) var(--pad-x);
-  }
+.inner[data-stacked] .source {
+  flex: none;
+}
+
+.inner[data-stacked] .well {
+  flex: 1 1 var(--aera-control-pattern-well);
+  min-height: var(--aera-space-14);
+}
+
+/* ---- the probe ------------------------------------------------------
+   Laid out at the panel's width with its height left to its content,
+   off screen, invisible and inert. See `PanelProbe`. */
+.probe {
+  position: fixed;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* ============================================================
@@ -525,7 +413,7 @@
 
    Everything used to stay on screen for the whole return, so the
    card rotated and shrank with a full page of detail still in it —
-   five blocks, a chart and a history list all in motion at once,
+   four blocks, a chart and a history list all in motion at once,
    which reads as noise rather than as dismissal.
 
    Each group carries its OWN opacity rather than one wrapper
@@ -541,36 +429,34 @@
    face is not in here on purpose: it carries through and resolves
    last.
    ============================================================ */
-[data-closing] .top,
-[data-closing] .cellHero,
-[data-closing] .linked,
-[data-closing] .cellChart,
-[data-closing] .cellHistory,
-[data-closing] .body,
+[data-closing] .head,
+[data-closing] .hero,
+[data-closing] .source,
+[data-closing] .well,
+[data-closing] .historyBlock,
 [data-closing] .close {
   opacity: 0;
   transition: opacity var(--aera-duration-content-clear) var(--aera-ease-collapse);
 }
 
-/* group 1 — the reading: meta, title, subtitle, numeral, CURRENT VALUE */
-[data-closing] .top,
-[data-closing] .cellHero {
+/* group 1 — the reading: the name, its chip and the numeral */
+[data-closing] .head,
+[data-closing] .hero {
   transition-delay: 0ms;
 }
 
-/* group 2 — the linked source panel */
-[data-closing] .linked {
+/* group 2 — the source block */
+[data-closing] .source {
   transition-delay: var(--aera-duration-clear-step);
 }
 
-/* group 3 — the chart well and the history rows under it */
-[data-closing] .cellChart,
-[data-closing] .cellHistory {
+/* group 3 — the chart well */
+[data-closing] .well {
   transition-delay: calc(var(--aera-duration-clear-step) * 2);
 }
 
-/* group 4 — the body paragraph */
-[data-closing] .body {
+/* group 4 — the history rows */
+[data-closing] .historyBlock {
   transition-delay: calc(var(--aera-duration-clear-step) * 3);
 }
 

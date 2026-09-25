@@ -199,6 +199,30 @@ export const textStyle = {
     fontWeight: fontWeight.bold,
   },
 
+  /* ---- figure · Inter, a reading set in the body face ----
+     The opened pattern's source block (Paper, pattern popup): the
+     session it was measured on carries its own readings — 33 shots,
+     14 pts, 70 minutes — and those are set in Inter rather than
+     Oswald, so they read as facts ABOUT the source rather than as a
+     second headline competing with the pattern's own numeral above. */
+  figure: {
+    fontFamily: fontFamily.body,
+    fontSize: '22px',
+    lineHeight: '1',
+    letterSpacing: '-0.02em',
+    fontWeight: fontWeight.bold,
+  },
+  /** the unit beside a `figure` — the same caps and tracking as the
+   *  mono annotation, in the face of the number it names */
+  figureUnit: {
+    fontFamily: fontFamily.body,
+    fontSize: '10px',
+    lineHeight: '1.4',
+    letterSpacing: '0.12em',
+    textTransform: 'uppercase',
+    fontWeight: fontWeight.medium,
+  },
+
   /* ---- body · Inter ---- */
   body: {
     fontFamily: fontFamily.body,

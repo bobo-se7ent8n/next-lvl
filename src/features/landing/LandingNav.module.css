@@ -81,14 +81,11 @@
   transition: background-color var(--aera-duration-fast) var(--aera-ease-out);
 }
 
+/* ONE HOVER FOR ALL THREE. The fill goes a shade darker under the
+   pointer and nothing else moves — the word stays exactly where it
+   is. The tool link used to be the only one that did this; App and
+   Storybook washed lighter instead, so the row answered the pointer
+   in two different ways. */
 .pill:hover {
-  background: var(--aera-color-utility-hover);
-}
-
-/* ---- the tool link: the one that leaves the product -------------
-   A shade darker under the pointer than the other two. Only the fill
-   moves; the word stays exactly where it is.
-   ---------------------------------------------------------------- */
-.tool:hover {
   background: var(--aera-color-hero-nav-pill-hover);
 }

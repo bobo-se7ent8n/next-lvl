@@ -29,13 +29,33 @@ export interface Rect {
   height: number;
 }
 
-/* ---- THE OPENED PANEL'S BOX, all four numbers the prototype's ----
+/* ---- THE OPENED PANEL'S BOX ---------------------------------------
    It is NOT centred in the viewport: it hangs under the headline, so
-   the page it came from stays legible above it. And it is small —
-   760 at the very most, where this used to open at 1040 and cover
-   most of the screen. */
-/** the widest the panel ever gets */
-const PANEL_MAX_W = 760;
+   the page it came from stays legible above it.
+
+   THE WIDTH SCALES WITH THE PRODUCT. Paper's pattern popup is 760
+   wide at full scale, and the panel is that width times the layout
+   scale — the same `--aera-scale` every length inside it is drawn at
+   — so the card keeps the popup's proportions on every desktop
+   window instead of being a fixed 760 box with shrinking contents.
+   It stops shrinking at PANEL_MIN_W, where the source block beside
+   the chart still holds its two lines, and below that it simply
+   takes the window less its gutter until it is narrow enough to
+   stack (STACK_WIDTH), which in practice means a phone.
+
+   THE HEIGHT IS THE CONTENT'S, AND IT IS ONE HEIGHT FOR ALL TWELVE.
+   Every opened pattern is the same stack — a one-line heading, the
+   numeral, the source block beside the chart, four history rows — so
+   they all stand at the same height by construction. What that height
+   is depends on the window (lengths scale, small type does not), so
+   it is measured off a hidden probe of the tallest kind of card (see
+   `PanelProbe` in ExpandedCard.tsx) rather than predicted. The window
+   is only a ceiling: a panel that would run past it is given the
+   window, and its chart well is what gives. */
+/** Paper's popup width at full scale */
+const PANEL_W = 760;
+/** the narrowest the two-column panel is drawn at */
+const PANEL_MIN_W = 560;
 /** and the gutter it keeps either side at narrow widths */
 const PANEL_GUTTER = 40;
 /** the gap between the headline's baseline box and the panel's top */
@@ -44,34 +64,33 @@ const PANEL_HEAD_GAP = 22;
 const PANEL_MIN_TOP = 20;
 /** what it leaves below itself */
 const PANEL_FOOT = 84;
-/** the panel's height floor and ceiling.
- *
- *  THE CEILING CAME DOWN WITH THE COPY. The panel used to reach 640
- *  because it held a trend line, a source tag, a caption under the
- *  button, six history rows and a paragraph twice this length. All
- *  of that is gone and the tallest card in the set now stands at
- *  470 at its most generous spacing — against a 640 ceiling that is
- *  a sixth of the panel left as bare card face under the content.
- *  520 is the tallest card plus enough slack for the chart well to
- *  read as a well rather than as a strip. */
-const PANEL_MIN_H = 340;
-const PANEL_MAX_H = 520;
+/** the height to assume before the probe has reported, and the least
+ *  a short window is allowed to squeeze the panel to */
+const PANEL_FALLBACK_H = 467;
+const PANEL_MIN_H = 300;
 
 /** the box to assume before a window has been measured — a server
- *  render, a first paint, a test. It is the panel at its ceiling,
+ *  render, a first paint, a test. It is Paper's popup at full scale,
  *  and it is a full `Rect` rather than a bare size so a consumer can
  *  hold one variable rather than a union of two shapes. */
 export const PANEL_FALLBACK: Rect = {
   left: 0,
   top: PANEL_MIN_TOP,
-  width: PANEL_MAX_W,
-  height: PANEL_MAX_H,
+  width: PANEL_W,
+  height: PANEL_FALLBACK_H,
 };
 
-/** below this the opened card's two columns stack — it must match the
- *  breakpoint in ExpandedCard.module.css, because the fit plan has to
- *  know which layout it is budgeting for */
-export const STACK_WIDTH = 720;
+/** below this width the opened card's two columns stack. ExpandedCard
+ *  takes the answer as a prop rather than from a media query of its
+ *  own, so the probe that measures the height and the panel that is
+ *  drawn can never be laid out for two different layouts. */
+export const STACK_WIDTH = 520;
+
+/** the panel's width on this window, at this layout scale */
+export function panelWidth(scale: number): number {
+  const scaled = Math.max(PANEL_MIN_W, Math.round(PANEL_W * scale));
+  return Math.min(PANEL_W, scaled, window.innerWidth - PANEL_GUTTER);
+}
 
 /**
  * Where an opened card ends up.
@@ -83,16 +102,19 @@ export const STACK_WIDTH = 720;
  * a panel that hangs politely under the heading does not.
  *
  * `head` is the page header the fan lives under. Without one the top
- * falls back to the prototype's own default.
+ * falls back to the prototype's own default. `contentHeight` is what
+ * the probe measured; without one the panel assumes Paper's height.
  */
-export function expandedRect(head: Element | null): Rect {
+export function expandedRect(
+  head: Element | null,
+  scale: number,
+  contentHeight: number | null,
+): Rect {
   const headBottom = head ? head.getBoundingClientRect().bottom : 120;
-  const width = Math.min(PANEL_MAX_W, window.innerWidth - PANEL_GUTTER);
+  const width = panelWidth(scale);
   const top = Math.max(PANEL_MIN_TOP, headBottom + PANEL_HEAD_GAP);
-  const height = Math.max(
-    PANEL_MIN_H,
-    Math.min(PANEL_MAX_H, window.innerHeight - top - PANEL_FOOT),
-  );
+  const room = window.innerHeight - top - PANEL_FOOT;
+  const height = Math.max(PANEL_MIN_H, Math.min(contentHeight ?? PANEL_FALLBACK_H, room));
   return { left: (window.innerWidth - width) / 2, top, width, height };
 }
 

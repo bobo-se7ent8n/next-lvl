@@ -70,9 +70,10 @@
 
    AND THE EDGE IS MASKED RATHER THAN CUT. A scroll box clips; a
    hard line drawn through the middle of a session card reads as a
-   fault rather than as a log carrying on. The fade is painted only
-   on an end that has cards past it — see lib/scrollEdges.ts and the
-   `[data-edge]` rules in global.css. */
+   fault rather than as a log carrying on. The fade sits in a gutter
+   outside the cards, so it is always on and a bounce dissolves as
+   well as a scroll — see lib/scrollEdges.ts and the `[data-edge]`
+   rules in global.css. */
 .log {
   display: flex;
   align-items: flex-start;
@@ -94,6 +95,11 @@
      somewhere to land. No gutter is reserved: the bar is never
      drawn (see global.css), so there is nothing to make room for. */
   padding: var(--aera-border-base);
+  /* the fade's gutter at both ends — padding in, the same margin
+     out, so the cards rest where they did and anything that moves
+     them carries them into the fade (see global.css) */
+  padding-block: calc(var(--pane-gutter, 0px) + var(--aera-border-base));
+  margin-block: calc(var(--pane-gutter, 0px) * -1);
 }
 
 .column {

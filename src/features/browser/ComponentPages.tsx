@@ -368,9 +368,9 @@ export function CardFanPage() {
 
 export function ExpandedCardPage() {
   return (
-    <BrowserSection title="A detail view, not a modal. No links, no close button.">
+    <BrowserSection title="A detail view, not a modal. Four rows, and one height for all twelve patterns.">
       <Demo>
-        <div style={{ height: 'min(620px, 70svh)' }}>
+        <div style={{ width: 'min(760px, 100%)' }}>
           <ExpandedCard pattern={PATTERNS[0]} />
         </div>
       </Demo>

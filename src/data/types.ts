@@ -23,10 +23,9 @@ export interface Pattern {
   tone: DataTone;
   /** the card face colour */
   fill: string;
-  /** what the sensors actually recorded */
+  /** what the sensors actually recorded — the source block of the
+   *  opened card holds it to two lines, so it is written to fit them */
   measured: string;
-  /** the longer read, shown only in the expanded state */
-  body: string;
   context: string;
   viz: VizKind;
   series: number[];

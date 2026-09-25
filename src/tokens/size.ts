@@ -106,6 +106,10 @@ export const controlSpec = {
   historyLabel: '80px',
   historyBar: '7px',
   historyValue: '52px',
+  /* the opened pattern's chart well, beside the source block. The
+     row they share is this tall or as tall as the source block needs,
+     whichever is more — Paper's pattern popup draws both at 173. */
+  patternWell: '173px',
 
   /* ---- THE TWO CORNER PANELS ------------------------------------
      The display settings and the token panel are the same

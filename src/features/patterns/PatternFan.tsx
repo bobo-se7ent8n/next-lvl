@@ -22,16 +22,8 @@ import {
   slotShape,
 } from './fanGeometry';
 import { duration } from '../../tokens';
-import {
-  expandedRect,
-  headlineOf,
-  ms,
-  PANEL_FALLBACK,
-  place,
-  poseOf,
-  STACK_WIDTH,
-  tokenValue,
-} from './flight';
+import { ms, place, poseOf, tokenValue } from './flight';
+import { panelRect, usePanelBox } from './usePanelBox';
 import type { Pattern } from '../../data/types';
 import styles from './PatternFan.module.css';
 
@@ -119,13 +111,9 @@ export function PatternFan({
      per frame, and never per pointer move. */
   const [active, setActive] = useState(Math.round(start));
   const activeRef = useRef(Math.round(start));
-  /* the box the opened popup has to stand inside. State rather than a
-     read at render time so the fit plan re-runs on resize. */
-  const [openBox, setOpenBox] = useState(() =>
-    typeof window === 'undefined'
-      ? PANEL_FALLBACK
-      : expandedRect(null),
-  );
+  /* the box the opened popup stands in, the rect it flies to, and
+     the probe that measures how tall it is on this window */
+  const { stacked, height: panelHeight, probe } = usePanelBox(stage);
   /* THE LOAD-IN. Changing this re-scopes the enter key inside the
      panel, which is what makes its numbers count up, its bars grow
      and its line draw itself. It is set one `recalc` after the flight
@@ -219,14 +207,13 @@ export function PatternFan({
       scale.current = layoutScale();
       const slot = slots.current.find(Boolean);
       if (slot) step.current = fanStep(slot.offsetWidth, scale.current);
-      setOpenBox(expandedRect(headlineOf(stage.current)));
       layout();
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     /* the stage is full-width, so it does not resize when only the
-       viewport HEIGHT changes — and the popup's budget depends on it */
+       viewport HEIGHT changes — and the scale depends on it */
     window.addEventListener('resize', measure);
     return () => {
       ro.disconnect();
@@ -326,7 +313,9 @@ export function PatternFan({
     stage.current?.classList.add(styles.dimmed);
 
     const cardRadius = tokenValue('--aera-radius-card') || '28px';
-    const target = expandedRect(headlineOf(stage.current));
+    /* the card leaves with its own corner and lands on the panel's */
+    const panelRadius = tokenValue('--aera-radius-window') || '36px';
+    const target = panelRect(stage.current, panelHeight());
     /* planted congruent with the card, leaning exactly as far as the
        card leans — the straightening is part of the journey, not a
        jump on the first frame */
@@ -346,7 +335,7 @@ export function PatternFan({
     const frame = requestAnimationFrame(() => {
       if (closing.current) return;
       el.classList.add(styles.open);
-      place(el, target, cardRadius, 0);
+      place(el, target, panelRadius, 0);
     });
     /* and the contents re-read themselves once the box is under way */
     const load = window.setTimeout(() => setRecalcKey((k) => k + 1), ms(duration.recalc));
@@ -354,7 +343,7 @@ export function PatternFan({
       cancelAnimationFrame(frame);
       window.clearTimeout(load);
     };
-  }, [openIndex, layout]);
+  }, [openIndex, layout, panelHeight]);
 
   /* ---- DISMISSAL: the same five values, travelling back ----------- */
   const requestClose = useCallback(() => {
@@ -452,6 +441,9 @@ export function PatternFan({
           travel through it. */}
       <span className={styles.marker} aria-hidden="true" />
 
+      {/* measures how tall the opened card is on this window */}
+      {probe}
+
       <div className={styles.hintRow}>
         <Label className={styles.hint}>
           {open ? 'click anywhere outside the card, or press escape, to close it' : hint}
@@ -483,9 +475,7 @@ export function PatternFan({
                     pattern={open}
                     onDismiss={requestClose}
                     bare
-                    maxHeight={openBox.height}
-                    maxWidth={openBox.width}
-                    stacked={openBox.width < STACK_WIDTH}
+                    stacked={stacked}
                   />
                 </EnterContext.Provider>
               </div>

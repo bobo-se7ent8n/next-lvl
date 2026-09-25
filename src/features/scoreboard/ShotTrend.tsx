@@ -31,10 +31,9 @@ export function ShotTrend({ className }: ShotTrendProps) {
       {/* 2 — the heading, in the Inter card-heading token */}
       <Display size="md" as="h3">{SHOT_TREND.heading}</Display>
 
-      {/* 3 — THE NUMERALS. A grid rather than a flex row: auto-flow
-          column with `1fr` tracks gives every reading the same width
-          and no wrap, so the row reads the same whether the card
-          carries two of them or five. */}
+      {/* 3 — THE NUMERALS, one after another at `space-8` and never
+          wrapping, so the row reads the same whether the card carries
+          two of them or five. */}
       <div className={styles.readings}>
         {SHOT_TREND.readings.map((reading) => (
           <Metric

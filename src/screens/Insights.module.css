@@ -64,8 +64,8 @@
    one that aligns, and it still does.
 
    The library scrolls when it is taller than the pane. Nothing is
-   clipped, no bar is drawn, and the pane's live edges dissolve
-   rather than cut — see the `[data-edge]` rules in global.css. */
+   clipped, no bar is drawn, and the pane's edges dissolve rather
+   than cut — see the `[data-edge]` rules in global.css. */
 .grid {
   display: flex;
   align-items: flex-start;
@@ -78,16 +78,22 @@
      away — and the padding is the card stroke's room, so the
      scroll box never shaves the stroke off a card's edge.
 
-     THE EDGE IT SCROLLS PAST IS MASKED, NOT CUT. A scroll box
-     clips by definition, and a hard line through the middle of a
-     card reads as a fault rather than as a list continuing. The
-     mask is painted only on an end that has cards beyond it, so
-     the top of the list keeps its own top edge — `useScrollEdges`
-     publishes which, and global.css draws it. */
+     THE EDGE IS MASKED, NOT CUT. A scroll box clips by
+     definition, and a hard line through the middle of a card reads
+     as a fault rather than as a list continuing. The mask sits in a
+     gutter outside the cards, so at rest the top of the list keeps
+     its own top edge and anything that moves it dissolves —
+     `useScrollEdges` says when the pane is a scroll box, and
+     global.css draws it. */
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: var(--aera-border-base);
+  /* the fade's gutter at both ends — padding in, the same margin
+     out, so the cards rest where they did and anything that moves
+     them carries them into the fade (see global.css) */
+  padding-block: calc(var(--pane-gutter, 0px) + var(--aera-border-base));
+  margin-block: calc(var(--pane-gutter, 0px) * -1);
 }
 
 .column {

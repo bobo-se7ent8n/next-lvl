@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { cx } from '../../lib/css';
 import { ROUTES } from '../../app/routes';
 import styles from './LandingNav.module.css';
 
@@ -52,7 +51,7 @@ export function LandingNav() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Dot matrix tool (opens in a new tab)"
-          className={cx(styles.pill, styles.tool)}
+          className={styles.pill}
         >
           Dot matrix tool
         </a>

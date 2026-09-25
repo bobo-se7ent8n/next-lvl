@@ -10,6 +10,8 @@ const SAMPLE: Record<TextStyleName, string> = {
   metricLG: '0.42',
   metricMD: '18',
   metricSM: '41',
+  figure: '33',
+  figureUnit: 'shots',
   bodyLG: 'Every session lands on your device and stays there.',
   body: 'A pattern is a behaviour your sessions keep repeating.',
   bodySM: 'Release time under a closeout has moved toward your baseline.',
@@ -34,7 +36,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Twelve composed text tokens for the product, and ten more that belong to the public page\'s hero and are used nowhere else. `metricSM` is the stat reading on a session card and `bodyStrong` is the sentence-case group heading inside a card — neither one is mono, because neither one is an annotation.  The two label sizes, the chart tick and the old mono all became one `mono` token — the mono family keeps the uppercase annotation voice, so a caption still reads as a caption. Display sizes carry per-letter weight variation hashed from the string itself.',
+          'Fourteen composed text tokens for the product, and ten more that belong to the public page\'s hero and are used nowhere else. `metricSM` is the stat reading on a session card and `bodyStrong` is the sentence-case group heading inside a card — neither one is mono, because neither one is an annotation. `figure` and `figureUnit` are a reading and its unit set in Inter, for the source block of the opened pattern. The two label sizes, the chart tick and the old mono all became one `mono` token — the mono family keeps the uppercase annotation voice, so a caption still reads as a caption. Display sizes carry per-letter weight variation hashed from the string itself.',
       },
     },
   },

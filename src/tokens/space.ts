@@ -89,9 +89,10 @@ export const layout = {
    *  Home scroll inside themselves while the header and the column
    *  beside them stay put. A scroll box clips, and a hard clip
    *  through the middle of a card reads as a fault rather than as a
-   *  list continuing. This is the band the mask fades over — and it
-   *  is painted only on an edge that has content beyond it. See
-   *  lib/scrollEdges.ts and the `[data-edge]` rules in global.css.
+   *  list continuing. This is the band the mask fades over, and the
+   *  gutter each pane is widened by so the band sits outside its
+   *  cards at rest. See lib/scrollEdges.ts and the `[data-edge]`
+   *  rules in global.css.
    *
    *  Deep enough to read as a dissolve rather than as a soft crop:
    *  at 16 it looked like an anti-aliased cut. */

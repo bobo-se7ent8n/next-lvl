@@ -11,16 +11,8 @@ import { createPortal } from 'react-dom';
 import { PatternCard } from '../../components/composed/PatternCard';
 import { EnterContext } from '../../lib/enterContext';
 import { ExpandedCard } from '../patterns/ExpandedCard';
-import {
-  expandedRect,
-  headlineOf,
-  ms,
-  PANEL_FALLBACK,
-  place,
-  poseOf,
-  STACK_WIDTH,
-  tokenValue,
-} from '../patterns/flight';
+import { ms, place, poseOf, tokenValue } from '../patterns/flight';
+import { panelRect, usePanelBox } from '../patterns/usePanelBox';
 import { duration, landing, radius } from '../../tokens';
 import { PATTERNS } from '../../data';
 import { LandingSection } from './LandingSection';
@@ -195,6 +187,8 @@ const TILT = 7;
  * being typed out beside it — a literal here is a second copy of a
  * value that already has one home. */
 const cardRadius = () => tokenValue('--aera-radius-card') || radius.card;
+/* the card leaves with its own corner and lands on the panel's */
+const panelRadius = () => tokenValue('--aera-radius-window') || radius.window;
 
 /**
  * PATTERNS.
@@ -231,19 +225,13 @@ export function LandingPatterns() {
      ring lives inside PatternCard and only React can reach it. It
      changes once per card the pointer crosses — never per move. */
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
-  const [openBox, setOpenBox] = useState(PANEL_FALLBACK);
+  /* the box the opened popup stands in, the rect it flies to, and
+     the probe that measures how tall it is on this window — the same
+     hook the Home fan uses, so the two open into one card */
+  const { stacked, height: panelHeight, probe } = usePanelBox(stage);
   /* re-scoping this is what makes the opened panel's numbers count
      up, its bars grow and its line draw itself */
   const [recalcKey, setRecalcKey] = useState(0);
-
-  /* the panel's budget, re-read on resize — the fit plan inside
-     ExpandedCard has to know the box it is planning for */
-  useLayoutEffect(() => {
-    const measure = () => setOpenBox(expandedRect(headlineOf(stage.current)));
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, []);
 
   /* ---- OPENING ---------------------------------------------------
      The card is measured where it stands, the panel is planted on
@@ -259,7 +247,7 @@ export function LandingPatterns() {
 
     closing.current = false;
     const from = poseOf(source, stage.current);
-    const target = expandedRect(headlineOf(stage.current));
+    const target = panelRect(stage.current, panelHeight());
 
     stage.current?.classList.add(styles.dimmed);
     delete el.dataset.closing;
@@ -274,7 +262,7 @@ export function LandingPatterns() {
 
     const frame = requestAnimationFrame(() => {
       if (closing.current) return;
-      place(el, target, cardRadius(), 0);
+      place(el, target, panelRadius(), 0);
     });
     /* and the contents re-read themselves once the box is under way */
     const load = window.setTimeout(() => setRecalcKey((k) => k + 1), ms(duration.recalc));
@@ -282,7 +270,7 @@ export function LandingPatterns() {
       cancelAnimationFrame(frame);
       window.clearTimeout(load);
     };
-  }, [openIndex]);
+  }, [openIndex, panelHeight]);
 
   /* ---- DISMISSAL: the same five values, travelling back ----------- */
   const requestClose = useCallback(() => {
@@ -439,6 +427,9 @@ export function LandingPatterns() {
         </div>
       </div>
 
+      {/* measures how tall the opened card is on this window */}
+      {probe}
+
       {open
         ? createPortal(
             <div
@@ -454,9 +445,7 @@ export function LandingPatterns() {
                     pattern={open}
                     onDismiss={requestClose}
                     bare
-                    maxHeight={openBox.height}
-                    maxWidth={openBox.width}
-                    stacked={openBox.width < STACK_WIDTH}
+                    stacked={stacked}
                   />
                 </EnterContext.Provider>
               </div>

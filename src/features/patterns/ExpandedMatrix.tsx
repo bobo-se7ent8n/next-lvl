@@ -1,7 +1,6 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { DataDotMatrix } from '../../vendor/pixel-motion/DataDotMatrix';
-import { Label, Text } from '../../components/primitives/Text';
-import { EXPANDED_VIZ, expandedRowsFor } from '../../vendor/pixel-motion/recipes/expanded';
+import { EXPANDED_VIZ, expandedCutFor } from '../../vendor/pixel-motion/recipes/expanded';
 import { duration } from '../../tokens';
 import type { Pattern } from '../../data/types';
 import styles from './ExpandedCard.module.css';
@@ -29,25 +28,23 @@ const SETTLE_MS = Number.parseFloat(duration.fast);
    well is its empty ground, and the chart sweeps in, once, after it
    lands. The same gesture the card made on entering the tab.
 
-   THE LOOKUP NEVER BUILDS. `expandedRowsFor` turns the settled box
-   into a row count and the row count picks one of the frozen recipes
-   made at module load — see recipes/expanded.ts. Nothing here
-   constructs a recipe or a series.
+   THE LOOKUP NEVER BUILDS. `expandedCutFor` turns the settled box
+   into a row count — Paper's 32x23 cut when the chart fits in what
+   the well shows, the most rows that fit when it does not — and the
+   row count picks one of the frozen recipes made at module load; see
+   recipes/expanded.ts. Nothing here constructs a recipe or a series.
 
-   THE WORDS THE BAR SET CARRIED STAY. A bar pattern's opened chart
-   used to print each value over its category name. The matrix draws
-   no type, so those annotations are set under it instead, each one
-   centred on the marks the engine drew for its value (see
-   `marksFor` in recipes/expanded.ts). Nothing the old chart said is
-   lost.
+   THE MATRIX IS THE WHOLE WELL. A bar pattern's opened chart used to
+   carry each value and its category name in a row of annotations
+   under the dots. Paper's popup draws the matrix alone, edge to edge
+   of the well, and the source block and the history beside and below
+   it carry the words — so the annotations are gone.
 
    A pattern without a data-matrix entry renders `children` — the
    chart it drew before — exactly as `CardViz` does for the card.
    ============================================================ */
 export function ExpandedMatrix({ pattern, children }: ExpandedMatrixProps) {
   const entry = EXPANDED_VIZ[pattern.id];
-  /* only a bar pattern's old chart printed its categories */
-  const labelled = pattern.viz === 'bars' && pattern.bars.length === entry?.marks.length;
   const host = useRef<HTMLDivElement>(null);
   const [rows, setRows] = useState<number | null>(null);
 
@@ -63,7 +60,7 @@ export function ExpandedMatrix({ pattern, children }: ExpandedMatrixProps) {
         const width = el.clientWidth;
         const height = el.clientHeight;
         if (width < 1 || height < 1) return;
-        const next = expandedRowsFor(width, height, entry.pitch);
+        const next = expandedCutFor(width, height, entry);
         /* an unchanged row count keeps the same recipe reference, so a
            sub-pixel reflow can never restart the reveal */
         setRows((prev) => (prev === next ? prev : next));
@@ -92,24 +89,6 @@ export function ExpandedMatrix({ pattern, children }: ExpandedMatrixProps) {
           />
         ) : null}
       </div>
-
-      {labelled ? (
-        <div className={styles.matrixMarks}>
-          {pattern.bars.map((bar, i) => (
-            <span
-              key={bar.label}
-              className={styles.mark}
-              data-align={entry.marks[i].align}
-              style={{ '--at': entry.marks[i].at } as CSSProperties}
-            >
-              <Text as="span" variant="metricMD" tone="primary" numeric>
-                {bar.value}
-              </Text>
-              <Label tone="secondary">{bar.label}</Label>
-            </span>
-          ))}
-        </div>
-      ) : null}
     </div>
   );
 }

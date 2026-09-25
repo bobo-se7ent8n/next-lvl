@@ -13,8 +13,8 @@ import { DOT_MATRIX_VIZ, isDataViz, type DataVizEntry } from './registry';
    It is the same chart now: same data, same colours, same palette,
    same chart type, same seed and the same reveal. What cannot be the
    same is the CUT. The panel's well is a wide landscape box — about
-   390 across and 200-300 down at every target window, depending on
-   how long the pattern's text runs — and `object-fit: contain` would
+   370 across and 130-170 down on a desktop window — and
+   `object-fit: contain` would
    letterbox the card's near-square recipe into a band down the middle
    of it. Stretching it instead would make the dots oval. So the
    opened panel gets recipes of its own.
@@ -27,11 +27,17 @@ import { DOT_MATRIX_VIZ, isDataViz, type DataVizEntry } from './registry';
      card's own 3/2 pitch put the dot within a few percent of the size
      it is in the hand: the opened chart is made of the same material,
      not a blown-up version of it.
-   · ROWS follow the well's measured shape. One recipe per row count,
-     from 6 to 48, and the panel takes the most rows that fit: the
-     canvas spans the well's full width exactly and stands on its
-     floor, the way every chart in a well does, and what is left over
-     is less than one row of the well's own ground at the top.
+   · ROWS are PAPER'S CUT when the chart allows it. The pattern popup
+     in Paper draws the tool's own export at 158x113 logical — 32
+     columns by 23 rows — standing on the well's floor at the well's
+     full width and cropped at its top, so a chart that only reaches a
+     third of the way up its canvas fills half the well rather than
+     lying in a band along its floor. That cut is taken whenever the
+     chart's highest mark still stands inside the rows the well shows
+     (`peak`, measured below); otherwise — a chart whose domain runs
+     to its own maximum, which reaches the top row of any cut — the
+     well takes the most rows that fit instead, so no chart is ever
+     cropped. One recipe per row count, from 6 to 48, either way.
 
    The logical size snaps to whole cells (`count * pitch - gap`), so
    the engine's grid tiles the canvas exactly and no strip of bare
@@ -53,6 +59,8 @@ export const EXPANDED_COLUMNS = 32;
 /** the shallowest and the deepest well a recipe is cut for */
 export const EXPANDED_MIN_ROWS = 6;
 export const EXPANDED_MAX_ROWS = 48;
+/** Paper's cut — the tool's 158x113 export, 32 x 23 at the card's pitch */
+export const EXPANDED_CUT_ROWS = 23;
 
 /** a nominal display size for the tool's `format` field: the well
  *  width at 1512x850, the window the recipes were checked against */
@@ -81,52 +89,23 @@ function canvasFor(rows: number, base: CanvasRecipe, pitch: Readonly<Pitch>): Ca
 /** every row count's recipe for one pattern, indexed by row count */
 export type ExpandedRecipes = Readonly<Record<number, DataDotMatrixRecipe>>;
 
-/** where one bar's annotation stands under the matrix: the centre of
- *  what the engine drew for it, as a share of the canvas width */
-export interface ExpandedMark {
-  at: number;
-  align: 'start' | 'center' | 'end';
-}
-
 export interface ExpandedVizEntry {
   recipes: ExpandedRecipes;
   data: DataVizEntry['data'];
   ariaLabel: string;
   /** the dot pitch every one of `recipes` is cut at — the card's own */
   pitch: Readonly<Pitch>;
-  /** one mark per value, in data order. Columns are fixed, so where a
-   *  value is drawn does not depend on the row count. */
-  marks: readonly ExpandedMark[];
+  /** how many rows up from the floor the chart's highest mark stands
+   *  in Paper's cut — the rows a well has to show to take that cut */
+  peak: number;
 }
 
-/* ---- WHERE EACH VALUE IS DRAWN ---------------------------------
-   The opened panel names its categories under the chart — the bar
-   set it used to draw printed each value over its category, and the
-   dot matrix has no type in it, so those words would otherwise be
-   gone. They have to stand under the right marks, and the only
-   honest source for where the marks are is the engine itself: a
-   comparison chart's bars are measured off the composition it
-   actually builds; an area chart runs its series edge to edge, so
-   value i stands at i/(n-1) of the width. */
-function marksFor(recipe: DataDotMatrixRecipe, data: readonly number[]): ExpandedMark[] {
-  if (recipe.visualization === 'comparison') {
-    const { composition } = createDataDotMatrix(recipe, data.slice());
-    const spans = new Map<number, [number, number]>();
-    for (const cell of composition.cells) {
-      const right = cell.x + composition.pixelSize;
-      const span = spans.get(cell.paletteIndex);
-      spans.set(cell.paletteIndex, span ? [Math.min(span[0], cell.x), Math.max(span[1], right)] : [cell.x, right]);
-    }
-    return data.map((_, i) => {
-      const [left, right] = spans.get(i) ?? [0, composition.width];
-      return { at: (left + right) / 2 / composition.width, align: 'center' as const };
-    });
-  }
-  const last = Math.max(1, data.length - 1);
-  return data.map((_, i) => ({
-    at: i / last,
-    align: i === 0 ? ('start' as const) : i === last ? ('end' as const) : ('center' as const),
-  }));
+/** how far up its canvas a recipe's marks reach, in rows */
+function peakOf(recipe: DataDotMatrixRecipe, data: readonly number[]): number {
+  const { composition } = createDataDotMatrix(recipe, data.slice());
+  let top = composition.rows;
+  for (const cell of composition.cells) top = Math.min(top, cell.row);
+  return composition.rows - top;
 }
 
 /* All twelve Patterns recipes share one pitch and one canvas base,
@@ -161,9 +140,7 @@ function expand(entry: DataVizEntry): ExpandedVizEntry {
     data: entry.data,
     ariaLabel: entry.ariaLabel,
     pitch: recipe.pixelStyle,
-    marks: Object.freeze(
-      marksFor(recipes[EXPANDED_MAX_ROWS], entry.data).map((mark) => Object.freeze(mark)),
-    ),
+    peak: peakOf(recipes[EXPANDED_CUT_ROWS], entry.data),
   });
 }
 
@@ -188,4 +165,18 @@ export function expandedRowsFor(width: number, height: number, pitch: Readonly<P
   const logicalHeight = (logicalWidth * height) / Math.max(1, width);
   const rows = Math.floor((logicalHeight + pitch.gap) / (pitch.pixelSize + pitch.gap));
   return Math.min(EXPANDED_MAX_ROWS, Math.max(EXPANDED_MIN_ROWS, rows));
+}
+
+/**
+ * Which cut a settled well draws: Paper's, cropped at the top, when
+ * every mark of the chart stands inside the rows the well shows; the
+ * most rows that fit when the well is deeper than Paper's cut or the
+ * chart reaches higher than the well can show. A pure function of the
+ * measured box and the entry — it picks one of the frozen recipes
+ * above and never builds anything.
+ */
+export function expandedCutFor(width: number, height: number, entry: ExpandedVizEntry): number {
+  const fits = expandedRowsFor(width, height, entry.pitch);
+  if (fits >= EXPANDED_CUT_ROWS) return fits;
+  return entry.peak <= fits ? EXPANDED_CUT_ROWS : fits;
 }

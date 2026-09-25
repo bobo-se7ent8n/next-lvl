@@ -246,46 +246,58 @@ button:not(:disabled):active {
 }
 
 /* ============================================================
-   A SCROLL PANE DISSOLVES AT ITS LIVE EDGES — IT DOES NOT CUT
+   A SCROLL PANE DISSOLVES AT ITS EDGES — IT NEVER CUTS
 
    Three screens hold a pane that scrolls inside itself while the
    header and the column beside it stay exactly where they are:
    the library on Insights, the log on Sessions, the vitals on
-   Home. That is the behaviour to keep. What had to go is the edge
-   it was bought with — a scroll box clips, and a hard clip through
-   the middle of a card reads as a rendering fault rather than as a
-   list carrying on past the pane.
+   Home. A scroll box clips, and a hard clip through the middle of
+   a card reads as a rendering fault rather than as a list carrying
+   on past the pane.
 
-   The mask is painted only on an edge that HAS something beyond
-   it. A permanent fade on both sides is the same fault inside
-   out: at the top of the list the first card's own top edge
-   dissolves into the paper for no reason at all. `lib/scrollEdges.ts`
-   watches the pane and publishes which edges are live as one
-   attribute; these four rules are the whole visual half of it.
+   THE FADE LIVES OUTSIDE THE CONTENT, SO IT IS ALWAYS ON.
+   It used to be painted only on an edge the pane reported as live —
+   scrolled away from, or with cards past it. That missed the one
+   case people actually hit: a pane with nothing to scroll still
+   rubber-bands under a trackpad, `scrollTop` never leaves 0, no
+   edge is live, and for the length of the bounce the cards are cut
+   on a hard line. The same happened to any nudge the report lagged.
 
-   `mask-image` costs a compositing layer and nothing else — no
-   layout, no repaint on scroll — and `data-edge="none"` declares no
-   mask whatsoever, so a pane with nothing to scroll is not paying
-   for one.
+   So the pane is widened by the fade's depth at both ends — padding
+   in, the same margin out, see `--pane-gutter` on each pane — and the
+   fade is painted over that gutter permanently. At rest the gutter
+   is empty and every card stands fully clear of the fade, exactly
+   where it stood before; anything that moves a card past its resting
+   line, a scroll, a bounce or a nudge, carries it into the fade and
+   it dissolves. There is no state to be late about.
+
+   The gutter spends the header's own reserve at the top (52 against
+   a 44 fade) and runs under the fixed nav at the bottom, which sits
+   above it. `lib/scrollEdges.ts` only reports whether the pane IS a
+   scroll box: every one of them hands its overflow back to the page
+   at a breakpoint, and a column of content in the page flow gets no
+   gutter and no mask.
+
+   The ramp is eased rather than linear: a straight ramp reads as a
+   smudge at its opaque end, an eased one as a dissolve.
    ============================================================ */
 [data-edge] {
   --scroll-fade: var(--aera-layout-scroll-fade);
 }
 
-[data-edge='top'] {
-  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--scroll-fade));
-}
-
-[data-edge='bottom'] {
-  mask-image: linear-gradient(to top, transparent 0, #000 var(--scroll-fade));
-}
-
-[data-edge='both'] {
+[data-edge='soft'] {
+  --pane-gutter: var(--scroll-fade);
   mask-image: linear-gradient(
     to bottom,
     transparent 0,
+    rgb(0 0 0 / 0.12) calc(var(--scroll-fade) * 0.3),
+    rgb(0 0 0 / 0.45) calc(var(--scroll-fade) * 0.6),
+    rgb(0 0 0 / 0.82) calc(var(--scroll-fade) * 0.85),
     #000 var(--scroll-fade),
     #000 calc(100% - var(--scroll-fade)),
+    rgb(0 0 0 / 0.82) calc(100% - var(--scroll-fade) * 0.85),
+    rgb(0 0 0 / 0.45) calc(100% - var(--scroll-fade) * 0.6),
+    rgb(0 0 0 / 0.12) calc(100% - var(--scroll-fade) * 0.3),
     transparent 100%
   );
 }

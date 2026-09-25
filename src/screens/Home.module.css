@@ -107,7 +107,7 @@
 
    The padding is the card stroke's room: a non-clickable card wears
    its stroke as a spread shadow outside its own edge, and a scroll
-   box clips that first. The live edges are masked rather than cut —
+   box clips that first. The edges are masked rather than cut —
    see lib/scrollEdges.ts and the `[data-edge]` rules in global.css. */
 .vitals {
   display: grid;
@@ -118,6 +118,11 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: var(--aera-border-base);
+  /* the fade's gutter at both ends — padding in, the same margin
+     out, so the cards rest where they did and anything that moves
+     them carries them into the fade (see global.css) */
+  padding-block: calc(var(--pane-gutter, 0px) + var(--aera-border-base));
+  margin-block: calc(var(--pane-gutter, 0px) * -1);
 }
 
 /* below the split the two halves stack, and one screen is no longer
