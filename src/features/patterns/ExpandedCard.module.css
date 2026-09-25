@@ -18,8 +18,11 @@
    it. Type never shrinks to make room.
    ============================================================ */
 .panel {
-  /* the one inset, shared by the content and the close control */
-  --pad: var(--aera-space-9);
+  /* the one inset, shared by the content and the close control. A
+     step roomier than Paper's 24: the panel grows by it (flight.ts
+     adds it to the width, the probe to the height) rather than the
+     content giving it up. */
+  --pad: var(--aera-space-11);
   width: 100%;
   height: 100%;
   padding: 0;

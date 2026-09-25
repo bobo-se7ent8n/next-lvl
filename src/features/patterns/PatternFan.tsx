@@ -113,7 +113,9 @@ export function PatternFan({
   const activeRef = useRef(Math.round(start));
   /* the box the opened popup stands in, the rect it flies to, and
      the probe that measures how tall it is on this window */
-  const { stacked, height: panelHeight, probe } = usePanelBox(stage);
+  /* the opened card is centred on the hand, so it opens at the height
+     the card it came from was standing at */
+  const { stacked, height: panelHeight, follow: followPanel, probe } = usePanelBox(stage, stage);
   /* THE LOAD-IN. Changing this re-scopes the enter key inside the
      panel, which is what makes its numbers count up, its bars grow
      and its line draw itself. It is set one `recalc` after the flight
@@ -315,7 +317,7 @@ export function PatternFan({
     const cardRadius = tokenValue('--aera-radius-card') || '28px';
     /* the card leaves with its own corner and lands on the panel's */
     const panelRadius = tokenValue('--aera-radius-window') || '36px';
-    const target = panelRect(stage.current, panelHeight());
+    const target = panelRect(stage.current, panelHeight(), stage.current);
     /* planted congruent with the card, leaning exactly as far as the
        card leans — the straightening is part of the journey, not a
        jump on the first frame */
@@ -336,6 +338,8 @@ export function PatternFan({
       if (closing.current) return;
       el.classList.add(styles.open);
       place(el, target, panelRadius, 0);
+      /* from here until it closes, a new measurement moves it */
+      followPanel(el);
     });
     /* and the contents re-read themselves once the box is under way */
     const load = window.setTimeout(() => setRecalcKey((k) => k + 1), ms(duration.recalc));
@@ -343,7 +347,7 @@ export function PatternFan({
       cancelAnimationFrame(frame);
       window.clearTimeout(load);
     };
-  }, [openIndex, layout, panelHeight]);
+  }, [openIndex, layout, panelHeight, followPanel]);
 
   /* ---- DISMISSAL: the same five values, travelling back ----------- */
   const requestClose = useCallback(() => {
@@ -362,6 +366,8 @@ export function PatternFan({
          card is empty by the time it is really travelling. */
       el.dataset.closing = 'true';
       el.classList.remove(styles.open);
+      /* on its way home now, so a measurement no longer moves it */
+      followPanel(null);
       const home = poseOf(source as HTMLElement, stage.current);
       place(el, home.rect, cardRadius, home.rot);
     }
@@ -378,7 +384,7 @@ export function PatternFan({
       layout();
       onOpen(null);
     }, ms(duration.collapse));
-  }, [openIndex, onOpen, layout]);
+  }, [openIndex, onOpen, layout, followPanel]);
 
   /* escape, or a press anywhere outside the opened card, closes it */
   useEffect(() => {

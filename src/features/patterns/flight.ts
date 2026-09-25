@@ -30,16 +30,22 @@ export interface Rect {
 }
 
 /* ---- THE OPENED PANEL'S BOX ---------------------------------------
-   It is NOT centred in the viewport: it hangs under the headline, so
-   the page it came from stays legible above it.
+   It is NOT centred in the viewport. Where the host names an anchor —
+   the hand, on Home — the panel is centred on it, so the card opens
+   at the height the card it came from was standing at and the eye
+   does not have to travel to find it. Where there is none it hangs
+   under the headline. Either way it never rises past the headline's
+   gap, so the page it came from stays legible above it, and never
+   runs into the band the nav stands in.
 
-   THE WIDTH SCALES WITH THE PRODUCT. Paper's pattern popup is 760
-   wide at full scale, and the panel is that width times the layout
-   scale — the same `--aera-scale` every length inside it is drawn at
+   THE WIDTH SCALES WITH THE PRODUCT. Paper's pattern popup holds 712
+   of content, and the panel is that plus its inset either side
+   (`space-11`, 32) — 776 — times the layout scale — the same `--aera-scale` every length inside it is drawn at
    — so the card keeps the popup's proportions on every desktop
    window instead of being a fixed 760 box with shrinking contents.
    It stops shrinking at PANEL_MIN_W, where the source block beside
-   the chart still holds its two lines, and below that it simply
+   the chart still holds its readings on one line and its sentence on
+   two, and below that it simply
    takes the window less its gutter until it is narrow enough to
    stack (STACK_WIDTH), which in practice means a phone.
 
@@ -52,10 +58,12 @@ export interface Rect {
    `PanelProbe` in ExpandedCard.tsx) rather than predicted. The window
    is only a ceiling: a panel that would run past it is given the
    window, and its chart well is what gives. */
-/** Paper's popup width at full scale */
-const PANEL_W = 760;
-/** the narrowest the two-column panel is drawn at */
-const PANEL_MIN_W = 560;
+/** Paper's popup content, plus the panel's `space-11` inset either
+ *  side, at full scale */
+const PANEL_W = 712 + 32 * 2;
+/** the narrowest the two-column panel is drawn at — where the source
+ *  block still holds a session's three readings on one line */
+const PANEL_MIN_W = 620;
 /** and the gutter it keeps either side at narrow widths */
 const PANEL_GUTTER = 40;
 /** the gap between the headline's baseline box and the panel's top */
@@ -66,7 +74,7 @@ const PANEL_MIN_TOP = 20;
 const PANEL_FOOT = 84;
 /** the height to assume before the probe has reported, and the least
  *  a short window is allowed to squeeze the panel to */
-const PANEL_FALLBACK_H = 467;
+const PANEL_FALLBACK_H = 487;
 const PANEL_MIN_H = 300;
 
 /** the box to assume before a window has been measured — a server
@@ -104,17 +112,28 @@ export function panelWidth(scale: number): number {
  * `head` is the page header the fan lives under. Without one the top
  * falls back to the prototype's own default. `contentHeight` is what
  * the probe measured; without one the panel assumes Paper's height.
+ * `anchor` is what the panel is centred on, when the host has one —
+ * the hand, whose middle is within a few pixels of the middle of the
+ * card at its pointer. The centring gives way at either end: the
+ * panel is never lifted past the headline's gap nor pushed into the
+ * nav's band.
  */
 export function expandedRect(
   head: Element | null,
   scale: number,
   contentHeight: number | null,
+  anchor: Element | null = null,
 ): Rect {
   const headBottom = head ? head.getBoundingClientRect().bottom : 120;
   const width = panelWidth(scale);
-  const top = Math.max(PANEL_MIN_TOP, headBottom + PANEL_HEAD_GAP);
-  const room = window.innerHeight - top - PANEL_FOOT;
-  const height = Math.max(PANEL_MIN_H, Math.min(contentHeight ?? PANEL_FALLBACK_H, room));
+  const highest = Math.max(PANEL_MIN_TOP, headBottom + PANEL_HEAD_GAP);
+  const lowest = window.innerHeight - PANEL_FOOT;
+  const height = Math.max(PANEL_MIN_H, Math.min(contentHeight ?? PANEL_FALLBACK_H, lowest - highest));
+  let top = highest;
+  if (anchor) {
+    const a = anchor.getBoundingClientRect();
+    top = Math.max(highest, Math.min((a.top + a.bottom) / 2 - height / 2, lowest - height));
+  }
   return { left: (window.innerWidth - width) / 2, top, width, height };
 }
 

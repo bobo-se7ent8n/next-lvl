@@ -228,7 +228,7 @@ export function LandingPatterns() {
   /* the box the opened popup stands in, the rect it flies to, and
      the probe that measures how tall it is on this window — the same
      hook the Home fan uses, so the two open into one card */
-  const { stacked, height: panelHeight, probe } = usePanelBox(stage);
+  const { stacked, height: panelHeight, follow: followPanel, probe } = usePanelBox(stage);
   /* re-scoping this is what makes the opened panel's numbers count
      up, its bars grow and its line draw itself */
   const [recalcKey, setRecalcKey] = useState(0);
@@ -263,6 +263,8 @@ export function LandingPatterns() {
     const frame = requestAnimationFrame(() => {
       if (closing.current) return;
       place(el, target, panelRadius(), 0);
+      /* from here until it closes, a new measurement moves it */
+      followPanel(el);
     });
     /* and the contents re-read themselves once the box is under way */
     const load = window.setTimeout(() => setRecalcKey((k) => k + 1), ms(duration.recalc));
@@ -270,7 +272,7 @@ export function LandingPatterns() {
       cancelAnimationFrame(frame);
       window.clearTimeout(load);
     };
-  }, [openIndex, panelHeight]);
+  }, [openIndex, panelHeight, followPanel]);
 
   /* ---- DISMISSAL: the same five values, travelling back ----------- */
   const requestClose = useCallback(() => {
@@ -285,6 +287,8 @@ export function LandingPatterns() {
          themselves. Set BEFORE the geometry moves, so the card is
          empty by the time it is really travelling. */
       el.dataset.closing = 'true';
+      /* on its way home now, so a measurement no longer moves it */
+      followPanel(null);
       const home = poseOf(source, stage.current);
       place(el, home.rect, cardRadius(), home.rot);
     }
@@ -295,7 +299,7 @@ export function LandingPatterns() {
       closing.current = false;
       setOpenIndex(null);
     }, ms(duration.collapse));
-  }, [openIndex]);
+  }, [openIndex, followPanel]);
 
   /* escape, or a press anywhere outside the opened card, closes it */
   useEffect(() => {
